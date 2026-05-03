@@ -1,20 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>LingoGPT</title>
+  <title>Translation Token Highlighter</title>
   <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-    }
-
-    textarea {
-      width: 100%;
-      height: 80px;
-      font-size: 16px;
-    }
+    body { font-family: Arial; padding: 20px; }
+    textarea { width: 100%; height: 80px; }
 
     .row {
       margin-top: 15px;
@@ -23,25 +13,23 @@
     }
 
     .token {
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 3px 6px;
+      border-radius: 5px;
       margin-right: 4px;
       display: inline-block;
       color: white;
-      font-weight: bold;
     }
 
-    button {
-      padding: 10px 16px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+    div#translated {
+    /* flex-direction: row-reverse; */
+    /* display: flex; */
+}
   </style>
 </head>
 
 <body>
 
-<h1>LingoGPT</h1>
+<h1>Translation Token Highlighter</h1>
 
 <textarea id="text" placeholder="Enter text..."></textarea>
 
@@ -59,17 +47,17 @@
 <button onclick="run()">Translate</button>
 
 <h3>English</h3>
-<div id="english" class="row" dir="ltr"></div>
+<div id="english" class="row"></div>
 
 <h3>Translation</h3>
-<div id="translated" class="row"></div>
+<div id="translated" class="row" dir="auto"></div>
 
 <h3>Transliteration</h3>
-<div id="translit" class="row" dir="ltr"></div>
+<div id="translit" class="row"></div>
 
 <script>
 
-// Color palette
+// Fixed palette (no randomness, stable mapping)
 const palette = [
   "red","blue","green","orange","purple","teal",
   "brown","pink","gold","navy","magenta","lime",
@@ -80,73 +68,42 @@ function color(i) {
   return palette[i % palette.length];
 }
 
-// API call to your Vercel backend
+// API call helper
 async function callAPI(prompt) {
   const res = await fetch("/api/translate", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
     },
-    body: JSON.stringify({ prompt })
+    body: JSON.stringify({
+      model: "gpt-5.4-mini",
+      input: prompt,
+      temperature: 0
+    })
   });
 
   const data = await res.json();
-
-  // 🔍 DEBUG (see what API actually returned)
-  console.log("FULL API RESPONSE:", data);
-
-  let raw = "";
-
-  // ✅ Main format
-  if (data.output && data.output[0]?.content?.[0]?.text) {
-    raw = data.output[0].content[0].text;
-  }
-
-  // ✅ Fallback format (important)
-  else if (data.output_text) {
-    raw = data.output_text;
-  }
-
-  // ❌ If still nothing → show error
-  else {
-    console.error("Unexpected API format:", data);
-    alert("API returned unexpected format");
-    return;
-  }
-
+  const raw = data.output[0].content[0].text;
   return JSON.parse(raw);
 }
 
-// Render tokens
+// Render function
 function render(containerId, tokens, key) {
   document.getElementById(containerId).innerHTML =
-    tokens.map((t, i) =>
-      `<span class="token" style="background:${color(i)}">
+    tokens.map(t =>
+      `<span class="token" style="background:${t.color}">
         ${t[key] || ""}
       </span>`
     ).join(" ");
 }
 
-// Detect RTL languages
-function applyDirection(lang) {
-  const rtlLanguages = ["Arabic", "Hebrew", "Urdu"];
-  const isRTL = rtlLanguages.includes(lang);
-
-  document.getElementById("translated").dir = isRTL ? "rtl" : "ltr";
-}
-
-// Main function
 async function run() {
 
-  const text = document.getElementById("text").value.trim();
+  const text = document.getElementById("text").value;
   const lang = document.getElementById("lang").value;
 
-  if (!text) {
-    alert("Please enter text");
-    return;
-  }
-
-  applyDirection(lang);
+  const words = text.trim().split(/\s+/);
 
   // =========================
   // STEP 1: TRANSLATION
@@ -154,8 +111,7 @@ async function run() {
   const step1Prompt = `
 Translate into ${lang}.
 
-Always provide transliteration in Latin script if the language is non-Latin.
-If already Latin, return "".
+Also provide transliteration if needed (Latin script only if target is non-Latin).
 
 Output ONLY JSON:
 {
@@ -183,12 +139,12 @@ Break translation into WORD TOKENS and align each with English and transliterati
 Rules:
 - Each token = 1 translation word
 - English can be 1–3 words per token
+- Do NOT merge full sentences
 - Keep order exactly the same
-- DO NOT merge sentences
+- Assign stable color per token
 - DO NOT invent words
-- Assign a color per token
 
-English:
+English sentence:
 ${text}
 
 Translation:
@@ -216,14 +172,13 @@ Output ONLY JSON:
   const tokens = step2.tokens;
 
   // =========================
-  // RENDER
+  // RENDER UI
   // =========================
+
   render("english", tokens, "english");
   render("translated", tokens, "translation");
   render("translit", tokens, "transliteration");
 
-  // Debug (optional)
-  console.log("TOKENS:", tokens);
 }
 
 </script>

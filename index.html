@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Translation Token Highlighter</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    textarea { width: 100%; height: 80px; }
+
+    .row {
+      margin-top: 15px;
+      font-size: 18px;
+      line-height: 2;
+    }
+
+    .token {
+      padding: 3px 6px;
+      border-radius: 5px;
+      margin-right: 4px;
+      display: inline-block;
+      color: white;
+    }
+
+    div#translated {
+    /* flex-direction: row-reverse; */
+    /* display: flex; */
+}
+  </style>
+</head>
+
+<body>
+
+<h1>Translation Token Highlighter</h1>
+
+<textarea id="text" placeholder="Enter text..."></textarea>
+
+<br><br>
+
+<select id="lang">
+  <option>Arabic</option>
+  <option>Japanese</option>
+  <option>French</option>
+  <option>Spanish</option>
+</select>
+
+<br><br>
+
+<button onclick="run()">Translate</button>
+
+<h3>English</h3>
+<div id="english" class="row"></div>
+
+<h3>Translation</h3>
+<div id="translated" class="row" dir="auto"></div>
+
+<h3>Transliteration</h3>
+<div id="translit" class="row"></div>
+
+<script>
+
+// Fixed palette (no randomness, stable mapping)
+const palette = [
+  "red","blue","green","orange","purple","teal",
+  "brown","pink","gold","navy","magenta","lime",
+  "indigo","turquoise"
+];
+
+function color(i) {
+  return palette[i % palette.length];
+}
+
+// API call helper
+async function callAPI(prompt) {
+  const res = await fetch("https://api.openai.com/v1/responses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+    },
+    body: JSON.stringify({
+      model: "gpt-5.4-mini",
+      input: prompt,
+      temperature: 0
+    })
+  });
+
+  const data = await res.json();
+  const raw = data.output[0].content[0].text;
+  return JSON.parse(raw);
+}
+
+// Render function
+function render(containerId, tokens, key) {
+  document.getElementById(containerId).innerHTML =
+    tokens.map(t =>
+      `<span class="token" style="background:${t.color}">
+        ${t[key] || ""}
+      </span>`
+    ).join(" ");
+}
+
+async function run() {
+
+  const text = document.getElementById("text").value;
+  const lang = document.getElementById("lang").value;
+
+  const words = text.trim().split(/\s+/);
+
+  // =========================
+  // STEP 1: TRANSLATION
+  // =========================
+  const step1Prompt = `
+Translate into ${lang}.
+
+Also provide transliteration if needed (Latin script only if target is non-Latin).
+
+Output ONLY JSON:
+{
+  "translation": "",
+  "transliteration": ""
+}
+
+Text:
+${text}
+`;
+
+  const step1 = await callAPI(step1Prompt);
+
+  // =========================
+  // STEP 2: TOKEN ALIGNMENT
+  // =========================
+  const step2Prompt = `
+You are building a word-level translation alignment system.
+
+The translation is the SOURCE OF TRUTH.
+
+Task:
+Break translation into WORD TOKENS and align each with English and transliteration.
+
+Rules:
+- Each token = 1 translation word
+- English can be 1–3 words per token
+- Do NOT merge full sentences
+- Keep order exactly the same
+- Assign stable color per token
+- DO NOT invent words
+
+English sentence:
+${text}
+
+Translation:
+${step1.translation}
+
+Transliteration:
+${step1.transliteration}
+
+Output ONLY JSON:
+
+{
+  "tokens": [
+    {
+      "translation": "",
+      "english": "",
+      "transliteration": "",
+      "color": ""
+    }
+  ]
+}
+`;
+
+  const step2 = await callAPI(step2Prompt);
+
+  const tokens = step2.tokens;
+
+  // =========================
+  // RENDER UI
+  // =========================
+
+  render("english", tokens, "english");
+  render("translated", tokens, "translation");
+  render("translit", tokens, "transliteration");
+
+}
+
+</script>
+
+</body>
+</html>

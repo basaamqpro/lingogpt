@@ -51,18 +51,10 @@
 
 <select id="lang">
   <option>Arabic</option>
-  <option>English</option>
   <option>Japanese</option>
   <option>French</option>
-  <option>Yoruba</option>
-  <option>Igbo</option>
-  <option>Hausa</option>
-  <option>Russian</option>
-  <option>Urdu</option>
   <option>Spanish</option>
-  <option>Algerian Arabic (Darija)</option>
-  <option>Tamazight (Berber)</option>
-  <option>Amharic</option>
+  <option>English</option>
 </select>
 
 <br><br>
@@ -87,7 +79,7 @@
 <script>
 
 // ----------------------
-// COLORS
+// COLORS (by index)
 // ----------------------
 const palette = [
   "#e6194b","#3cb44b","#ffe119","#4363d8",
@@ -113,7 +105,6 @@ async function callAPI(prompt) {
   });
 
   const data = await res.json();
-
   console.log("API RESPONSE:", data);
 
   let raw = "";
@@ -130,13 +121,13 @@ async function callAPI(prompt) {
 }
 
 // ----------------------
-// RENDER
+// RENDER (INDEX BASED)
 // ----------------------
-function render(containerId, tokens, key) {
+function renderAligned(containerId, words) {
   document.getElementById(containerId).innerHTML =
-    tokens.map(t =>
-      `<span class="token" style="background:${t.color}">
-        ${t[key] || ""}
+    words.map(w =>
+      `<span class="token" style="background:${color(w.index)}">
+        ${w.word || ""}
       </span>`
     ).join(" ");
 }
@@ -155,7 +146,7 @@ async function run() {
   }
 
   // =========================
-  // STEP 1: NORMALISATION + TRANSLATION
+  // STEP 1: NORMALISE + TRANSLATE
   // =========================
   const step1Prompt = `
 You are a multilingual normalization + translation engine.
@@ -163,20 +154,19 @@ You are a multilingual normalization + translation engine.
 TASK:
 Detect input language automatically.
 
-If input is romanized (e.g. Japanese romaji):
-→ convert to correct native script
+If input is romanized:
+→ convert to native script
 
 Then return:
 
-1. script_version (native script sentence)
+1. script_version
 2. input_transliteration
 3. translation (${lang})
 4. output_transliteration
 
 Rules:
+- Natural translation only
 - No word-by-word translation
-- Keep natural grammar
-- script_version must be full sentence
 
 Output ONLY JSON:
 {
@@ -192,69 +182,66 @@ ${text}
 
   const step1 = await callAPI(step1Prompt);
 
-  // ✅ IMPORTANT FIX: render AFTER step1
   document.getElementById("scriptVersion").innerText =
     step1.script_version || "";
 
   // =========================
-  // STEP 2: TOKENISE NORMALISED SCRIPT ONLY
+  // STEP 2: SEMANTIC ALIGNMENT
   // =========================
   const step2Prompt = `
-You are building a visual alignment system.
+You are building a semantic alignment system.
 
-Task:
-Split the INPUT (normalized script version) into meaningful tokens only.
+GOAL:
+Assign each word across ALL sentences to the SAME meaning index.
 
-Rules:
-- Do NOT translate anything
-- Do NOT reorder text
-- Assign each token:
-  - index (starting from 0)
-  - color (unique per index)
-  - input transliteration (if possible)
-
-Input (normalized script version):
+INPUT:
 ${step1.script_version}
 
-Output ONLY JSON:
+INPUT TRANSLITERATION:
+${step1.input_transliteration}
+
+TRANSLATION:
+${step1.translation}
+
+OUTPUT TRANSLITERATION:
+${step1.output_transliteration}
+
+RULES:
+- Same meaning → same index
+- Word order does NOT matter
+- Words can map 1-to-many
+- Do NOT force matches
+- If no match → skip
+
+OUTPUT ONLY JSON:
 
 {
-  "tokens": [
-    {
-      "input": "",
-      "input_transliteration": "",
-      "index": 0,
-      "color": ""
-    }
+  "input": [
+    { "word": "", "index": 0 }
+  ],
+  "input_transliteration": [
+    { "word": "", "index": 0 }
+  ],
+  "translation": [
+    { "word": "", "index": 0 }
+  ],
+  "output_transliteration": [
+    { "word": "", "index": 0 }
   ]
 }
 `;
 
   const step2 = await callAPI(step2Prompt);
 
-  const tokens = step2.tokens;
-
-  // =========================
-  // STEP 3: JS ALIGNMENT
-  // =========================
-  const translatedWords = step1.translation.split(" ");
-  const outputTranslitWords = step1.output_transliteration.split(" ");
-
-  const enriched = tokens.map((t, i) => ({
-    ...t,
-    translation: translatedWords[i] || "",
-    output_transliteration: outputTranslitWords[i] || ""
-  }));
-
   // =========================
   // RENDER
   // =========================
-  render("inputText", enriched, "input");
-  render("inputTranslit", enriched, "input_transliteration");
-  render("translated", enriched, "translation");
-  render("outputTranslit", enriched, "output_transliteration");
+  renderAligned("inputText", step2.input);
+  renderAligned("inputTranslit", step2.input_transliteration);
+  renderAligned("translated", step2.translation);
+  renderAligned("outputTranslit", step2.output_transliteration);
 
-  console.log("FINAL TOKENS:", enriched);
+  console.log("FINAL ALIGNMENT:", step2);
 }
 
 </script>

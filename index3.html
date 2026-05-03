@@ -51,18 +51,10 @@
 
 <select id="lang">
   <option>Arabic</option>
-  <option>English</option>
   <option>Japanese</option>
   <option>French</option>
-  <option>Yoruba</option>
-  <option>Igbo</option>
-  <option>Hausa</option>
-  <option>Russian</option>
-  <option>Urdu</option>
   <option>Spanish</option>
-  <option>Algerian Arabic (Darija)</option>
-  <option>Tamazight (Berber)</option>
-  <option>Amharic</option>
+  <option>English</option>
 </select>
 
 <br><br>
@@ -71,9 +63,6 @@
 
 <h3>Input</h3>
 <div id="inputText" class="row"></div>
-
-<h3>Normalized Input (Script Version)</h3>
-<div id="scriptVersion" class="row"></div>
 
 <h3>Input Transliteration</h3>
 <div id="inputTranslit" class="row"></div>
@@ -87,7 +76,7 @@
 <script>
 
 // ----------------------
-// COLORS
+// COLORS (index-based)
 // ----------------------
 const palette = [
   "#e6194b","#3cb44b","#ffe119","#4363d8",
@@ -106,9 +95,7 @@ function color(i) {
 async function callAPI(prompt) {
   const res = await fetch("/api/translate", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt })
   });
 
@@ -130,7 +117,7 @@ async function callAPI(prompt) {
 }
 
 // ----------------------
-// RENDER
+// RENDER FUNCTION
 // ----------------------
 function render(containerId, tokens, key) {
   document.getElementById(containerId).innerHTML =
@@ -155,34 +142,24 @@ async function run() {
   }
 
   // =========================
-  // STEP 1: NORMALISATION + TRANSLATION
+  // STEP 1: FULL TRANSLATION ONLY
   // =========================
   const step1Prompt = `
-You are a multilingual normalization + translation engine.
+Translate the text into ${lang}.
 
-TASK:
-Detect input language automatically.
-
-If input is romanized (e.g. Japanese romaji):
-→ convert to correct native script
-
-Then return:
-
-1. script_version (native script sentence)
-2. input_transliteration
-3. translation (${lang})
-4. output_transliteration
+Also provide:
+- input transliteration
+- output transliteration
 
 Rules:
-- No word-by-word translation
 - Keep natural grammar
-- script_version must be full sentence
+- Do NOT split into words
+- Return full sentences only
 
 Output ONLY JSON:
 {
-  "script_version": "",
-  "input_transliteration": "",
   "translation": "",
+  "input_transliteration": "",
   "output_transliteration": ""
 }
 
@@ -192,29 +169,26 @@ ${text}
 
   const step1 = await callAPI(step1Prompt);
 
-  // ✅ IMPORTANT FIX: render AFTER step1
-  document.getElementById("scriptVersion").innerText =
-    step1.script_version || "";
-
   // =========================
-  // STEP 2: TOKENISE NORMALISED SCRIPT ONLY
+  // STEP 2: INPUT SEGMENTATION ONLY (NO TRANSLATION ALIGNMENT)
   // =========================
   const step2Prompt = `
 You are building a visual alignment system.
 
 Task:
-Split the INPUT (normalized script version) into meaningful tokens only.
+Split the INPUT text into meaningful tokens only.
 
 Rules:
 - Do NOT translate anything
 - Do NOT reorder text
+- Do NOT combine incorrect segments
 - Assign each token:
   - index (starting from 0)
   - color (unique per index)
-  - input transliteration (if possible)
+  - input transliteration (if possible, otherwise "")
 
-Input (normalized script version):
-${step1.script_version}
+Input:
+${text}
 
 Output ONLY JSON:
 
@@ -235,8 +209,10 @@ Output ONLY JSON:
   const tokens = step2.tokens;
 
   // =========================
-  // STEP 3: JS ALIGNMENT
+  // STEP 3: ALIGNMENT (JS ONLY)
   // =========================
+  // Fill translation + transliteration per index
+
   const translatedWords = step1.translation.split(" ");
   const outputTranslitWords = step1.output_transliteration.split(" ");
 

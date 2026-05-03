@@ -1,15 +1,14 @@
 export default async function handler(req, res) {
-  console.log("➡️ API HIT /api/translate");
-
-  // 👇 ADD IT HERE
-  console.log("API KEY TEST:", process.env.OPENAI_API_KEY);
-
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
     const { prompt } = req.body;
+     
+    if (!prompt) {
+      return res.status(400).json({ error: "Missing prompt" });
+    }
 
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -25,10 +24,11 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+
     return res.status(200).json(data);
 
   } catch (err) {
-    console.error(err);
+    console.error("API ERROR:", err);
     return res.status(500).json({ error: err.message });
   }
 }

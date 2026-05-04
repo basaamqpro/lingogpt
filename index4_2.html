@@ -51,10 +51,18 @@
 
 <select id="lang">
   <option>Arabic</option>
+  <option>English</option>
   <option>Japanese</option>
   <option>French</option>
+  <option>Yoruba</option>
+  <option>Igbo</option>
+  <option>Hausa</option>
+  <option>Russian</option>
+  <option>Urdu</option>
   <option>Spanish</option>
-  <option>English</option>
+  <option>Algerian Arabic (Darija)</option>
+  <option>Tamazight (Berber)</option>
+  <option>Amharic</option>
 </select>
 
 <br><br>
@@ -67,19 +75,19 @@
 <h3>Normalized Input (Script Version)</h3>
 <div id="scriptVersion" class="row"></div>
 
-<h3>Input Pronunciation</h3>
+<h3>Input Transliteration</h3>
 <div id="inputTranslit" class="row"></div>
 
 <h3>Translation</h3>
 <div id="translated" class="row"></div>
 
-<h3>Output Pronunciation</h3>
-<div id="outputPronounce" class="row"></div>
+<h3>Output Transliteration</h3>
+<div id="outputTranslit" class="row"></div>
 
 <script>
 
 // ----------------------
-// COLORS (by meaning index)
+// COLORS (by index)
 // ----------------------
 const palette = [
   "#e6194b","#3cb44b","#ffe119","#4363d8",
@@ -121,7 +129,7 @@ async function callAPI(prompt) {
 }
 
 // ----------------------
-// RENDER (semantic color)
+// RENDER (INDEX BASED)
 // ----------------------
 function renderAligned(containerId, words) {
   document.getElementById(containerId).innerHTML =
@@ -146,10 +154,10 @@ async function run() {
   }
 
   // =========================
-  // STEP 1: NORMALISE + TRANSLATE + PRONUNCIATION
+  // STEP 1: NORMALISE + TRANSLATE
   // =========================
   const step1Prompt = `
-You are a multilingual normalization + pronunciation engine.
+You are a multilingual normalization + translation engine.
 
 TASK:
 Detect input language automatically.
@@ -160,22 +168,20 @@ If input is romanized:
 Then return:
 
 1. script_version
-2. input_pronunciation
+2. input_transliteration
 3. translation (${lang})
-4. output_pronunciation
+4. output_transliteration
 
-IMPORTANT:
-- Pronunciation must be natural (human-friendly)
-- Do NOT use strict transliteration
-- Avoid special symbols like ʿ, ā, ī
-- Use simple Latin spelling
+Rules:
+- Natural translation only
+- No word-by-word translation
 
 Output ONLY JSON:
 {
   "script_version": "",
-  "input_pronunciation": "",
+  "input_transliteration": "",
   "translation": "",
-  "output_pronunciation": ""
+  "output_transliteration": ""
 }
 
 Text:
@@ -199,28 +205,37 @@ Assign each word across ALL sentences to the SAME meaning index.
 INPUT:
 ${step1.script_version}
 
-INPUT PRONUNCIATION:
-${step1.input_pronunciation}
+INPUT TRANSLITERATION:
+${step1.input_transliteration}
 
 TRANSLATION:
 ${step1.translation}
 
-OUTPUT PRONUNCIATION:
-${step1.output_pronunciation}
+OUTPUT TRANSLITERATION:
+${step1.output_transliteration}
 
 RULES:
 - Same meaning → same index
 - Word order does NOT matter
+- Words can map 1-to-many
 - Do NOT force matches
-- Some words may be missing
+- If no match → skip
 
 OUTPUT ONLY JSON:
 
 {
-  "input": [{ "word": "", "index": 0 }],
-  "input_pronunciation": [{ "word": "", "index": 0 }],
-  "translation": [{ "word": "", "index": 0 }],
-  "output_pronunciation": [{ "word": "", "index": 0 }]
+  "input": [
+    { "word": "", "index": 0 }
+  ],
+  "input_transliteration": [
+    { "word": "", "index": 0 }
+  ],
+  "translation": [
+    { "word": "", "index": 0 }
+  ],
+  "output_transliteration": [
+    { "word": "", "index": 0 }
+  ]
 }
 `;
 
@@ -230,9 +245,9 @@ OUTPUT ONLY JSON:
   // RENDER
   // =========================
   renderAligned("inputText", step2.input);
-  renderAligned("inputTranslit", step2.input_pronunciation);
+  renderAligned("inputTranslit", step2.input_transliteration);
   renderAligned("translated", step2.translation);
-  renderAligned("outputPronounce", step2.output_pronunciation);
+  renderAligned("outputTranslit", step2.output_transliteration);
 
   console.log("FINAL ALIGNMENT:", step2);
 }

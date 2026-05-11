@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LingoGPT</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+
+    body {
+      font-family: Arial;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    select, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .row {
+      margin-top: 15px;
+      font-size: 20px;
+      line-height: 2;
+    }
+
+    .token {
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-right: 4px;
+      display: inline-block;
+      color: white;
+      font-weight: bold;
+    }
+
+    .speak-btn {
+      margin-top: 10px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<h1>LingoGPT</h1>
+
+<textarea
+  id="text"
+  placeholder="Enter text..."
+></textarea>
+
+<div class="controls">
+
+  <!-- TARGET LANGUAGE -->
+  <select id="lang">
+
+    <option>Arabic</option>
+    <option>English</option>
+    <option>Japanese</option>
+    <option>French</option>
+    <option>Spanish</option>
+
+  </select>
+
+  <!-- VOICE -->
+  <select id="voice"></select>
+
+  <!-- SPEED -->
+  <select id="speed">
+
+    <option value="0.5">0.5x Very Slow</option>
+    <option value="0.75">0.75x Slow</option>
+
+    <option value="1" selected>
+      1x Normal
+    </option>
+
+    <option value="1.15">1.15x Natural Fast</option>
+    <option value="1.3">1.3x Fast</option>
+    <option value="1.5">1.5x Very Fast</option>
+
+  </select>
+
+</div>
+
+<br>
+
+<button onclick="run()">
+  Translate
+</button>
+
+<button
+  class="speak-btn"
+  onclick="speakTranslation()"
+>
+  🔊 Speak Translation
+</button>
+
+<h3>Input</h3>
+<div id="inputText" class="row"></div>
+
+<h3>Normalized Input (Script Version)</h3>
+<div id="scriptVersion" class="row"></div>
+
+<h3>Input Transliteration</h3>
+<div id="inputTranslit" class="row"></div>
+
+<h3>Translation</h3>
+<div id="translated" class="row"></div>
+
+<h3>Output Transliteration</h3>
+<div id="outputTranslit" class="row"></div>
+
+<h3>Natural Pronunciation</h3>
+<div id="naturalPronunciation" class="row"></div>
+
+<script src="api/speak.js"></script>
+
+<script>
+
+// ========================================
+// GLOBAL TRANSLATION
+// ========================================
+let finalTranslation = "";
+
+// ========================================
+// LOAD VOICES ON START
+// ========================================
+loadVoices("Arabic");
+
+// ========================================
+// CHANGE VOICES WHEN LANGUAGE CHANGES
+// ========================================
+document
+.getElementById("lang")
+.addEventListener("change", (e) => {
+
+  loadVoices(e.target.value);
+
+});
+
+// ========================================
+// COLOR PALETTE
+// ========================================
+const palette = [
+
+  "#e6194b",
+  "#3cb44b",
+  "#ffe119",
+  "#4363d8",
+  "#f58231",
+  "#911eb4",
+  "#46f0f0",
+  "#f032e6",
+  "#bcf60c",
+  "#fabebe",
+  "#008080",
+  "#e6beff",
+  "#9a6324",
+  "#fffac8"
+
+];
+
+function color(index) {
+
+  return palette[index % palette.length];
+
+}
+
+// ========================================
+// API CALL
+// ========================================
+async function callAPI(prompt) {
+
+  const res = await fetch("/api/translate", {
+
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+      prompt
+    })
+
+  });
+
+  const data = await res.json();
+
+  let raw = "";
+
+  if (
+    data.output &&
+    data.output[0]?.content?.[0]?.text
+  ) {
+
+    raw = data.output[0].content[0].text;
+
+  }
+
+  else {
+
+    console.error(data);
+
+    alert("Bad API response");
+
+    return;
+
+  }
+
+  return JSON.parse(raw);
+
+}
+
+// ========================================
+// RENDER TOKENS
+// ========================================
+function render(containerId, items) {
+
+  document.getElementById(containerId).innerHTML =
+
+    items.map(item => `
+
+      <span
+        class="token"
+        style="background:${color(item.index)}"
+      >
+
+        ${item.word}
+
+      </span>
+
+    `).join(" ");
+
+}
+
+// ========================================
+// SPEAK TRANSLATION
+// ========================================
+async function speakTranslation() {
+
+  const language =
+    document.getElementById("lang").value;
+
+  await speakText(finalTranslation, language);
+
+}
+
+// ========================================
+// MAIN
+// ========================================
+async function run() {
+
+  const text =
+    document.getElementById("text")
+    .value
+    .trim();
+
+  const lang =
+    document.getElementById("lang")
+    .value;
+
+  if (!text) {
+
+    alert("Enter text");
+
+    return;
+
+  }
+
+  // ========================================
+  // STEP 1
+  // ========================================
+  const step1Prompt = `
+
+You are a multilingual translation engine.
+
+TASK:
+
+1. Detect input language
+2. Detect if input is romanized
+3. Convert to native script if possible
+4. Translate naturally into ${lang}
+5. Generate transliterations
+
+Output ONLY JSON:
+
+{
+  "script_version": "",
+  "input_transliteration": "",
+  "translation": "",
+  "output_transliteration": "",
+  "natural_pronunciation": ""
+}
+
+Text:
+${text}
+
+`;
+
+  const step1 = await callAPI(step1Prompt);
+
+  finalTranslation = step1.translation;
+
+  // ========================================
+  // STEP 2
+  // ========================================
+  const step2Prompt = `
+
+You are creating a color alignment system.
+
+RULES:
+
+- Assign SAME index to matching meanings
+- Translation order MUST remain natural
+- Transliteration follows translation
+- Preserve punctuation
+- Repeated concepts reuse same index
+
+Output ONLY JSON:
+
+{
+  "input": [],
+  "input_transliteration": [],
+  "translation": [],
+  "output_transliteration": [],
+  "natural_pronunciation": []
+}
+
+Input:
+${step1.script_version}
+
+Input Transliteration:
+${step1.input_transliteration}
+
+Translation:
+${step1.translation}
+
+Output Transliteration:
+${step1.output_transliteration}
+
+Natural Pronunciation:
+${step1.natural_pronunciation}
+
+`;
+
+  const step2 = await callAPI(step2Prompt);
+
+  // ========================================
+  // RENDER
+  // ========================================
+  render("inputText", step2.input);
+
+  render(
+    "inputTranslit",
+    step2.input_transliteration
+  );
+
+  render(
+    "translated",
+    step2.translation
+  );
+
+  render(
+    "outputTranslit",
+    step2.output_transliteration
+  );
+
+  render(
+    "naturalPronunciation",
+    step2.natural_pronunciation
+  );
+
+  document.getElementById(
+    "scriptVersion"
+  ).innerText = step1.script_version;
+
+}
+
+</script>
+
+</body>
+</html>

@@ -89,7 +89,24 @@
 
 <h3>Natural Pronunciation</h3>
 <div id="naturalPronunciation" class="row"></div>
+<select id="lang">
+  <option>Arabic</option>
+  <option>Japanese</option>
+  <option>French</option>
+  <option>Spanish</option>
+  <option>English</option>
+</select>
 
+<select id="voiceSelect"></select>
+<select id="speed">
+  <option value="0.75">0.75x</option>
+  <option value="1" selected>1x</option>
+  <option value="1.5">1.5x</option>
+</select>
+
+<button onclick="playAudio()">🔊 Play Translation</button>
+
+<script src="voice5_2.js"></script>
 <script>
 
 // ----------------------

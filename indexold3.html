@@ -123,14 +123,6 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    .translation_sentence[dir="rtl"] {
-      direction: rtl;
-    }
-
-    .translation_sentence[dir="ltr"] {
-      direction: ltr;
-    }
-
     .message_row.right .translation_sentence {
       border-bottom-right-radius: 4px;
     }
@@ -712,26 +704,6 @@
 
     /*
     ==================================================
-    TEXT DIRECTION
-    ==================================================
-    */
-
-    function isRTLLanguage(language) {
-      const rtlLanguages = [
-        "Arabic",
-        "Hebrew",
-        "Persian",
-        "Urdu"
-      ];
-
-      return rtlLanguages.includes(
-        String(language || "")
-      );
-    }
-
-
-    /*
-    ==================================================
     FLOWS
     ==================================================
     */
@@ -890,20 +862,6 @@
               : getTargetFlow(chat);
 
 
-          const displayedLanguage =
-            sourceFlowActive
-              ? chat.source_language
-              : chat.target_language;
-
-
-          const flowDirection =
-            isRTLLanguage(
-              displayedLanguage
-            )
-              ? "rtl"
-              : "ltr";
-
-
           const row =
             document.createElement(
               "div"
@@ -942,9 +900,6 @@
 
           sentence.className =
             "translation_sentence";
-
-          sentence.dir =
-            flowDirection;
 
 
           flow.forEach(

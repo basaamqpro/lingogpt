@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>LingoGPT Local</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * { box-sizing: border-box; }
+    body { max-width: 1100px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background: #f8fafc; color: #111827; }
+    h1, h2, h3, p { overflow-wrap: anywhere; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .panel { padding: 20px; border: 1px solid #d1d5db; border-radius: 14px; background: white; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    label { display: block; margin: 10px 0 6px; font-weight: bold; }
+    input, textarea, select, button { width: 100%; padding: 11px; border-radius: 9px; font: inherit; }
+    input, textarea, select { border: 1px solid #cbd5e1; background: white; }
+    textarea { min-height: 100px; resize: vertical; }
+    button { border: 0; cursor: pointer; background: #111827; color: white; }
+    button.secondary { background: #e5e7eb; color: #111827; }
+    button.danger { background: #b91c1c; }
+    .button_row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .button_row button { width: auto; min-width: 120px; }
+    .message { display: none; margin: 12px 0; padding: 11px; border-radius: 9px; }
+    .message.visible { display: block; }
+    .message.error { background: #fee2e2; color: #991b1b; }
+    .message.success { background: #dcfce7; color: #166534; }
+    .room_card, .chat_card { margin-top: 14px; padding: 16px; border: 1px solid #d1d5db; border-radius: 12px; background: white; }
+    .room_header, .chat_header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .room_header h3, .chat_header h3 { margin: 0; }
+    .room_actions, .chat_actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .room_actions button, .chat_actions button { width: auto; padding: 8px 12px; }
+    .translation_group { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; border-top: 5px solid #4363d8; border-radius: 10px; overflow: hidden; }
+    .translation_group p { margin: 0; padding: 12px; min-height: 58px; background: #f3f4f6; }
+    .translation_group p:nth-child(2) { background: white; }
+    .translation_group p:nth-child(3) { background: #e0f2fe; color: #075985; }
+    .muted { color: #64748b; }
+    #display_edit_box { display: none; }
+    #display_edit_box.visible { display: block; }
+    @media (max-width: 750px) {
+      .grid, .translation_group { grid-template-columns: 1fr; }
+      .room_header, .chat_header { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="lingo_element_page_id">
+    <h1>LingoGPT Local</h1>
+    <p class="muted">This version uses hard-coded data and localStorage only. It does not call any API.</p>
+
+    <div id="appMessage" class="message"></div>
+
+    <section id="enter_page" class="page active">
+      <div class="grid">
+        <div class="panel">
+          <h2>Login</h2>
+
+          <label for="loginUsername">Username</label>
+          <input id="loginUsername" type="text" autocomplete="username">
+
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" autocomplete="current-password">
+
+          <div class="button_row">
+            <button id="loginButton" type="button">Login</button>
+          </div>
+
+          <p class="muted">Test account: Basaamqpro / 12345</p>
+        </div>
+
+        <div class="panel">
+          <h2>Register</h2>
+
+          <label for="registerName">Full name</label>
+          <input id="registerName" type="text">
+
+          <label for="registerUsername">Username</label>
+          <input id="registerUsername" type="text" autocomplete="username">
+
+          <label for="registerEmail">Email</label>
+          <input id="registerEmail" type="email">
+
+          <label for="registerPassword">Password</label>
+          <input id="registerPassword" type="password" autocomplete="new-password">
+
+          <div class="button_row">
+            <button id="registerButton" type="button">Register</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="welcome_page" class="page">
+      <div class="panel">
+        <div class="room_header">
+          <div>
+            <h2>Welcome, <span id="loggedInUsername"></span></h2>
+            <p class="muted">Select a room or create a new one.</p>
+          </div>
+
+          <div class="room_actions">
+            <button id="logoutButton" type="button" class="secondary">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Create Room</h2>
+
+        <div class="grid">
+          <div>
+            <label for="newRoomName">Room name</label>
+            <input id="newRoomName" type="text" placeholder="Room for short phrases">
+          </div>
+
+          <div>
+            <label for="newRoomSourceLanguage">Source language</label>
+            <select id="newRoomSourceLanguage"></select>
+          </div>
+
+          <div>
+            <label for="newRoomTargetLanguage">Target language</label>
+            <select id="newRoomTargetLanguage"></select>
+          </div>
+        </div>
+
+        <div class="button_row">
+          <button id="createRoomButton" type="button">Create Room</button>
+        </div>
+      </div>
+
+      <div id="show_rooms_names"></div>
+    </section>
+
+    <section id="clicked_room_page" class="page">
+      <div class="panel">
+        <div class="room_header">
+          <div>
+            <h2 id="currentRoomName"></h2>
+            <p id="currentRoomLanguages" class="muted"></p>
+          </div>
+
+          <div class="room_actions">
+            <button id="backToRoomsButton" type="button" class="secondary">Back to Rooms</button>
+            <button id="addChatButton" type="button">Add Translation</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="showChat"></div>
+
+      <div id="display_edit_box" class="panel">
+        <h2 id="chatFormTitle">Add Translation</h2>
+
+        <label for="chatTitle">Chat title</label>
+        <input id="chatTitle" type="text" placeholder="Shopping sentence">
+
+        <div class="grid">
+          <div>
+            <label for="sourceLang">Source language</label>
+            <select id="sourceLang"></select>
+          </div>
+
+          <div>
+            <label for="lang">Target language</label>
+            <select id="lang"></select>
+          </div>
+        </div>
+
+        <label for="sourceLines">Source phrases — one phrase per line</label>
+        <textarea id="sourceLines" placeholder="Today I went to the store&#10;and bought milk and bread"></textarea>
+
+        <label for="translationLines">Translations — one phrase per line</label>
+        <textarea id="translationLines" placeholder="今日は店に行って&#10;牛乳とパンを買って"></textarea>
+
+        <label for="pronunciationLines">Pronunciations — one phrase per line</label>
+        <textarea id="pronunciationLines" placeholder="Kyo wa mise ni itte&#10;Gyunyu to pan o katte"></textarea>
+
+        <div class="button_row">
+          <button id="saveChatButton" type="button">Save</button>
+          <button id="cancelEditButton" type="button" class="secondary">Cancel</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEYS = {
+      users: "lingo_user_details",
+      data: "lingo_user_data",
+      session: "lingo_logged_in_user"
+    };
+
+    const supportedLanguages = [
+      "English",
+      "Arabic",
+      "Hausa",
+      "French",
+      "Spanish",
+      "Portuguese",
+      "German",
+      "Italian",
+      "Russian",
+      "Turkish",
+      "Urdu",
+      "Hindi",
+      "Mandarin Chinese",
+      "Japanese",
+      "Korean",
+      "Swahili",
+      "Yoruba",
+      "Igbo"
+    ];
+
+    const palette = [
+      "#e6194b",
+      "#3cb44b",
+      "#b59b00",
+      "#4363d8",
+      "#f58231",
+      "#911eb4",
+      "#008b8b",
+      "#f032e6"
+    ];
+
+    const DEFAULT_USERS = [
+      {
+        name: "Basaam Daniel",
+        email: "Basaamqpro@gmail.com",
+        website: "portfolio1.com",
+        experience: 5,
+        username: "Basaamqpro",
+        user_idx: "user_basaam",
+        profile_pic: "Basaam.jpg",
+        cv: "BasaamCV.pdf",
+        password: "12345"
+      },
+      {
+        name: "John Oliver",
+        hide_name: false,
+        email: "john_o@gmail.com",
+        website: "portfolio2.com",
+        experience: 6,
+        username: "khalidAliyu",
+        user_idx: "user_khalid",
+        profile_pic: "john.jpg",
+        cv: "JohnCV.pdf",
+        password: "12345"
+      }
+    ];
+
+    const DEFAULT_LINGO_DATA = [
+      {
+        user_idx: "user_basaam",
+        username: "Basaamqpro",
+        rooms: [
+          {
+            room_idx: "room_basaam_1",
+            room_name: "Room for short phrases",
+            source_language: "English",
+            target_language: "Japanese",
+            room_data: [
+              {
+                chat_idx: "chat_basaam_1",
+                chat_title: "Shopping sentence",
+                source_language: "English",
+                target_language: "Japanese",
+                groups: [
+                  {
+                    index: 0,
+                    source: "Today I went to the store",
+                    translation: "今日は店に行って",
+                    pronunciation: "Kyo wa mise ni itte"
+                  },
+                  {
+                    index: 1,
+                    source: "and bought milk, bread, and orange",
+                    translation: "牛乳とパンとオレンジを買って",
+                    pronunciation: "Gyunyu to pan to orenji o katte"
+                  },
+                  {
+                    index: 2,
+                    source: "and ate the bread",
+                    translation: "パンを食べました",
+                    pronunciation: "Pan o tabemashita"
+                  }
+                ],
+                prompts_and_answers: [
+                  {
+                    user_prompt: "Today I went to the store and bought milk, bread, and orange and ate the bread.",
+                    gpt_api_answer: "Hard-coded Japanese translation groups"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            room_idx: "room_basaam_2",
+            room_name: "Basic greetings",
+            source_language: "English",
+            target_language: "Hausa",
+            room_data: [
+              {
+                chat_idx: "chat_basaam_2",
+                chat_title: "Morning greeting",
+                source_language: "English",
+                target_language: "Hausa",
+                groups: [
+                  {
+                    index: 0,
+                    source: "Good morning",
+                    translation: "Ina kwana",
+                    pronunciation: "Ee-nah kwah-nah"
+                  },
+                  {
+                    index: 1,
+                    source: "How are you?",
+                    translation: "Yaya kake?",
+                    pronunciation: "Yah-yah kah-keh"
+                  }
+                ],
+                prompts_and_answers: []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        user_idx: "user_khalid",
+        username: "khalidAliyu",
+        rooms: [
+          {
+            room_idx: "room_khalid_1",
+            room_name: "My Japanese practice",
+            source_language: "English",
+            target_language: "Japanese",
+            room_data: [
+              {
+                chat_idx: "chat_khalid_1",
+                chat_title: "Simple introduction",
+                source_language: "English",
+                target_language: "Japanese",
+                groups: [
+                  {
+                    index: 0,
+                    source: "My name is Khalid",
+                    translation: "私の名前はハリドです",
+                    pronunciation: "Watashi no namae wa Harido desu"
+                  }
+                ],
+                prompts_and_answers: []
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    let user_details = loadOrSeed(STORAGE_KEYS.users, DEFAULT_USERS);
+    let userLingo_data = loadOrSeed(STORAGE_KEYS.data, DEFAULT_LINGO_DATA);
+    let loggedInUserIdx = localStorage.getItem(STORAGE_KEYS.session) || "";
+    let currentRoomIdx = "";
+    let editingChatIdx = "";
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function loadOrSeed(key, fallbackValue) {
+      const savedValue = localStorage.getItem(key);
+
+      if (savedValue) {
+        try {
+          return JSON.parse(savedValue);
+        } catch (error) {
+          console.warn("Invalid localStorage data was replaced:", key);
+        }
+      }
+
+      const initialValue = clone(fallbackValue);
+      localStorage.setItem(key, JSON.stringify(initialValue));
+      return initialValue;
+    }
+
+    function saveAll() {
+      localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(user_details));
+      localStorage.setItem(STORAGE_KEYS.data, JSON.stringify(userLingo_data));
+
+      if (loggedInUserIdx) {
+        localStorage.setItem(STORAGE_KEYS.session, loggedInUserIdx);
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.session);
+      }
+    }
+
+    function createId(prefix) {
+      return prefix + "_" + Date.now() + "_" + Math.floor(Math.random() * 10000);
+    }
+
+    function color(index) {
+      return palette[Math.abs(Number(index) || 0) % palette.length];
+    }
+
+    function showMessage(message, type) {
+      const box = document.getElementById("appMessage");
+      box.textContent = message || "";
+      box.className = "message";
+
+      if (message) {
+        box.classList.add("visible", type === "error" ? "error" : "success");
+      }
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll(".page").forEach(function(page) {
+        page.classList.toggle("active", page.id === pageId);
+      });
+    }
+
+    function getLoggedInUser() {
+      return user_details.find(function(user) {
+        return user.user_idx === loggedInUserIdx;
+      }) || null;
+    }
+
+    function getLoggedInUserData() {
+      let userData = userLingo_data.find(function(item) {
+        return item.user_idx === loggedInUserIdx;
+      });
+
+      if (!userData) {
+        const user = getLoggedInUser();
+
+        if (!user) {
+          return null;
+        }
+
+        userData = {
+          user_idx: user.user_idx,
+          username: user.username,
+          rooms: []
+        };
+
+        userLingo_data.push(userData);
+        saveAll();
+      }
+
+      return userData;
+    }
+
+    function getCurrentRoom() {
+      const userData = getLoggedInUserData();
+
+      if (!userData) {
+        return null;
+      }
+
+      return userData.rooms.find(function(room) {
+        return room.room_idx === currentRoomIdx;
+      }) || null;
+    }
+
+    function populateSelect(selectId, selectedLanguage) {
+      const select = document.getElementById(selectId);
+      select.innerHTML = "";
+
+      supportedLanguages.forEach(function(language) {
+        const option = document.createElement("option");
+        option.value = language;
+        option.textContent = language;
+        option.selected = language === selectedLanguage;
+        select.appendChild(option);
+      });
+    }
+
+    function populateLanguageSelectors() {
+      populateSelect("newRoomSourceLanguage", "English");
+      populateSelect("newRoomTargetLanguage", "Japanese");
+      populateSelect("sourceLang", "English");
+      populateSelect("lang", "Japanese");
+    }
+
+    function login() {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      const user = user_details.find(function(item) {
+        return item.username.toLowerCase() === username.toLowerCase() &&
+          String(item.password) === password;
+      });
+
+      if (!user) {
+        showMessage("Incorrect username or password.", "error");
+        return;
+      }
+
+      loggedInUserIdx = user.user_idx;
+      currentRoomIdx = "";
+      saveAll();
+      showMessage("Login successful.", "success");
+      showRooms();
+    }
+
+    function register() {
+      const name = document.getElementById("registerName").value.trim();
+      const username = document.getElementById("registerUsername").value.trim();
+      const email = document.getElementById("registerEmail").value.trim();
+      const password = document.getElementById("registerPassword").value;
+
+      if (!name || !username || !email || !password) {
+        showMessage("Complete all registration fields.", "error");
+        return;
+      }
+
+      const usernameExists = user_details.some(function(user) {
+        return user.username.toLowerCase() === username.toLowerCase();
+      });
+
+      if (usernameExists) {
+        showMessage("That username already exists.", "error");
+        return;
+      }
+
+      const newUser = {
+        name: name,
+        email: email,
+        website: "",
+        experience: 0,
+        username: username,
+        user_idx: createId("user"),
+        profile_pic: "",
+        cv: "",
+        password: password
+      };
+
+      user_details.push(newUser);
+      userLingo_data.push({
+        user_idx: newUser.user_idx,
+        username: newUser.username,
+        rooms: []
+      });
+
+      loggedInUserIdx = newUser.user_idx;
+      saveAll();
+      showMessage("Registration successful.", "success");
+      showRooms();
+    }
+
+    function logout() {
+      loggedInUserIdx = "";
+      currentRoomIdx = "";
+      editingChatIdx = "";
+      saveAll();
+      showMessage("You have logged out.", "success");
+      showPage("enter_page");
+    }
+
+    function showRooms() {
+      const user = getLoggedInUser();
+      const userData = getLoggedInUserData();
+
+      if (!user || !userData) {
+        logout();
+        return;
+      }
+
+      document.getElementById("loggedInUsername").textContent = user.username;
+
+      const container = document.getElementById("show_rooms_names");
+      container.innerHTML = "";
+
+      if (!userData.rooms.length) {
+        const empty = document.createElement("div");
+        empty.className = "panel";
+        empty.textContent = "No rooms yet. Create your first room above.";
+        container.appendChild(empty);
+      }
+
+      userData.rooms.forEach(function(room) {
+        const card = document.createElement("div");
+        card.className = "room_card";
+
+        const header = document.createElement("div");
+        header.className = "room_header";
+
+        const details = document.createElement("div");
+        const title = document.createElement("h3");
+        title.textContent = room.room_name;
+
+        const languages = document.createElement("p");
+        languages.className = "muted";
+        languages.textContent = room.source_language + " → " + room.target_language + " · " + room.room_data.length + " chats";
+
+        details.append(title, languages);
+
+        const actions = document.createElement("div");
+        actions.className = "room_actions";
+
+        const openButton = document.createElement("button");
+        openButton.type = "button";
+        openButton.textContent = "Open";
+        openButton.onclick = function() {
+          openRoom(room.room_idx);
+        };
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() {
+          deleteRoom(room.room_idx);
+        };
+
+        actions.append(openButton, deleteButton);
+        header.append(details, actions);
+        card.appendChild(header);
+        container.appendChild(card);
+      });
+
+      showPage("welcome_page");
+    }
+
+    function createRoom() {
+      const userData = getLoggedInUserData();
+      const roomName = document.getElementById("newRoomName").value.trim();
+      const sourceLanguage = document.getElementById("newRoomSourceLanguage").value;
+      const targetLanguage = document.getElementById("newRoomTargetLanguage").value;
+
+      if (!userData || !roomName) {
+        showMessage("Enter a room name.", "error");
+        return;
+      }
+
+      if (sourceLanguage === targetLanguage) {
+        showMessage("Choose different source and target languages.", "error");
+        return;
+      }
+
+      userData.rooms.push({
+        room_idx: createId("room"),
+        room_name: roomName,
+        source_language: sourceLanguage,
+        target_language: targetLanguage,
+        room_data: []
+      });
+
+      document.getElementById("newRoomName").value = "";
+      saveAll();
+      showMessage("Room created.", "success");
+      showRooms();
+    }
+
+    function deleteRoom(roomIdx) {
+      const userData = getLoggedInUserData();
+
+      if (!userData) {
+        return;
+      }
+
+      const room = userData.rooms.find(function(item) {
+        return item.room_idx === roomIdx;
+      });
+
+      if (!room || !confirm("Delete " + room.room_name + "?")) {
+        return;
+      }
+
+      userData.rooms = userData.rooms.filter(function(item) {
+        return item.room_idx !== roomIdx;
+      });
+
+      saveAll();
+      showMessage("Room deleted.", "success");
+      showRooms();
+    }
+
+    function openRoom(roomIdx) {
+      currentRoomIdx = roomIdx;
+      editingChatIdx = "";
+      renderCurrentRoom();
+    }
+
+    function renderCurrentRoom() {
+      const room = getCurrentRoom();
+
+      if (!room) {
+        showRooms();
+        return;
+      }
+
+      document.getElementById("currentRoomName").textContent = room.room_name;
+      document.getElementById("currentRoomLanguages").textContent = room.source_language + " → " + room.target_language;
+      showChat(room);
+      hideChatForm();
+      showPage("clicked_room_page");
+    }
+
+    function showChat(room) {
+      const container = document.getElementById("showChat");
+      container.innerHTML = "";
+
+      if (!room.room_data.length) {
+        const empty = document.createElement("div");
+        empty.className = "panel";
+        empty.textContent = "This room has no translations yet.";
+        container.appendChild(empty);
+        return;
+      }
+
+      room.room_data.forEach(function(chat) {
+        const card = document.createElement("article");
+        card.className = "chat_card";
+
+        const header = document.createElement("div");
+        header.className = "chat_header";
+
+        const details = document.createElement("div");
+        const title = document.createElement("h3");
+        title.textContent = chat.chat_title || "Untitled translation";
+
+        const languages = document.createElement("p");
+        languages.className = "muted";
+        languages.textContent = chat.source_language + " → " + chat.target_language;
+
+        details.append(title, languages);
+
+        const actions = document.createElement("div");
+        actions.className = "chat_actions";
+
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "secondary";
+        editButton.textContent = "Edit";
+        editButton.onclick = function() {
+          editChat(chat.chat_idx);
+        };
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = function() {
+          deleteChat(chat.chat_idx);
+        };
+
+        actions.append(editButton, deleteButton);
+        header.append(details, actions);
+        card.appendChild(header);
+
+        chat.groups.forEach(function(group) {
+          const groupBox = document.createElement("div");
+          groupBox.className = "translation_group";
+          groupBox.style.borderTopColor = color(group.index);
+
+          const source = document.createElement("p");
+          source.dir = "auto";
+          source.textContent = group.source;
+
+          const translation = document.createElement("p");
+          translation.dir = "auto";
+          translation.textContent = group.translation;
+
+          const pronunciation = document.createElement("p");
+          pronunciation.textContent = group.pronunciation;
+
+          groupBox.append(source, translation, pronunciation);
+          card.appendChild(groupBox);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function splitLines(value) {
+      return String(value || "")
+        .split(/\r?\n/)
+        .map(function(line) {
+          return line.trim();
+        })
+        .filter(Boolean);
+    }
+
+    function showAddChatForm() {
+      const room = getCurrentRoom();
+
+      if (!room) {
+        return;
+      }
+
+      editingChatIdx = "";
+      document.getElementById("chatFormTitle").textContent = "Add Translation";
+      document.getElementById("chatTitle").value = "";
+      document.getElementById("sourceLines").value = "";
+      document.getElementById("translationLines").value = "";
+      document.getElementById("pronunciationLines").value = "";
+      populateSelect("sourceLang", room.source_language);
+      populateSelect("lang", room.target_language);
+      document.getElementById("display_edit_box").classList.add("visible");
+      document.getElementById("chatTitle").focus();
+    }
+
+    function editChat(chatIdx) {
+      const room = getCurrentRoom();
+
+      if (!room) {
+        return;
+      }
+
+      const chat = room.room_data.find(function(item) {
+        return item.chat_idx === chatIdx;
+      });
+
+      if (!chat) {
+        return;
+      }
+
+      editingChatIdx = chatIdx;
+      document.getElementById("chatFormTitle").textContent = "Edit Translation";
+      document.getElementById("chatTitle").value = chat.chat_title;
+      document.getElementById("sourceLines").value = chat.groups.map(function(group) {
+        return group.source;
+      }).join("\n");
+      document.getElementById("translationLines").value = chat.groups.map(function(group) {
+        return group.translation;
+      }).join("\n");
+      document.getElementById("pronunciationLines").value = chat.groups.map(function(group) {
+        return group.pronunciation;
+      }).join("\n");
+      populateSelect("sourceLang", chat.source_language);
+      populateSelect("lang", chat.target_language);
+      document.getElementById("display_edit_box").classList.add("visible");
+      document.getElementById("chatTitle").focus();
+    }
+
+    function hideChatForm() {
+      editingChatIdx = "";
+      document.getElementById("display_edit_box").classList.remove("visible");
+    }
+
+    function saveChat() {
+      const room = getCurrentRoom();
+
+      if (!room) {
+        return;
+      }
+
+      const chatTitle = document.getElementById("chatTitle").value.trim();
+      const sourceLanguage = document.getElementById("sourceLang").value;
+      const targetLanguage = document.getElementById("lang").value;
+      const sourceLines = splitLines(document.getElementById("sourceLines").value);
+      const translationLines = splitLines(document.getElementById("translationLines").value);
+      const pronunciationLines = splitLines(document.getElementById("pronunciationLines").value);
+
+      if (!chatTitle) {
+        showMessage("Enter a chat title.", "error");
+        return;
+      }
+
+      if (sourceLanguage === targetLanguage) {
+        showMessage("Choose different source and target languages.", "error");
+        return;
+      }
+
+      if (!sourceLines.length || sourceLines.length !== translationLines.length || sourceLines.length !== pronunciationLines.length) {
+        showMessage("Source, translation and pronunciation must have the same number of non-empty lines.", "error");
+        return;
+      }
+
+      const groups = sourceLines.map(function(source, index) {
+        return {
+          index: index,
+          source: source,
+          translation: translationLines[index],
+          pronunciation: pronunciationLines[index]
+        };
+      });
+
+      const chatData = {
+        chat_idx: editingChatIdx || createId("chat"),
+        chat_title: chatTitle,
+        source_language: sourceLanguage,
+        target_language: targetLanguage,
+        groups: groups,
+        prompts_and_answers: [
+          {
+            user_prompt: sourceLines.join(" "),
+            gpt_api_answer: "Hard-coded local translation data"
+          }
+        ]
+      };
+
+      if (editingChatIdx) {
+        const chatIndex = room.room_data.findIndex(function(chat) {
+          return chat.chat_idx === editingChatIdx;
+        });
+
+        if (chatIndex !== -1) {
+          room.room_data[chatIndex] = chatData;
+        }
+      } else {
+        room.room_data.push(chatData);
+      }
+
+      saveAll();
+      showMessage(editingChatIdx ? "Translation updated." : "Translation added.", "success");
+      hideChatForm();
+      showChat(room);
+    }
+
+    function deleteChat(chatIdx) {
+      const room = getCurrentRoom();
+
+      if (!room) {
+        return;
+      }
+
+      const chat = room.room_data.find(function(item) {
+        return item.chat_idx === chatIdx;
+      });
+
+      if (!chat || !confirm("Delete " + chat.chat_title + "?")) {
+        return;
+      }
+
+      room.room_data = room.room_data.filter(function(item) {
+        return item.chat_idx !== chatIdx;
+      });
+
+      saveAll();
+      showMessage("Translation deleted.", "success");
+      hideChatForm();
+      showChat(room);
+    }
+
+    document.getElementById("loginButton").addEventListener("click", login);
+    document.getElementById("registerButton").addEventListener("click", register);
+    document.getElementById("logoutButton").addEventListener("click", logout);
+    document.getElementById("createRoomButton").addEventListener("click", createRoom);
+    document.getElementById("backToRoomsButton").addEventListener("click", showRooms);
+    document.getElementById("addChatButton").addEventListener("click", showAddChatForm);
+    document.getElementById("saveChatButton").addEventListener("click", saveChat);
+    document.getElementById("cancelEditButton").addEventListener("click", hideChatForm);
+
+    populateLanguageSelectors();
+
+    if (getLoggedInUser()) {
+      showRooms();
+    } else {
+      loggedInUserIdx = "";
+      saveAll();
+      showPage("enter_page");
+    }
+  </script>
+</body>
+</html>

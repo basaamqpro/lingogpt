@@ -229,7 +229,7 @@
 
     .composer {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 140px 140px auto auto;
+      grid-template-columns: minmax(0, 1fr) 140px 140px auto;
       gap: 7px;
       width: 100%;
       max-width: 1000px;
@@ -266,26 +266,17 @@
       outline: none;
     }
 
-    #sendButton,
-    #interactButton {
+    #sendButton {
       min-width: 70px;
       height: 44px;
       padding: 0 14px;
       border-radius: 11px;
+      background: #111827;
       color: #ffffff;
       font-weight: 700;
     }
 
-    #sendButton {
-      background: #111827;
-    }
-
-    #interactButton {
-      background: #2563eb;
-    }
-
-    #sendButton:disabled,
-    #interactButton:disabled {
+    #sendButton:disabled {
       cursor: not-allowed;
       opacity: 0.55;
     }
@@ -349,7 +340,7 @@
       }
 
       .composer {
-        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-columns: minmax(0, 1fr) auto;
       }
 
       .composer_languages {
@@ -423,13 +414,6 @@
       </button>
 
       <button
-        id="interactButton"
-        type="button"
-      >
-        Interact
-      </button>
-
-      <button
         id="cancelEditButton"
         type="button"
       >
@@ -441,7 +425,6 @@
 
 
   <script src="results5.js"></script>
-  <script src="interact.js"></script>
 
   <script>
     "use strict";
@@ -831,21 +814,13 @@
               "div"
             );
 
-          const messageSide =
-            chat.message_type === "interaction" ||
-            chat.is_interaction === true
-              ? "left"
-              : chat.message_type === "user"
-                ? "right"
-                : (
-                    chatIndex % 2 === 0
-                      ? "right"
-                      : "left"
-                  );
-
           row.className =
             "message_row " +
-            messageSide;
+            (
+              chatIndex % 2 === 0
+                ? "right"
+                : "left"
+            );
 
 
           const bubble =
@@ -1278,11 +1253,6 @@
           "sendButton"
         );
 
-      const interactButton =
-        document.getElementById(
-          "interactButton"
-        );
-
 
       if (!text) {
         setStatus(
@@ -1320,7 +1290,6 @@
 
 
       sendButton.disabled = true;
-      interactButton.disabled = true;
 
       sendButton.textContent =
         editingChatIdx
@@ -1389,16 +1358,6 @@
           chat_idx:
             editingChatIdx ||
             createId("chat"),
-
-          message_type:
-            oldChat &&
-            oldChat.message_type
-              ? oldChat.message_type
-              : "user",
-
-          is_interaction:
-            oldChat &&
-            oldChat.is_interaction === true,
 
           source_language:
             results.detectedLanguage ||
@@ -1514,232 +1473,10 @@
           sendButton.disabled =
             false;
 
-          interactButton.disabled =
-            false;
-
           sendButton.textContent =
             editingChatIdx
               ? "Update"
               : "Send";
-        }
-      }
-    }
-
-
-    /*
-    ==================================================
-    INTERACT
-
-    ChatGPT reads previous room messages,
-    writes one simple source-language reply,
-    then interact.js sends that reply through
-    results.js for translation and breakdown.
-    ==================================================
-    */
-
-    async function interactWithRoom() {
-      const room =
-        getRoom();
-
-      if (!room) {
-        return;
-      }
-
-
-      if (editingChatIdx) {
-        setStatus(
-          "Finish or cancel editing first.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      if (
-        !window.LingoGPTInteract ||
-        typeof LingoGPTInteract.interact !==
-          "function"
-      ) {
-        setStatus(
-          "interact.js is not loaded.",
-          "error"
-        );
-
-        return;
-      }
-
-
-      const sendButton =
-        document.getElementById(
-          "sendButton"
-        );
-
-      const interactButton =
-        document.getElementById(
-          "interactButton"
-        );
-
-
-      if (activeController) {
-        activeController.abort();
-      }
-
-
-      const controller =
-        new AbortController();
-
-      activeController =
-        controller;
-
-
-      sendButton.disabled = true;
-      interactButton.disabled = true;
-
-      interactButton.textContent =
-        "Thinking...";
-
-
-      setStatus(
-        "Reading the conversation..."
-      );
-
-
-      try {
-        const results =
-          await LingoGPTInteract.interact({
-            signal:
-              controller.signal,
-
-            onStatus:
-              function(message) {
-                if (
-                  activeController ===
-                    controller &&
-                  message !==
-                    "Complete."
-                ) {
-                  setStatus(
-                    message
-                  );
-                }
-              }
-          });
-
-
-        if (
-          activeController !==
-          controller
-        ) {
-          return;
-        }
-
-
-        const interactionText =
-          String(
-            results.interactionText ||
-            results.request?.text ||
-            ""
-          ).trim();
-
-
-        const chatData = {
-          chat_idx:
-            createId("chat"),
-
-          message_type:
-            "interaction",
-
-          is_interaction:
-            true,
-
-          source_language:
-            results.detectedLanguage ||
-            room.source_language,
-
-          target_language:
-            results.targetLanguage ||
-            room.target_language,
-
-          target_flow:
-            Array.isArray(
-              results.targetFlow
-            )
-              ? results.targetFlow
-              : [],
-
-          source_flow:
-            Array.isArray(
-              results.sourceFlow
-            )
-              ? results.sourceFlow
-              : [],
-
-          groups:
-            Array.isArray(
-              results.groups
-            )
-              ? results.groups
-              : [],
-
-          display_flow:
-            "target",
-
-          prompts_and_answers: [
-            {
-              user_prompt:
-                interactionText,
-
-              gpt_api_answer:
-                results
-            }
-          ],
-
-          generated_at:
-            results.generatedAt ||
-            new Date().toISOString()
-        };
-
-
-        room.room_data.push(
-          chatData
-        );
-
-
-        saveData();
-
-        setStatus("");
-        renderChat();
-
-      } catch (error) {
-        if (
-          error.name !==
-          "AbortError"
-        ) {
-          console.error(error);
-
-          setStatus(
-            error.message ||
-            "Interaction failed.",
-            "error"
-          );
-        }
-
-      } finally {
-        if (
-          activeController ===
-          controller
-        ) {
-          activeController = null;
-
-          sendButton.disabled =
-            false;
-
-          interactButton.disabled =
-            false;
-
-          interactButton.textContent =
-            "Interact";
         }
       }
     }
@@ -1812,14 +1549,6 @@
     ).addEventListener(
       "click",
       sendTranslation
-    );
-
-
-    document.getElementById(
-      "interactButton"
-    ).addEventListener(
-      "click",
-      interactWithRoom
     );
 
 

@@ -1,8 +1,7 @@
 export default async function handler(req, res) {
   console.log("➡️ API HIT /api/translate");
 
-  // 👇 ADD IT HERE
-  // console.log("API KEY TEST:", process.env.OPENAI_API_KEY);
+
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });

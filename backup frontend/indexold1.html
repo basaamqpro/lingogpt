@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LingoGPT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    textarea {
+      width: 100%;
+      height: 90px;
+      font-size: 16px;
+    }
+
+    .row {
+      margin-top: 15px;
+      font-size: 18px;
+      line-height: 2;
+    }
+
+    .token {
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-right: 4px;
+      display: inline-block;
+      color: white;
+      font-weight: bold;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div>
+  <a href="index4_2.html"><p>version 1 transliteration</p></a>
+  <a href="index.html"><p>version index output pronounciation</p></a>
+   <a href="indexspeak.html"><p>index speak 1</p></a>
+   <a href="indexspeak2.html"><p>index speak 2</p></a>
+   <a href="indexspeak4.html"><p>index speak 4</p></a>
+   <a href="iindexspeak4_2.html"><p>index speak 4_2</p></a>
+   <a href="indexspeak4_22.html"><p>index speak 4_22</p></a>
+   <a href="indexspeak5.html"><p>index speak 5</p></a>
+   <a href="new2.html"><p>new version 2</p></a>
+</div>
+
+<h1>LingoGPT</h1>
+
+<textarea id="text" placeholder="Enter text..."></textarea>
+
+<br><br>
+
+<select id="lang">
+  <option>Arabic</option>
+  <option>Japanese</option>
+  <option>French</option>
+  <option>Spanish</option>
+  <option>English</option>
+</select>
+
+<br><br>
+
+<button onclick="run()">Translate</button>
+
+<h3>Input</h3>
+<div id="inputText" class="row"></div>
+
+<h3>Normalized Input (Script Version)</h3>
+<div id="scriptVersion" class="row"></div>
+
+<h3>Input Transliteration</h3>
+<div id="inputTranslit" class="row"></div>
+
+<h3>Translation</h3>
+<div id="translated" class="row"></div>
+
+<h3>Output Transliteration</h3>
+<div id="outputTranslit" class="row"></div>
+
+<h3>Natural Pronunciation</h3>
+<div id="naturalPronunciation" class="row"></div>
+
+<script>
+
+// ----------------------
+// COLORS
+// ----------------------
+const palette = [
+  "#e6194b","#3cb44b","#ffe119","#4363d8",
+  "#f58231","#911eb4","#46f0f0","#f032e6",
+  "#bcf60c","#fabebe","#008080","#e6beff",
+  "#9a6324","#fffac8"
+];
+
+function color(i) {
+  return palette[i % palette.length];
+}
+
+// ----------------------
+// API CALL
+// ----------------------
+async function callAPI(prompt) {
+  const res = await fetch("/api/translate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ prompt })
+  });
+
+  const data = await res.json();
+  console.log("API RESPONSE:", data);
+
+  let raw = "";
+
+  if (data.output && data.output[0]?.content?.[0]?.text) {
+    raw = data.output[0].content[0].text;
+  } else {
+    console.error(data);
+    alert("Bad API response");
+    return;
+  }
+
+  return JSON.parse(raw);
+}
+
+// ----------------------
+// RENDER
+// ----------------------
+function renderAligned(containerId, words) {
+  document.getElementById(containerId).innerHTML =
+    words.map(w =>
+      `<span class="token" style="background:${color(w.index)}">
+        ${w.word || ""}
+      </span>`
+    ).join(" ");
+}
+
+// ----------------------
+// MAIN
+// ----------------------
+async function run() {
+
+  const text = document.getElementById("text").value.trim();
+  const lang = document.getElementById("lang").value;
+
+  if (!text) {
+    alert("Enter text");
+    return;
+  }
+
+  // =========================
+  // STEP 1: NORMALISE + TRANSLATE + NATURAL PRONUNCIATION
+  // =========================
+  const step1Prompt = `
+You are a multilingual normalization + translation engine.
+
+TASK:
+Detect input language automatically.
+
+If input is romanized:
+→ convert to native script
+
+Then return:
+
+1. script_version
+2. input_transliteration
+3. translation (${lang})
+4. output_transliteration
+5. natural_pronunciation
+
+Definition:
+- natural_pronunciation = how a native speaker would naturally SAY the translated sentence in Latin script
+Rules:
+- Natural translation only
+- No word-by-word translation
+- pronunciation should sound natural and smooth
+
+Output ONLY JSON:
+{
+  "script_version": "",
+  "input_transliteration": "",
+  "translation": "",
+  "output_transliteration": "",
+  "natural_pronunciation": ""
+}
+
+Text:
+${text}
+`;
+
+  const step1 = await callAPI(step1Prompt);
+
+  document.getElementById("scriptVersion").innerText =
+    step1.script_version || "";
+
+  // =========================
+  // STEP 2: SEMANTIC ALIGNMENT
+  // =========================
+  const step2Prompt = `
+You are building a semantic alignment system.
+
+GOAL:
+Assign each word across ALL sentences to the SAME meaning index.
+
+INPUT:
+${step1.script_version}
+
+INPUT TRANSLITERATION:
+${step1.input_transliteration}
+
+TRANSLATION:
+${step1.translation}
+
+OUTPUT TRANSLITERATION:
+${step1.output_transliteration}
+
+NATURAL PRONUNCIATION:
+${step1.natural_pronunciation}
+
+RULES:
+- Same meaning → same index
+- Word order does NOT matter
+- Words can map 1-to-many
+- Do NOT force matches
+
+OUTPUT ONLY JSON:
+
+{
+  "input": [
+    { "word": "", "index": 0 }
+  ],
+  "input_transliteration": [
+    { "word": "", "index": 0 }
+  ],
+  "translation": [
+    { "word": "", "index": 0 }
+  ],
+  "output_transliteration": [
+    { "word": "", "index": 0 }
+  ],
+  "natural_pronunciation": [
+    { "word": "", "index": 0 }
+  ]
+}
+`;
+
+  const step2 = await callAPI(step2Prompt);
+
+  // =========================
+  // RENDER
+  // =========================
+  renderAligned("inputText", step2.input);
+  renderAligned("inputTranslit", step2.input_transliteration);
+  renderAligned("translated", step2.translation);
+  renderAligned("outputTranslit", step2.output_transliteration);
+  renderAligned("naturalPronunciation", step2.natural_pronunciation);
+
+  console.log("FINAL ALIGNMENT:", step2);
+}
+
+</script>
+
+</body>
+</html>

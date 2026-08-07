@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>LingoGPT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    
+  </style>
+</head>
+
+<body>
+
+
+
+<div id="lingo_element_page_id">
+  <div id="enter_page">
+      <div register></div>
+      <div login></div>
+  </div>
+
+  <div id="welcome_page">
+      <div show_rooms_names></div>
+      <div create_room></div>
+  </div>
+
+  <div id="clicked_room_page">
+      <div showChat(room_b) />
+
+      <textarea id="text" placeholder="Enter text..."></textarea>
+      <div class="language_controls">
+
+  <div class="language_section">
+    <label for="sourceLang">Source Language</label>
+    <select id="sourceLang">
+           for loop languages
+        </select>
+  </div>
+
+  <div class="language_section">
+    <label for="lang">option for loop languages</label>
+    <select id="lang">option for loop languages</select>
+  </div>
+
+  </div>
+
+</div>
+
+
+<div>
+
+  <div id="display_edit_box">
+      <textarea id="text" placeholder="Enter text..."></textarea>
+      <div class="language_controls">
+
+  <div class="language_section">
+    <label for="sourceLang">Source Language</label>
+    <select id="sourceLang">
+           for loop languages
+        </select>
+  </div>
+
+  <div class="language_section">
+    <label for="lang">option for loop languages</label>
+    <select id="lang">option for loop languages</select>
+  </div>
+  </div>
+</div>
+
+<script>
+function createUserIdx(){
+
+    return"user_"+
+        Date.now()+
+        "_"+
+        Math.floor(
+            Math.random()*10000
+        );
+}
+
+ var user_details = [
+            {
+                "name": "Basaam Daniel",
+                "email": "Basaamqpro@gmail.com",
+                "website": "portfolio1.com",
+                "experience": 5,
+                "username": "Basaamqpro",
+                "user_idx": createUserIdx(),
+                "profile_pic": "Basaam.jpg",
+                "cv": "BasaamCV.pdf",
+                "password": 12345
+            },
+            {
+                "name": "John Oliver",
+                "hide_name": false,
+                "email": "john_o@gmail.com",
+                "website": "portfolio2.com",
+                "experience": 6,
+                "username": "khalidAliyu",
+                "user_idx": createUserIdx(),
+                "profile_pic": "john.jpg",
+                "cv": "JohnCV.pdf",
+                "password": 12345
+            }
+        ];
+     
+
+        var userLingo_data = [table0, table1] 
+
+        var table0 = [
+  {
+    "roomName": "room1",
+    "room_idx": "roomidx",
+    "room_name": "Room for short phrases",
+    "username": "Basaamqpro",
+    "user_idx": "kbj",
+    "room_data": [
+      {
+        "chatid": "Hello",
+        [
+          {
+              "index": 0,
+              "source": "Today I went to the store",
+              "translation": "今日は店に行って",
+              "pronunciation": "Kyo wa mise ni itte"
+          },
+          {
+              "index": 1,
+              "source": "and bought milk, bread, and orange",
+              "translation": "牛乳とパンとオレンジを買って",
+              "pronunciation": "Gyunyu to pan to orenji o katte"
+          },
+          {
+              "index": 2,
+              "source": "and ate the bread",
+              "translation": "パンを食べました",
+              "pronunciation": "Pan o tabemashita"
+          }
+        ],
+        "prompts_and_answers": [ ["user_prompt", "gpt_api_answer"],["user_prompt", "gpt_api_answer"]
+        ]
+      }
+    ]
+  }, {
+    "roomName": "room2",
+    "room_idx": "roomidx",
+    "room_name": "Room for short phrases",
+    "username": "Basaamqpro",
+    "user_idx": "kbj",
+    "room_data": [
+      {
+        "chatid": "Hello",
+        [
+          {
+              "index": 0,
+              "source": "Today I went to the store",
+              "translation": "今日は店に行って",
+              "pronunciation": "Kyo wa mise ni itte"
+          },
+          {
+              "index": 1,
+              "source": "and bought milk, bread, and orange",
+              "translation": "牛乳とパンとオレンジを買って",
+              "pronunciation": "Gyunyu to pan to orenji o katte"
+          },
+          {
+              "index": 2,
+              "source": "and ate the bread",
+              "translation": "パンを食べました",
+              "pronunciation": "Pan o tabemashita"
+          }
+        ],
+        "prompts_and_answers": [ ["user_prompt", "gpt_api_answer"],["user_prompt", "gpt_api_answer"]
+        ]
+      }
+    ]
+  }
+
+  
+]
+
+var table1_khalidAliyu = [
+  {
+    "roomName": "room1",
+    "room_idx": "roomidx",
+    "room_name": "Room for short phrases",
+    "username": "khalidAliyu",
+    "user_idx": "kbj",
+    "room_data": [
+      {
+        "chatid": "Hello",
+        [
+          {
+              "index": 0,
+              "source": "Today I went to the store",
+              "translation": "今日は店に行って",
+              "pronunciation": "Kyo wa mise ni itte"
+          },
+          {
+              "index": 1,
+              "source": "and bought milk, bread, and orange",
+              "translation": "牛乳とパンとオレンジを買って",
+              "pronunciation": "Gyunyu to pan to orenji o katte"
+          },
+          {
+              "index": 2,
+              "source": "and ate the bread",
+              "translation": "パンを食べました",
+              "pronunciation": "Pan o tabemashita"
+          }
+        ],
+        "prompts_and_answers": [ ["user_prompt", "gpt_api_answer"],["user_prompt", "gpt_api_answer"]
+        ]
+      }
+    ]
+  }, {
+    "roomName": "room2",
+    "room_idx": "roomidx",
+    "room_name": "Room for short phrases",
+    "username": "Basaamqpro",
+    "user_idx": "kbj",
+    "room_data": [
+      {
+        "chatid": "Hello",
+        [
+          {
+              "index": 0,
+              "source": "Today I went to the store",
+              "translation": "今日は店に行って",
+              "pronunciation": "Kyo wa mise ni itte"
+          },
+          {
+              "index": 1,
+              "source": "and bought milk, bread, and orange",
+              "translation": "牛乳とパンとオレンジを買って",
+              "pronunciation": "Gyunyu to pan to orenji o katte"
+          },
+          {
+              "index": 2,
+              "source": "and ate the bread",
+              "translation": "パンを食べました",
+              "pronunciation": "Pan o tabemashita"
+          }
+        ],
+        "prompts_and_answers": [ ["user_prompt", "gpt_api_answer"],["user_prompt", "gpt_api_answer"]
+        ]
+      }
+    ]
+  }
+
+  
+]
+
+
+
+var loggedin_user = "Basaamqpro";
+var password = user_details[0].password;
+
+
+
+function showRooms() {
+for(a=0; a<=userLingo_data.length + -1; a++) {
+  for(b=0; b<=userLingo_data.room_data.length + -1; b++) {
+      console.log(userLingo_data[a].room_data[b])
+          
+    if(userLingo_data.username == loggedin_user) {
+      var room_name = document.createElement("p")
+          room_name.innerText = userLingo_data[a].room_data[b].room_name
+
+          room_name.onclick = function() {
+                 showChat(userLingo_data.room_data[b])
+
+          }
+        }
+    }
+
+  console.log(userLingo_data[a])
+}
+}
+
+
+function showChat(room_b) {
+        
+  for(a=0; a<=room_b.length+-1; a++) {
+     //build the cards
+        
+
+     pedit = document.createElement("p")
+     pedit.innerText = "Edit"
+
+     pedit.onclick = function() { 
+        display
+        .getElementByID(display_edit_box)
+     }
+
+     pedit = document.createElement("p")
+     pedit.innerText = "delete this data"
+
+     for(b=0; a<=room_b[a].prompts_and_answers+-1; b++) {
+        Normalized_Input_Script_Version = room_b[a].prompts_and_answers[b].user_prompt
+        Normalized_Input_Script_Version = room_b[a].prompts_and_answers[b].gpt_api_answer
+     }
+  }
+
+
+}
+
+
+function create+room_intialization() {
+  <input /> your new room name
+  <input /> your target language 
+  <button /> create push to data
+  
+}
+
+function register() {
+    <input /> username
+    <input /> password
+
+    if(loggein) 
+    
+     showRooms()
+}
+
+
+function login() {
+    <input /> username
+    <input /> password
+
+    if(loggein) 
+    
+     showRooms()
+}
+
+// everything will be saved to local storage
+
+localStorage.setItem(
+            "userLingo_data",userLingo_data
+        );
+localStorage.setItem(
+            "user_details",user_details
+        );
+</script>
+
+</body>
+</html>

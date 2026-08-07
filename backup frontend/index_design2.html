@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>LingoGPT Local</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * { box-sizing: border-box; }
+     h1, h2, h3, p { overflow-wrap: anywhere; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .panel { padding: 20px; border: 1px solid #d1d5db; border-radius: 14px; background: white; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    label { display: block; margin: 10px 0 6px; font-weight: bold; }
+    input, textarea, select, button { width: 100%; padding: 11px; border-radius: 9px; font: inherit; }
+    input, textarea, select { border: 1px solid #cbd5e1; background: white; }
+    textarea { min-height: 100px; resize: vertical; }
+    button { border: 0; cursor: pointer; background: #111827; color: white; }
+    button.secondary { background: #e5e7eb; color: #111827; }
+    button.danger { background: #b91c1c; }
+    .button_row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .button_row button { width: auto; min-width: 120px; }
+    .message { display: none; margin: 12px 0; padding: 11px; border-radius: 9px; }
+    .message.visible { display: block; }
+    .message.error { background: #fee2e2; color: #991b1b; }
+    .message.success { background: #dcfce7; color: #166534; }
+    .room_card, .chat_card { margin-top: 14px; padding: 16px; border: 1px solid #d1d5db; border-radius: 12px; background: white; }
+    .room_header, .chat_header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .room_header h3, .chat_header h3 { margin: 0; }
+    .room_actions, .chat_actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .room_actions button, .chat_actions button { width: auto; padding: 8px 12px; }
+
+    .flow_button {
+      background: #075985;
+      color: white;
+    }
+
+    .flow_button.source_flow_active {
+      background: #7c3aed;
+    }
+
+    .flow_status {
+      margin: 5px 0 0;
+      color: #475569;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .translation_sentence {
+    width: 50%;
+    overflow: hidden;
+    overflow-x: scroll;
+    display: flex;
+}
+
+    .translation_group {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      max-width: 100%;
+      padding: 3px 6px 6px;
+      border-bottom: 4px solid #4363d8;
+      background: transparent;
+      text-align: center;
+      vertical-align: bottom;
+    }
+
+    .translation_group span {
+      display: block;
+      max-width: 100%;
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .group_pronunciation {
+      margin-bottom: 3px !important;
+      color: #0369a1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .group_translation {
+      color: #111827;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .group_source {
+      margin-top: 3px !important;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .muted { color: #64748b; }
+    #display_edit_box { display: none; }
+    #display_edit_box.visible { display: block; }
+
+    @media (max-width: 750px) {
+      .grid { grid-template-columns: 1fr; }
+      .room_header, .chat_header { align-items: flex-start; flex-direction: column; }
+      .translation_sentence { gap: 15px 5px; padding: 15px 4px; }
+      .translation_group { padding: 3px 4px 6px; }
+      .group_translation { font-size: 20px; }
+      .group_pronunciation, .group_source { font-size: 13px; }
+    }
+
+    .chatContainer.chatContainer_right {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    justify-content: flex-end;
+    flex-direction: column;
+}
+
+
+
+span.translation_group {
+    min-width: max-content;
+}
+div#inputform_div {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+  </style>
+</head>
+
+<body>
+  <div "chat_page_id">
+    <div class="chatContainer chatContainer_right">
+        <div class="translation_sentence translation_sentence_right"><span class="translation_group" data-meaning-index="0" style="border-bottom-color: rgb(230, 25, 75);"><span class="group_pronunciation" dir="ltr">Ringo</span><span class="group_translation" dir="auto">リンゴ</span><span class="group_source" dir="auto">apple</span></span><span class="translation_group" data-meaning-index="1" style="border-bottom-color: rgb(60, 180, 75);"><span class="group_pronunciation" dir="ltr">Orenji</span><span class="group_translation" dir="auto">オレンジ</span><span class="group_source" dir="auto">orange</span></span><span class="translation_group" data-meaning-index="2" style="border-bottom-color: rgb(181, 155, 0);"><span class="group_pronunciation" dir="ltr">Painappuru</span><span class="group_translation" dir="auto">パイナップル</span><span class="group_source" dir="auto">pineapple</span></span><span class="translation_group" data-meaning-index="3" style="border-bottom-color: rgb(67, 99, 216);"><span class="group_pronunciation" dir="ltr">Nado wa</span><span class="group_translation" dir="auto">などは</span><span class="group_source" dir="auto">all of these</span></span><span class="translation_group" data-meaning-index="4" style="border-bottom-color: rgb(245, 130, 49);"><span class="group_pronunciation" dir="ltr">Suki desu ga</span><span class="group_translation" dir="auto">好きですが</span><span class="group_source" dir="auto">I like</span></span><span class="translation_group" data-meaning-index="5" style="border-bottom-color: rgb(145, 30, 180);"><span class="group_pronunciation" dir="ltr">Suki de wa arimasen</span><span class="group_translation" dir="auto">好きではありません</span><span class="group_source" dir="auto">except</span></span><span class="translation_group" data-meaning-index="6" style="border-bottom-color: rgb(0, 139, 139);"><span class="group_pronunciation" dir="ltr">Gyuunyuu wa</span><span class="group_translation" dir="auto">牛乳は</span><span class="group_source" dir="auto">milk</span></span></div>
+        <div class="chat_actions"><button type="button" class="flow_button source_flow_active">Show Japanese Flow</button><button type="button" class="secondary">Edit</button><button type="button" class="danger">Delete</button></div>
+    </div>
+
+    <div class="chatContainer chatContainer_left">
+        <div class="translation_sentence translation_sentence_left"><span class="translation_group" data-meaning-index="0" style="border-bottom-color: rgb(230, 25, 75);"><span class="group_pronunciation" dir="ltr">Ringo</span><span class="group_translation" dir="auto">リンゴ</span><span class="group_source" dir="auto">apple</span></span><span class="translation_group" data-meaning-index="1" style="border-bottom-color: rgb(60, 180, 75);"><span class="group_pronunciation" dir="ltr">Orenji</span><span class="group_translation" dir="auto">オレンジ</span><span class="group_source" dir="auto">orange</span></span><span class="translation_group" data-meaning-index="2" style="border-bottom-color: rgb(181, 155, 0);"><span class="group_pronunciation" dir="ltr">Painappuru</span><span class="group_translation" dir="auto">パイナップル</span><span class="group_source" dir="auto">pineapple</span></span><span class="translation_group" data-meaning-index="3" style="border-bottom-color: rgb(67, 99, 216);"><span class="group_pronunciation" dir="ltr">Nado wa</span><span class="group_translation" dir="auto">などは</span><span class="group_source" dir="auto">all of these</span></span><span class="translation_group" data-meaning-index="4" style="border-bottom-color: rgb(245, 130, 49);"><span class="group_pronunciation" dir="ltr">Suki desu ga</span><span class="group_translation" dir="auto">好きですが</span><span class="group_source" dir="auto">I like</span></span><span class="translation_group" data-meaning-index="5" style="border-bottom-color: rgb(145, 30, 180);"><span class="group_pronunciation" dir="ltr">Suki de wa arimasen</span><span class="group_translation" dir="auto">好きではありません</span><span class="group_source" dir="auto">except</span></span><span class="translation_group" data-meaning-index="6" style="border-bottom-color: rgb(0, 139, 139);"><span class="group_pronunciation" dir="ltr">Gyuunyuu wa</span><span class="group_translation" dir="auto">牛乳は</span><span class="group_source" dir="auto">milk</span></span></div>
+        <div class="chat_actions"><button type="button" class="flow_button source_flow_active">Show Japanese Flow</button><button type="button" class="secondary">Edit</button><button type="button" class="danger">Delete</button></div>
+
+    </div>
+  </div>
+
+  <div id="inputform_div">
+     <input />
+     
+     <select id="sourceLang">
+        <option>English</option>
+     </select>
+
+     <select id="targetlang">
+        <option>English</option>
+     </select>
+
+     <button>Send</button>
+  </div>
+
+
+  <script>
+
+  </script>
+</body>
+</html>

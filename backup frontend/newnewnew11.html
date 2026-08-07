@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>LingoGPT</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      color: #111827;
+      background: #f8fafc;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      margin-top: 35px;
+      margin-bottom: 6px;
+    }
+
+    .page_description,
+    .section_note {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      resize: vertical;
+      background: #ffffff;
+      font: inherit;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    textarea:focus,
+    select:focus {
+      border-color: #2563eb;
+      outline: 2px solid rgba(37, 99, 235, 0.15);
+    }
+
+    select,
+    button {
+      padding: 11px 14px;
+      border-radius: 9px;
+      font: inherit;
+      font-size: 16px;
+    }
+
+    select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .language_controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .main_buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    #translateButton {
+      min-width: 180px;
+      background: #111827;
+      color: #ffffff;
+    }
+
+    #clearButton {
+      background: #e2e8f0;
+      color: #111827;
+    }
+
+    .status {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-weight: bold;
+    }
+
+    .status.visible {
+      display: block;
+    }
+
+    .error {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: bold;
+    }
+
+    .results_section {
+      display: none;
+    }
+
+    .results_section.visible {
+      display: block;
+    }
+
+    .meaning_map_headings {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+      padding: 13px 15px;
+      border-radius: 10px;
+      background: #111827;
+      color: #ffffff;
+    }
+
+    .meaning_map_headings strong {
+      display: flex;
+      align-items: center;
+    }
+
+    .meaning_map {
+      display: grid;
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(230px, 1fr)
+      );
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .meaning_card {
+      overflow: hidden;
+      border: 1px solid #d1d5db;
+      border-top-width: 7px;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 5px 16px rgba(0, 0, 0, 0.07);
+    }
+
+    .meaning_card p {
+      display: flex;
+      align-items: center;
+      min-height: 66px;
+      margin: 0;
+      padding: 13px;
+      overflow-wrap: anywhere;
+      font-size: 17px;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+
+    .meaning_card p:not(:last-child) {
+      border-bottom: 1px solid #d1d5db;
+    }
+
+    .meaning_source {
+      background: #f1f5f9;
+      color: #111827;
+    }
+
+    .meaning_target {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .meaning_pronunciation {
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    .meaning_label {
+      display: none;
+    }
+
+    .empty_result {
+      padding: 15px;
+      border-radius: 9px;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    @media (max-width: 750px) {
+      body {
+        padding: 15px;
+      }
+
+      .language_controls {
+        grid-template-columns: 1fr;
+        gap: 13px;
+      }
+
+      .meaning_map_headings {
+        display: none;
+      }
+
+      .meaning_map {
+        grid-template-columns: 1fr;
+      }
+
+      .meaning_card p {
+        display: block;
+        min-height: auto;
+        text-align: center;
+      }
+
+      .meaning_label {
+        display: block;
+        margin-bottom: 7px;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: normal;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>LingoGPT</h1>
+
+  <p class="page_description">
+    Translate text and connect every source phrase with its translation
+    and natural pronunciation.
+  </p>
+
+  <label for="text">Enter text</label>
+
+  <textarea
+    id="text"
+    placeholder="Enter a sentence or paragraph..."
+  ></textarea>
+
+  <div class="language_controls">
+
+    <div>
+      <label for="sourceLang">
+        Source Language
+      </label>
+
+      <select id="sourceLang"></select>
+    </div>
+
+    <div>
+      <label for="lang">
+        Target Language
+      </label>
+
+      <select id="lang"></select>
+    </div>
+
+  </div>
+
+  <div class="main_buttons">
+
+    <button
+      id="translateButton"
+      type="button"
+    >
+      Translate
+    </button>
+
+    <button
+      id="clearButton"
+      type="button"
+    >
+      Clear
+    </button>
+
+  </div>
+
+  <div
+    id="statusMessage"
+    class="status"
+    role="status"
+    aria-live="polite"
+  ></div>
+
+  <div
+    id="errorMessage"
+    aria-live="assertive"
+  ></div>
+
+  <main
+    id="resultsSection"
+    class="results_section"
+  >
+
+    <h2>Connected Translation</h2>
+
+    <p class="section_note">
+      Each card connects the source phrase, target translation and
+      natural pronunciation.
+    </p>
+
+    <div class="meaning_map_headings">
+
+      <strong id="meaningSourceHeading">
+        Source
+      </strong>
+
+      <strong id="meaningTargetHeading">
+        Translation
+      </strong>
+
+      <strong id="meaningPronunciationHeading">
+        Natural Pronunciation
+      </strong>
+
+    </div>
+
+    <div
+      id="meaningMap"
+      class="meaning_map"
+    ></div>
+
+  </main>
+
+  <script src="results2.js"></script>
+
+  <script>
+    "use strict";
+
+    const palette = [
+      "#e6194b",
+      "#3cb44b",
+      "#b59b00",
+      "#4363d8",
+      "#f58231",
+      "#911eb4",
+      "#008b8b",
+      "#f032e6",
+      "#649600",
+      "#a05252",
+      "#008080",
+      "#7251b5",
+      "#9a6324",
+      "#7c6f00"
+    ];
+
+    let activeRequestController = null;
+
+    function color(index) {
+      const safeIndex =
+        Number.isInteger(Number(index))
+          ? Number(index)
+          : 0;
+
+      return palette[
+        Math.abs(safeIndex) % palette.length
+      ];
+    }
+
+    function escapeHTML(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function populateLanguageSelectors() {
+      const sourceSelector =
+        document.getElementById("sourceLang");
+
+      const targetSelector =
+        document.getElementById("lang");
+
+      const languages =
+        LingoGPTResults.supportedLanguages;
+
+      sourceSelector.innerHTML = "";
+      targetSelector.innerHTML = "";
+
+      const autoDetectOption =
+        document.createElement("option");
+
+      autoDetectOption.value =
+        "Auto Detect";
+
+      autoDetectOption.textContent =
+        "Auto Detect";
+
+      autoDetectOption.selected = true;
+
+      sourceSelector.appendChild(
+        autoDetectOption
+      );
+
+      languages.forEach(function(language) {
+        const sourceOption =
+          document.createElement("option");
+
+        sourceOption.value =
+          language;
+
+        sourceOption.textContent =
+          language;
+
+        sourceSelector.appendChild(
+          sourceOption
+        );
+
+        const targetOption =
+          document.createElement("option");
+
+        targetOption.value =
+          language;
+
+        targetOption.textContent =
+          language;
+
+        if (language === "English") {
+          targetOption.selected = true;
+        }
+
+        targetSelector.appendChild(
+          targetOption
+        );
+      });
+    }
+
+    function setStatus(message) {
+      const status =
+        document.getElementById(
+          "statusMessage"
+        );
+
+      status.textContent =
+        message || "";
+
+      status.classList.toggle(
+        "visible",
+        Boolean(message)
+      );
+    }
+
+    function showError(message) {
+      document.getElementById(
+        "errorMessage"
+      ).innerHTML = `
+        <div class="error">
+          ${escapeHTML(message)}
+        </div>
+      `;
+    }
+
+    function clearError() {
+      document.getElementById(
+        "errorMessage"
+      ).innerHTML = "";
+    }
+
+    function showResults() {
+      document.getElementById(
+        "resultsSection"
+      ).classList.add("visible");
+    }
+
+    function hideResults() {
+      document.getElementById(
+        "resultsSection"
+      ).classList.remove("visible");
+    }
+
+    function clearRenderedResults() {
+      document.getElementById(
+        "meaningMap"
+      ).innerHTML = "";
+    }
+
+    function renderResults(results) {
+      const sourceLanguage =
+        results.detectedLanguage ||
+        results.request.sourceLanguage ||
+        "Source";
+
+      const targetLanguage =
+        results.targetLanguage ||
+        results.request.targetLanguage ||
+        "Target";
+
+      document.getElementById(
+        "meaningSourceHeading"
+      ).textContent =
+        `${sourceLanguage} Source`;
+
+      document.getElementById(
+        "meaningTargetHeading"
+      ).textContent =
+        `${targetLanguage} Translation`;
+
+      document.getElementById(
+        "meaningPronunciationHeading"
+      ).textContent =
+        `${targetLanguage} Natural Pronunciation`;
+
+      const groups =
+        Array.isArray(results.groups)
+          ? results.groups
+          : [];
+
+      const cards = groups
+        .map(function(group, position) {
+          const index =
+            Number.isInteger(
+              Number(group.index)
+            )
+              ? Number(group.index)
+              : position;
+
+          const source =
+            escapeHTML(group.source);
+
+          const translation =
+            escapeHTML(group.translation);
+
+          const pronunciation =
+            escapeHTML(group.pronunciation);
+
+          if (
+            !source ||
+            !translation ||
+            !pronunciation
+          ) {
+            return "";
+          }
+
+          return `
+            <article
+              class="meaning_card"
+              style="border-top-color:${color(index)}"
+              data-meaning-index="${index}"
+            >
+
+              <p
+                class="meaning_source"
+                dir="auto"
+              >
+                <span class="meaning_label">
+                  ${escapeHTML(sourceLanguage)} Source
+                </span>
+
+                ${source}
+              </p>
+
+              <p
+                class="meaning_target"
+                dir="auto"
+              >
+                <span class="meaning_label">
+                  ${escapeHTML(targetLanguage)} Translation
+                </span>
+
+                ${translation}
+              </p>
+
+              <p
+                class="meaning_pronunciation"
+                dir="ltr"
+              >
+                <span class="meaning_label">
+                  ${escapeHTML(targetLanguage)}
+                  Natural Pronunciation
+                </span>
+
+                ${pronunciation}
+              </p>
+
+            </article>
+          `;
+        })
+        .join("");
+
+      document.getElementById(
+        "meaningMap"
+      ).innerHTML =
+        cards ||
+        `
+          <p class="empty_result">
+            No connected translation groups were returned.
+          </p>
+        `;
+
+      showResults();
+    }
+
+    async function runTranslation() {
+      const text =
+        document.getElementById(
+          "text"
+        ).value.trim();
+
+      const sourceLanguage =
+        document.getElementById(
+          "sourceLang"
+        ).value;
+
+      const targetLanguage =
+        document.getElementById(
+          "lang"
+        ).value;
+
+      const translateButton =
+        document.getElementById(
+          "translateButton"
+        );
+
+      clearError();
+
+      if (!text) {
+        showError(
+          "Enter some text."
+        );
+
+        return;
+      }
+
+      if (
+        sourceLanguage !== "Auto Detect" &&
+        sourceLanguage === targetLanguage
+      ) {
+        showError(
+          "The source and target languages must be different."
+        );
+
+        return;
+      }
+
+      if (activeRequestController) {
+        activeRequestController.abort();
+      }
+
+      const requestController =
+        new AbortController();
+
+      activeRequestController =
+        requestController;
+
+      translateButton.disabled = true;
+      translateButton.textContent =
+        "Translating...";
+
+      clearRenderedResults();
+      hideResults();
+      setStatus(
+        "Translating and connecting meanings..."
+      );
+
+      try {
+        const results =
+          await LingoGPTResults.generateResults({
+            text: text,
+
+            sourceLanguage:
+              sourceLanguage,
+
+            targetLanguage:
+              targetLanguage,
+
+            signal:
+              requestController.signal,
+
+            onStatus: function(message) {
+              if (
+                activeRequestController !==
+                requestController
+              ) {
+                return;
+              }
+
+              if (
+                message &&
+                message !== "Complete."
+              ) {
+                setStatus(message);
+              }
+            }
+          });
+
+        if (
+          activeRequestController !==
+          requestController
+        ) {
+          return;
+        }
+
+        renderResults(results);
+        setStatus("");
+
+        console.log(
+          "RESULTS:",
+          results
+        );
+
+        console.log(
+          "GLOBAL RESULTS:",
+          window.lingoResults
+        );
+
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
+
+        if (
+          activeRequestController !==
+          requestController
+        ) {
+          return;
+        }
+
+        console.error(error);
+
+        setStatus("");
+        showError(
+          error.message ||
+          "The translation failed."
+        );
+
+      } finally {
+        if (
+          activeRequestController ===
+          requestController
+        ) {
+          activeRequestController = null;
+
+          translateButton.disabled = false;
+          translateButton.textContent =
+            "Translate";
+        }
+      }
+    }
+
+    function clearPage() {
+      if (activeRequestController) {
+        activeRequestController.abort();
+        activeRequestController = null;
+      }
+
+      const translateButton =
+        document.getElementById(
+          "translateButton"
+        );
+
+      translateButton.disabled = false;
+      translateButton.textContent =
+        "Translate";
+
+      document.getElementById(
+        "text"
+      ).value = "";
+
+      document.getElementById(
+        "sourceLang"
+      ).value =
+        "Auto Detect";
+
+      document.getElementById(
+        "lang"
+      ).value =
+        "English";
+
+      clearError();
+      setStatus("");
+      clearRenderedResults();
+      hideResults();
+
+      document.getElementById(
+        "text"
+      ).focus();
+    }
+
+    populateLanguageSelectors();
+
+    document.getElementById(
+      "translateButton"
+    ).addEventListener(
+      "click",
+      runTranslation
+    );
+
+    document.getElementById(
+      "clearButton"
+    ).addEventListener(
+      "click",
+      clearPage
+    );
+
+    document.getElementById(
+      "text"
+    ).addEventListener(
+      "keydown",
+      function(event) {
+        if (
+          event.ctrlKey &&
+          event.key === "Enter"
+        ) {
+          event.preventDefault();
+          runTranslation();
+        }
+      }
+    );
+
+    document.getElementById(
+      "text"
+    ).focus();
+  </script>
+
+</body>
+</html>

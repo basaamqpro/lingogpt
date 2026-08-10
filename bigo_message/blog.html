@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f7f7f7;
+    color:#202020;
+}
+
+button,
+input,
+textarea,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+#topbar{
+    position:sticky;
+    top:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 4%;
+    background:white;
+    border-bottom:1px solid #ddd;
+}
+
+#topbar a{
+    color:#222;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.topbar_actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.page_button,
+.small_button{
+    border:1px solid #ccc;
+    background:white;
+    color:#222;
+    border-radius:8px;
+}
+
+.page_button{
+    padding:9px 13px;
+}
+
+.small_button{
+    padding:7px 10px;
+}
+
+.primary_button{
+    border-color:#222;
+    background:#222;
+    color:white;
+}
+
+.danger_button{
+    color:#a40000;
+}
+
+#page{
+    width:94%;
+    max-width:900px;
+    margin:24px auto 80px;
+}
+
+#status{
+    min-height:22px;
+    margin-bottom:12px;
+    font-size:14px;
+}
+
+.blog_header{
+    margin-bottom:28px;
+}
+
+.blog_title{
+    margin:0 0 12px;
+    font-size:clamp(30px,6vw,50px);
+    line-height:1.08;
+}
+
+.blog_meta{
+    color:#666;
+    font-size:14px;
+    margin-bottom:12px;
+}
+
+.tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+}
+
+.tag{
+    display:inline-block;
+    padding:5px 9px;
+    border:1px solid #ddd;
+    background:white;
+    border-radius:999px;
+    font-size:13px;
+}
+
+.blog_section{
+    margin:38px 0;
+    padding-top:10px;
+    scroll-margin-top:85px;
+}
+
+.section_head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    border-bottom:1px solid #ddd;
+    padding-bottom:10px;
+    margin-bottom:20px;
+}
+
+.section_head h2{
+    margin:0;
+    font-size:28px;
+}
+
+.content_block{
+    margin:28px 0;
+}
+
+.content_block h3{
+    margin:0 0 10px;
+    font-size:21px;
+}
+
+.paragraph{
+    margin:10px 0;
+    line-height:1.7;
+    white-space:pre-wrap;
+}
+
+.content_links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:10px 0;
+}
+
+.content_links a{
+    color:#1456c0;
+}
+
+.media_row{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding:6px 2px 12px;
+    margin:12px 0;
+    scroll-snap-type:x proximity;
+}
+
+.media_item{
+    flex:0 0 min(78vw,320px);
+    min-height:120px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    background:white;
+    overflow:hidden;
+    scroll-snap-align:start;
+}
+
+.media_item img,
+.media_item video,
+.media_item iframe{
+    display:block;
+    width:100%;
+    height:220px;
+    border:0;
+    object-fit:cover;
+    background:#000;
+}
+
+.media_item audio{
+    display:block;
+    width:calc(100% - 20px);
+    margin:36px 10px;
+}
+
+.document_card{
+    min-height:120px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:10px;
+}
+
+.document_card a{
+    color:#1456c0;
+    word-break:break-word;
+}
+
+.empty_text{
+    color:#777;
+    font-size:14px;
+}
+
+#comments_area{
+    margin-top:60px;
+    padding-top:26px;
+    border-top:1px solid #ccc;
+}
+
+#comments_area h2{
+    margin-top:0;
+}
+
+.comment{
+    padding:14px 0;
+    border-bottom:1px solid #e3e3e3;
+}
+
+.comment_top{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:flex-start;
+}
+
+.comment_username{
+    font-weight:bold;
+}
+
+.comment_date{
+    color:#777;
+    font-size:12px;
+}
+
+.comment_text{
+    margin:8px 0 0;
+    white-space:pre-wrap;
+    line-height:1.5;
+}
+
+.comment_admin_actions{
+    display:flex;
+    gap:6px;
+    margin-top:10px;
+}
+
+#comment_form{
+    margin-top:18px;
+}
+
+#comment_text{
+    width:100%;
+    min-height:90px;
+    resize:vertical;
+    padding:11px;
+    border:1px solid #bbb;
+    border-radius:8px;
+    background:white;
+}
+
+/* Editor */
+
+#editor{
+    display:none;
+}
+
+.editor_box{
+    background:white;
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:16px;
+}
+
+.editor_box label{
+    display:block;
+    margin-bottom:6px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.editor_box input[type="text"],
+.editor_box input[type="url"],
+.editor_box textarea,
+.editor_box select{
+    width:100%;
+    padding:10px;
+    border:1px solid #bbb;
+    border-radius:8px;
+    background:white;
+}
+
+.editor_box textarea{
+    min-height:130px;
+    resize:vertical;
+}
+
+.editor_section{
+    margin:22px 0;
+    padding:16px;
+    border:1px solid #ccc;
+    border-radius:12px;
+    background:#fcfcfc;
+}
+
+.editor_section_header,
+.editor_content_header,
+.editor_row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.editor_section_header,
+.editor_content_header{
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.editor_content{
+    margin:16px 0;
+    padding:14px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    background:white;
+}
+
+.editor_grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.editor_field{
+    margin-bottom:11px;
+}
+
+.editor_actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+
+.editor_list_item{
+    border:1px solid #e0e0e0;
+    border-radius:8px;
+    padding:10px;
+    margin:8px 0;
+}
+
+.editor_list_item .editor_row{
+    align-items:flex-end;
+}
+
+.grow{
+    flex:1;
+}
+
+.media_upload_status{
+    margin-top:7px;
+    min-height:18px;
+    font-size:13px;
+    color:#555;
+}
+
+#save_bar{
+    position:sticky;
+    bottom:12px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    padding:10px;
+    margin-top:18px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    background:rgba(255,255,255,.96);
+}
+
+.hidden{
+    display:none !important;
+}
+
+@media(max-width:650px){
+    #page{
+        width:92%;
+    }
+
+    .editor_grid{
+        grid-template-columns:1fr;
+    }
+
+    .editor_row{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .editor_row .small_button{
+        width:100%;
+    }
+
+    .section_head{
+        flex-direction:column;
+    }
+}
+
+
+textarea {
+    min-width: 76%;
+    min-height: 200px;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<header id="topbar">
+    <a href="view_blogs.html">Blogs</a>
+
+    <div class="topbar_actions">
+        <a class="page_button" href="blog.html">Create Blog</a>
+        <button class="page_button hidden" id="edit_button">Edit</button>
+        <button class="page_button" id="share_blog_button">Share</button>
+    </div>
+</header>
+
+<main id="page">
+
+    <div id="status"></div>
+
+    <div id="viewer"></div>
+
+    <div id="editor"></div>
+
+    <section id="comments_area" class="hidden">
+        <h2>Comments</h2>
+        <div id="comments_list"></div>
+
+        <div id="comment_form">
+            <textarea id="comment_text" placeholder="Write a comment..."></textarea>
+            <div class="editor_actions">
+                <button class="page_button primary_button" id="comment_button">Comment</button>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script type="module">
+
+import{
+    initializeApp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+
+import{
+    getAuth,
+    onAuthStateChanged
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+
+import{
+    getFirestore,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    deleteDoc,
+    query,
+    where,
+    limit,
+    orderBy,
+    serverTimestamp,
+    increment
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
+import{
+    getStorage,
+    ref,
+    uploadBytes,
+    getDownloadURL
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-storage.js";
+
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+const firebaseConfig={
+    apiKey:"AIzaSyDVh4UFpUIGLIDllXgB4V03PPHncg6llIA",
+    authDomain:"two-todolist-project.firebaseapp.com",
+    projectId:"two-todolist-project",
+    storageBucket:"two-todolist-project.firebasestorage.app",
+    messagingSenderId:"981585696379",
+    appId:"1:981585696379:web:fcd35ed7176c86c64ef4de"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const database=getFirestore(app);
+const storage=getStorage(app);
+
+
+/* =========================================================
+   ADMIN
+
+   Put your Firebase Authentication UID here.
+   You can find it in Firebase Console > Authentication > Users.
+========================================================= */
+
+const ADMIN_FIREBASE_UID="PUT_YOUR_FIREBASE_UID_HERE";
+
+
+/* =========================================================
+   PAGE VARIABLES
+========================================================= */
+
+var viewer=document.getElementById("viewer");
+var editor=document.getElementById("editor");
+var statusBox=document.getElementById("status");
+var editButton=document.getElementById("edit_button");
+var shareBlogButton=document.getElementById("share_blog_button");
+var commentsArea=document.getElementById("comments_area");
+var commentsList=document.getElementById("comments_list");
+var commentText=document.getElementById("comment_text");
+var commentButton=document.getElementById("comment_button");
+
+var params=new URLSearchParams(window.location.search);
+var requestedBlogId=params.get("id");
+
+var currentAuthUser=null;
+var currentProfile=null;
+var currentBlog=null;
+var blogDraft=null;
+var activeBlogId=requestedBlogId || "";
+var editMode=!requestedBlogId;
+var pageStarted=false;
+
+
+/* =========================================================
+   SMALL HELPERS
+========================================================= */
+
+function createId(prefix){
+    return prefix+"_"+Date.now()+"_"+Math.floor(Math.random()*100000);
+}
+
+function setStatus(text,colour="black"){
+    statusBox.textContent=text;
+    statusBox.style.color=colour;
+}
+
+function parseTags(text){
+    return text
+        .split(",")
+        .map(function(tag){
+            return tag.trim();
+        })
+        .filter(function(tag,index,array){
+            return tag!=="" && array.indexOf(tag)===index;
+        });
+}
+
+function tagsToText(tags){
+    return Array.isArray(tags) ? tags.join(", ") : "";
+}
+
+function safeHttpUrl(value){
+    try{
+        var url=new URL(value);
+
+        if(url.protocol==="http:" || url.protocol==="https:"){
+            return url.href;
+        }
+    }catch(error){
+        return "";
+    }
+
+    return "";
+}
+
+function formatDate(value){
+    if(!value){
+        return "";
+    }
+
+    try{
+        if(typeof value.toDate==="function"){
+            return value.toDate().toLocaleString([],{
+                year:"numeric",
+                month:"short",
+                day:"numeric",
+                hour:"2-digit",
+                minute:"2-digit"
+            });
+        }
+
+        return new Date(value).toLocaleString();
+    }catch(error){
+        return "";
+    }
+}
+
+function isAdmin(){
+    if(!currentAuthUser){
+        return false;
+    }
+
+    return (
+        currentAuthUser.uid===ADMIN_FIREBASE_UID ||
+        currentProfile?.is_admin===true
+    );
+}
+
+function canEditBlog(){
+    if(!currentAuthUser || !currentBlog){
+        return false;
+    }
+
+    return (
+        currentBlog.author_uid===currentAuthUser.uid ||
+        isAdmin()
+    );
+}
+
+function emptyContent(){
+    return{
+        content_id:createId("content"),
+        title:"",
+        paragraph:"",
+        links:[],
+        media:[]
+    };
+}
+
+function emptySection(){
+    return{
+        section_id:createId("section"),
+        title:"",
+        tags:[],
+        contents:[emptyContent()]
+    };
+}
+
+function emptyBlogDraft(blogId){
+    return{
+        blog_id:blogId,
+        title:"",
+        tags:[],
+        sections:[emptySection()]
+    };
+}
+
+function draftFromBlog(blog){
+    return{
+        blog_id:blog.blog_id,
+        title:blog.title || "",
+        tags:Array.isArray(blog.tags) ? blog.tags : [],
+        sections:Array.isArray(blog.sections) ? JSON.parse(JSON.stringify(blog.sections)) : []
+    };
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function draftStorageKey(){
+    if(requestedBlogId){
+        return "blog_draft_"+requestedBlogId;
+    }
+
+    return "blog_draft_new";
+}
+
+function saveDraftLocally(){
+    if(!blogDraft){
+        return;
+    }
+
+    localStorage.setItem(
+        draftStorageKey(),
+        JSON.stringify({
+            saved_at:Date.now(),
+            draft:blogDraft
+        })
+    );
+}
+
+function getLocalDraft(){
+    try{
+        var raw=localStorage.getItem(draftStorageKey());
+
+        if(!raw){
+            return null;
+        }
+
+        var parsed=JSON.parse(raw);
+
+        if(!parsed || !parsed.draft){
+            return null;
+        }
+
+        return parsed;
+    }catch(error){
+        return null;
+    }
+}
+
+function clearLocalDraft(){
+    localStorage.removeItem(draftStorageKey());
+}
+
+
+/* =========================================================
+   CURRENT USER
+========================================================= */
+
+async function loadCurrentProfile(){
+
+    currentProfile=null;
+
+    if(!currentAuthUser){
+        return;
+    }
+
+    try{
+        var localAccount=null;
+
+        try{
+            localAccount=JSON.parse(
+                localStorage.getItem("account_details") || "null"
+            );
+        }catch(error){
+            localAccount=null;
+        }
+
+        if(localAccount?.user_idx){
+
+            var localProfileSnapshot=await getDoc(
+                doc(
+                    database,
+                    "user_db_details",
+                    localAccount.user_idx
+                )
+            );
+
+            if(localProfileSnapshot.exists()){
+                var localProfile=localProfileSnapshot.data();
+
+                if(localProfile.firebase_uid===currentAuthUser.uid){
+                    currentProfile=localProfile;
+                    return;
+                }
+            }
+        }
+
+        var profileQuery=query(
+            collection(database,"user_db_details"),
+            where("firebase_uid","==",currentAuthUser.uid),
+            limit(1)
+        );
+
+        var profileResult=await getDocs(profileQuery);
+
+        if(!profileResult.empty){
+            currentProfile=profileResult.docs[0].data();
+
+            localStorage.setItem(
+                "account_details",
+                JSON.stringify({
+                    user_idx:currentProfile.user_idx,
+                    firebase_uid:currentProfile.firebase_uid,
+                    username:currentProfile.username,
+                    profile_pic:currentProfile.profile_pic || ""
+                })
+            );
+        }
+
+    }catch(error){
+        console.error("Profile error:",error);
+    }
+}
+
+
+/* =========================================================
+   LOAD BLOG
+========================================================= */
+
+async function loadBlog(){
+
+    if(!requestedBlogId){
+        return null;
+    }
+
+    var blogSnapshot=await getDoc(
+        doc(database,"blogs",requestedBlogId)
+    );
+
+    if(!blogSnapshot.exists()){
+        return null;
+    }
+
+    return blogSnapshot.data();
+}
+
+
+/* =========================================================
+   VIEW RENDERING
+========================================================= */
+
+function renderTags(container,tags){
+
+    if(!Array.isArray(tags) || tags.length===0){
+        return;
+    }
+
+    var tagsBox=document.createElement("div");
+    tagsBox.className="tags";
+
+    tags.forEach(function(tag){
+        var tagElement=document.createElement("span");
+        tagElement.className="tag";
+        tagElement.textContent=tag;
+        tagsBox.appendChild(tagElement);
+    });
+
+    container.appendChild(tagsBox);
+}
+
+function youtubeEmbedUrl(value){
+    try{
+        var url=new URL(value);
+        var videoId="";
+
+        if(url.hostname.includes("youtu.be")){
+            videoId=url.pathname.replace("/","").split("/")[0];
+        }
+
+        if(url.hostname.includes("youtube.com")){
+            if(url.pathname==="/watch"){
+                videoId=url.searchParams.get("v") || "";
+            }else if(url.pathname.startsWith("/shorts/")){
+                videoId=url.pathname.split("/shorts/")[1]?.split("/")[0] || "";
+            }else if(url.pathname.startsWith("/embed/")){
+                videoId=url.pathname.split("/embed/")[1]?.split("/")[0] || "";
+            }
+        }
+
+        if(!/^[a-zA-Z0-9_-]{6,20}$/.test(videoId)){
+            return "";
+        }
+
+        return "https://www.youtube.com/embed/"+videoId;
+
+    }catch(error){
+        return "";
+    }
+}
+
+function createMediaElement(media){
+
+    var item=document.createElement("div");
+    item.className="media_item";
+
+    var safeUrl=safeHttpUrl(media.url || "");
+
+    if(!safeUrl){
+        item.textContent="Invalid media link";
+        return item;
+    }
+
+    if(media.type==="image"){
+        var image=document.createElement("img");
+        image.src=safeUrl;
+        image.alt=media.name || "Blog image";
+        image.loading="lazy";
+        item.appendChild(image);
+    }
+
+    else if(media.type==="video"){
+        var video=document.createElement("video");
+        video.src=safeUrl;
+        video.controls=true;
+        video.preload="metadata";
+        item.appendChild(video);
+    }
+
+    else if(media.type==="audio"){
+        var audio=document.createElement("audio");
+        audio.src=safeUrl;
+        audio.controls=true;
+        audio.preload="metadata";
+        item.appendChild(audio);
+    }
+
+    else if(media.type==="youtube"){
+        var embedUrl=youtubeEmbedUrl(safeUrl);
+
+        if(embedUrl){
+            var iframe=document.createElement("iframe");
+            iframe.src=embedUrl;
+            iframe.title="YouTube video";
+            iframe.loading="lazy";
+            iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            iframe.allowFullscreen=true;
+            item.appendChild(iframe);
+        }else{
+            item.textContent="Invalid YouTube link";
+        }
+    }
+
+    else{
+        var card=document.createElement("div");
+        card.className="document_card";
+
+        var name=document.createElement("strong");
+        name.textContent=media.name || "Document";
+
+        var link=document.createElement("a");
+        link.href=safeUrl;
+        link.target="_blank";
+        link.rel="noopener noreferrer";
+        link.textContent="Open document";
+
+        card.appendChild(name);
+        card.appendChild(link);
+        item.appendChild(card);
+    }
+
+    return item;
+}
+
+function renderBlog(){
+
+    viewer.innerHTML="";
+
+    if(!currentBlog){
+        return;
+    }
+
+    var header=document.createElement("div");
+    header.className="blog_header";
+
+    var h1=document.createElement("h1");
+    h1.className="blog_title";
+    h1.textContent=currentBlog.title || "Untitled Blog";
+    header.appendChild(h1);
+
+    var meta=document.createElement("div");
+    meta.className="blog_meta";
+
+    var metaText="By "+(currentBlog.author_username || "User");
+
+    if(currentBlog.updated_at){
+        metaText+=" · Edited "+formatDate(currentBlog.updated_at);
+    }
+
+    meta.textContent=metaText;
+    header.appendChild(meta);
+
+    renderTags(header,currentBlog.tags);
+    viewer.appendChild(header);
+
+    var sections=Array.isArray(currentBlog.sections) ? currentBlog.sections : [];
+
+    if(sections.length===0){
+        var empty=document.createElement("p");
+        empty.className="empty_text";
+        empty.textContent="This blog does not have any sections yet.";
+        viewer.appendChild(empty);
+    }
+
+    sections.forEach(function(section){
+
+        var sectionElement=document.createElement("section");
+        sectionElement.className="blog_section";
+        sectionElement.id=section.section_id;
+
+        var sectionHead=document.createElement("div");
+        sectionHead.className="section_head";
+
+        var sectionTitleWrap=document.createElement("div");
+
+        var h2=document.createElement("h2");
+        h2.textContent=section.title || "Section";
+        sectionTitleWrap.appendChild(h2);
+        renderTags(sectionTitleWrap,section.tags);
+
+        var shareSectionButton=document.createElement("button");
+        shareSectionButton.className="small_button";
+        shareSectionButton.textContent="Share section";
+        shareSectionButton.onclick=function(){
+            shareSection(section.section_id,section.title || currentBlog.title);
+        };
+
+        sectionHead.appendChild(sectionTitleWrap);
+        sectionHead.appendChild(shareSectionButton);
+        sectionElement.appendChild(sectionHead);
+
+        var contents=Array.isArray(section.contents) ? section.contents : [];
+
+        contents.forEach(function(content){
+
+            var block=document.createElement("div");
+            block.className="content_block";
+
+            if(content.title){
+                var h3=document.createElement("h3");
+                h3.textContent=content.title;
+                block.appendChild(h3);
+            }
+
+            if(Array.isArray(content.media) && content.media.length>0){
+                var mediaRow=document.createElement("div");
+                mediaRow.className="media_row";
+
+                content.media.forEach(function(media){
+                    mediaRow.appendChild(createMediaElement(media));
+                });
+
+                block.appendChild(mediaRow);
+            }
+
+            if(content.paragraph){
+                var paragraph=document.createElement("p");
+                paragraph.className="paragraph";
+                paragraph.textContent=content.paragraph;
+                block.appendChild(paragraph);
+            }
+
+            if(Array.isArray(content.links) && content.links.length>0){
+                var links=document.createElement("div");
+                links.className="content_links";
+
+                content.links.forEach(function(linkData){
+                    var safeUrl=safeHttpUrl(linkData.url || "");
+
+                    if(!safeUrl){
+                        return;
+                    }
+
+                    var link=document.createElement("a");
+                    link.href=safeUrl;
+                    link.target="_blank";
+                    link.rel="noopener noreferrer";
+                    link.textContent=linkData.text || safeUrl;
+                    links.appendChild(link);
+                });
+
+                block.appendChild(links);
+            }
+
+            sectionElement.appendChild(block);
+        });
+
+        viewer.appendChild(sectionElement);
+    });
+
+    editButton.classList.toggle("hidden",!canEditBlog());
+    commentsArea.classList.remove("hidden");
+}
+
+
+/* =========================================================
+   EDITOR RENDERING
+========================================================= */
+
+function makeField(labelText,inputElement){
+    var field=document.createElement("div");
+    field.className="editor_field";
+
+    var label=document.createElement("label");
+    label.textContent=labelText;
+
+    field.appendChild(label);
+    field.appendChild(inputElement);
+
+    return field;
+}
+
+function renderEditor(){
+
+    if(!blogDraft){
+        return;
+    }
+
+    viewer.classList.add("hidden");
+    commentsArea.classList.add("hidden");
+    editor.style.display="block";
+    editor.innerHTML="";
+
+    var blogBox=document.createElement("div");
+    blogBox.className="editor_box";
+
+    var title=document.createElement("input");
+    title.type="text";
+    title.placeholder="Blog title";
+    title.value=blogDraft.title;
+    title.oninput=function(){
+        blogDraft.title=title.value;
+        saveDraftLocally();
+    };
+
+    var tags=document.createElement("input");
+    tags.type="text";
+    tags.placeholder="firebase, tutorial, javascript";
+    tags.value=tagsToText(blogDraft.tags);
+    tags.oninput=function(){
+        blogDraft.tags=parseTags(tags.value);
+        saveDraftLocally();
+    };
+
+    blogBox.appendChild(makeField("Blog title",title));
+    blogBox.appendChild(makeField("Blog tags - separate with commas",tags));
+    editor.appendChild(blogBox);
+
+    blogDraft.sections.forEach(function(section,sectionIndex){
+        editor.appendChild(
+            renderEditorSection(section,sectionIndex)
+        );
+    });
+
+    var addSectionButton=document.createElement("button");
+    addSectionButton.className="page_button";
+    addSectionButton.textContent="+ Add Section";
+    addSectionButton.onclick=function(){
+        blogDraft.sections.push(emptySection());
+        saveDraftLocally();
+        renderEditor();
+    };
+    editor.appendChild(addSectionButton);
+
+    var saveBar=document.createElement("div");
+    saveBar.id="save_bar";
+
+    if(requestedBlogId){
+        var cancelButton=document.createElement("button");
+        cancelButton.className="page_button";
+        cancelButton.textContent="Cancel";
+        cancelButton.onclick=cancelEditing;
+        saveBar.appendChild(cancelButton);
+    }
+
+    var saveButton=document.createElement("button");
+    saveButton.className="page_button primary_button";
+    saveButton.textContent="Save Blog";
+    saveButton.onclick=saveBlog;
+    saveBar.appendChild(saveButton);
+
+    editor.appendChild(saveBar);
+}
+
+function renderEditorSection(section,sectionIndex){
+
+    var box=document.createElement("div");
+    box.className="editor_section";
+
+    var header=document.createElement("div");
+    header.className="editor_section_header";
+
+    var strong=document.createElement("strong");
+    strong.textContent="Section "+(sectionIndex+1);
+
+    var removeSection=document.createElement("button");
+    removeSection.className="small_button danger_button";
+    removeSection.textContent="Remove section";
+    removeSection.onclick=function(){
+        if(confirm("Remove this section?")){
+            blogDraft.sections.splice(sectionIndex,1);
+            saveDraftLocally();
+            renderEditor();
+        }
+    };
+
+    header.appendChild(strong);
+    header.appendChild(removeSection);
+    box.appendChild(header);
+
+    var title=document.createElement("input");
+    title.type="text";
+    title.placeholder="Section title";
+    title.value=section.title || "";
+    title.oninput=function(){
+        section.title=title.value;
+        saveDraftLocally();
+    };
+
+    var tags=document.createElement("input");
+    tags.type="text";
+    tags.placeholder="optional, section, tags";
+    tags.value=tagsToText(section.tags);
+    tags.oninput=function(){
+        section.tags=parseTags(tags.value);
+        saveDraftLocally();
+    };
+
+    var grid=document.createElement("div");
+    grid.className="editor_grid";
+    grid.appendChild(makeField("Section title",title));
+    grid.appendChild(makeField("Section tags",tags));
+    box.appendChild(grid);
+
+    section.contents.forEach(function(content,contentIndex){
+        box.appendChild(
+            renderEditorContent(
+                section,
+                content,
+                sectionIndex,
+                contentIndex
+            )
+        );
+    });
+
+    var addContent=document.createElement("button");
+    addContent.className="small_button";
+    addContent.textContent="+ Add Content";
+    addContent.onclick=function(){
+        section.contents.push(emptyContent());
+        saveDraftLocally();
+        renderEditor();
+    };
+
+    box.appendChild(addContent);
+    return box;
+}
+
+function renderEditorContent(section,content,sectionIndex,contentIndex){
+
+    var box=document.createElement("div");
+    box.className="editor_content";
+
+    var header=document.createElement("div");
+    header.className="editor_content_header";
+
+    var strong=document.createElement("strong");
+    strong.textContent="Content "+(contentIndex+1);
+
+    var removeContent=document.createElement("button");
+    removeContent.className="small_button danger_button";
+    removeContent.textContent="Remove";
+    removeContent.onclick=function(){
+        if(confirm("Remove this content block?")){
+            section.contents.splice(contentIndex,1);
+            saveDraftLocally();
+            renderEditor();
+        }
+    };
+
+    header.appendChild(strong);
+    header.appendChild(removeContent);
+    box.appendChild(header);
+
+    var title=document.createElement("input");
+    title.type="text";
+    title.placeholder="Optional H3 title";
+    title.value=content.title || "";
+    title.oninput=function(){
+        content.title=title.value;
+        saveDraftLocally();
+    };
+
+    var paragraph=document.createElement("textarea");
+    paragraph.placeholder="Paragraph...";
+    paragraph.value=content.paragraph || "";
+    paragraph.oninput=function(){
+        content.paragraph=paragraph.value;
+        saveDraftLocally();
+    };
+
+    box.appendChild(makeField("Title H3",title));
+    box.appendChild(makeField("Paragraph",paragraph));
+
+
+    /* Links */
+
+    var linksTitle=document.createElement("strong");
+    linksTitle.textContent="Links";
+    box.appendChild(linksTitle);
+
+    if(!Array.isArray(content.links)){
+        content.links=[];
+    }
+
+    content.links.forEach(function(linkData,linkIndex){
+
+        var item=document.createElement("div");
+        item.className="editor_list_item";
+
+        var row=document.createElement("div");
+        row.className="editor_row";
+
+        var textWrap=document.createElement("div");
+        textWrap.className="grow";
+
+        var text=document.createElement("input");
+        text.type="text";
+        text.placeholder="Link text";
+        text.value=linkData.text || "";
+        text.oninput=function(){
+            linkData.text=text.value;
+            saveDraftLocally();
+        };
+
+        textWrap.appendChild(makeField("Text",text));
+
+        var urlWrap=document.createElement("div");
+        urlWrap.className="grow";
+
+        var url=document.createElement("input");
+        url.type="url";
+        url.placeholder="https://example.com";
+        url.value=linkData.url || "";
+        url.oninput=function(){
+            linkData.url=url.value;
+            saveDraftLocally();
+        };
+
+        urlWrap.appendChild(makeField("URL",url));
+
+        var remove=document.createElement("button");
+        remove.className="small_button danger_button";
+        remove.textContent="Remove";
+        remove.onclick=function(){
+            content.links.splice(linkIndex,1);
+            saveDraftLocally();
+            renderEditor();
+        };
+
+        row.appendChild(textWrap);
+        row.appendChild(urlWrap);
+        row.appendChild(remove);
+        item.appendChild(row);
+        box.appendChild(item);
+    });
+
+    var addLink=document.createElement("button");
+    addLink.className="small_button";
+    addLink.textContent="+ Add Link";
+    addLink.onclick=function(){
+        content.links.push({
+            text:"",
+            url:""
+        });
+        saveDraftLocally();
+        renderEditor();
+    };
+    box.appendChild(addLink);
+
+
+    /* Media */
+
+    var mediaTitle=document.createElement("strong");
+    mediaTitle.style.display="block";
+    mediaTitle.style.marginTop="18px";
+    mediaTitle.textContent="Media";
+    box.appendChild(mediaTitle);
+
+    if(!Array.isArray(content.media)){
+        content.media=[];
+    }
+
+    content.media.forEach(function(media,mediaIndex){
+
+        var item=document.createElement("div");
+        item.className="editor_list_item";
+
+        var row=document.createElement("div");
+        row.className="editor_row";
+
+        var type=document.createElement("strong");
+        type.textContent=media.type || "media";
+
+        var name=document.createElement("span");
+        name.className="grow";
+        name.textContent=media.name || media.url || "Media";
+
+        var remove=document.createElement("button");
+        remove.className="small_button danger_button";
+        remove.textContent="Remove";
+        remove.onclick=function(){
+            content.media.splice(mediaIndex,1);
+            saveDraftLocally();
+            renderEditor();
+        };
+
+        row.appendChild(type);
+        row.appendChild(name);
+        row.appendChild(remove);
+        item.appendChild(row);
+        box.appendChild(item);
+    });
+
+    var mediaActions=document.createElement("div");
+    mediaActions.className="editor_actions";
+
+    var addMediaLink=document.createElement("button");
+    addMediaLink.className="small_button";
+    addMediaLink.textContent="+ Media Link";
+    addMediaLink.onclick=function(){
+        addMediaLinkToContent(content);
+    };
+
+    var uploadLabel=document.createElement("label");
+    uploadLabel.className="small_button";
+    uploadLabel.style.display="inline-block";
+    uploadLabel.style.cursor="pointer";
+    uploadLabel.textContent="+ Upload Media";
+
+    var uploadInput=document.createElement("input");
+    uploadInput.type="file";
+    uploadInput.accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt";
+    uploadInput.multiple=true;
+    uploadInput.style.display="none";
+
+    var uploadStatus=document.createElement("div");
+    uploadStatus.className="media_upload_status";
+
+    uploadInput.onchange=async function(){
+        await uploadFilesToContent(
+            content,
+            Array.from(uploadInput.files),
+            uploadStatus
+        );
+        uploadInput.value="";
+    };
+
+    uploadLabel.appendChild(uploadInput);
+
+    mediaActions.appendChild(addMediaLink);
+    mediaActions.appendChild(uploadLabel);
+    box.appendChild(mediaActions);
+    box.appendChild(uploadStatus);
+
+    return box;
+}
+
+
+/* =========================================================
+   MEDIA
+========================================================= */
+
+function addMediaLinkToContent(content){
+
+    var type=prompt(
+        "Media type: image, video, audio, document or youtube",
+        "image"
+    );
+
+    if(type===null){
+        return;
+    }
+
+    type=type.trim().toLowerCase();
+
+    if(!["image","video","audio","document","youtube"].includes(type)){
+        alert("Use image, video, audio, document or youtube.");
+        return;
+    }
+
+    var url=prompt("Paste the media link:","https://");
+
+    if(url===null){
+        return;
+    }
+
+    var safeUrl=safeHttpUrl(url);
+
+    if(!safeUrl){
+        alert("Please enter a valid http or https link.");
+        return;
+    }
+
+    var name="";
+
+    if(type==="document"){
+        name=prompt("Document name:","Document") || "Document";
+    }
+
+    content.media.push({
+        media_id:createId("media"),
+        type:type,
+        url:safeUrl,
+        name:name,
+        storage_path:""
+    });
+
+    saveDraftLocally();
+    renderEditor();
+}
+
+function mediaTypeFromFile(file){
+
+    if(file.type.startsWith("image/")){
+        return "image";
+    }
+
+    if(file.type.startsWith("video/")){
+        return "video";
+    }
+
+    if(file.type.startsWith("audio/")){
+        return "audio";
+    }
+
+    return "document";
+}
+
+async function uploadFilesToContent(content,files,statusElement){
+
+    if(!currentAuthUser){
+        alert("Please login before uploading media.");
+        return;
+    }
+
+    if(files.length===0){
+        return;
+    }
+
+    try{
+        for(var i=0;i<files.length;i++){
+
+            var file=files[i];
+
+            statusElement.textContent=
+                "Uploading "+(i+1)+" of "+files.length+"...";
+
+            var safeFileName=file.name.replace(
+                /[^a-zA-Z0-9._-]/g,
+                "_"
+            );
+
+            var storagePath=
+                "blogs/"+
+                activeBlogId+
+                "/media/"+
+                Date.now()+
+                "_"+
+                Math.floor(Math.random()*10000)+
+                "_"+
+                safeFileName;
+
+            var fileRef=ref(storage,storagePath);
+
+            await uploadBytes(fileRef,file);
+
+            var url=await getDownloadURL(fileRef);
+
+            content.media.push({
+                media_id:createId("media"),
+                type:mediaTypeFromFile(file),
+                url:url,
+                name:file.name,
+                storage_path:storagePath
+            });
+
+            saveDraftLocally();
+        }
+
+        statusElement.textContent="Upload complete.";
+        renderEditor();
+
+    }catch(error){
+        console.error(error);
+        statusElement.textContent="Upload error: "+error.message;
+    }
+}
+
+
+/* =========================================================
+   SAVE BLOG
+========================================================= */
+
+function cleanBlogDraftForFirebase(){
+
+    return{
+        blog_id:activeBlogId,
+        title:(blogDraft.title || "").trim(),
+        tags:Array.isArray(blogDraft.tags) ? blogDraft.tags : [],
+        sections:(blogDraft.sections || []).map(function(section){
+            return{
+                section_id:section.section_id || createId("section"),
+                title:(section.title || "").trim(),
+                tags:Array.isArray(section.tags) ? section.tags : [],
+                contents:(section.contents || []).map(function(content){
+                    return{
+                        content_id:content.content_id || createId("content"),
+                        title:(content.title || "").trim(),
+                        paragraph:content.paragraph || "",
+                        links:(content.links || [])
+                            .map(function(link){
+                                return{
+                                    text:(link.text || "").trim(),
+                                    url:safeHttpUrl(link.url || "")
+                                };
+                            })
+                            .filter(function(link){
+                                return link.url!=="";
+                            }),
+                        media:(content.media || [])
+                            .map(function(media){
+                                return{
+                                    media_id:media.media_id || createId("media"),
+                                    type:media.type || "document",
+                                    url:safeHttpUrl(media.url || ""),
+                                    name:media.name || "",
+                                    storage_path:media.storage_path || ""
+                                };
+                            })
+                            .filter(function(media){
+                                return media.url!=="";
+                            })
+                    };
+                })
+            };
+        })
+    };
+}
+
+async function saveBlog(){
+
+    if(!currentAuthUser){
+        alert("Please login before creating or editing a blog.");
+        window.location.href="login.html";
+        return;
+    }
+
+    if(requestedBlogId && !canEditBlog()){
+        alert("You cannot edit this blog.");
+        return;
+    }
+
+    var cleanDraft=cleanBlogDraftForFirebase();
+
+    if(cleanDraft.title===""){
+        alert("Please enter a blog title.");
+        return;
+    }
+
+    if(cleanDraft.sections.length===0){
+        alert("Please add at least one section.");
+        return;
+    }
+
+    try{
+        setStatus("Saving blog...");
+
+        var blogData={
+            blog_id:activeBlogId,
+            title:cleanDraft.title,
+            tags:cleanDraft.tags,
+            sections:cleanDraft.sections,
+            updated_at:serverTimestamp()
+        };
+
+        if(!currentBlog){
+            blogData.author_uid=currentAuthUser.uid;
+            blogData.author_user_idx=currentProfile?.user_idx || "";
+            blogData.author_username=currentProfile?.username || "User";
+            blogData.created_at=serverTimestamp();
+            blogData.last_commented_at=null;
+            blogData.comment_count=0;
+        }
+
+        await setDoc(
+            doc(database,"blogs",activeBlogId),
+            blogData,
+            {merge:true}
+        );
+
+        clearLocalDraft();
+        setStatus("Blog saved.","green");
+
+        window.location.href=
+            "blog.html?id="+encodeURIComponent(activeBlogId);
+
+    }catch(error){
+        console.error(error);
+        setStatus("Save error: "+error.message,"red");
+    }
+}
+
+function cancelEditing(){
+    editMode=false;
+    editor.style.display="none";
+    editor.classList.add("hidden");
+    viewer.classList.remove("hidden");
+    commentsArea.classList.remove("hidden");
+    renderBlog();
+    loadComments();
+}
+
+
+/* =========================================================
+   COMMENTS
+========================================================= */
+
+async function loadComments(){
+
+    if(!requestedBlogId || !currentBlog){
+        return;
+    }
+
+    commentsList.innerHTML="";
+
+    try{
+        var commentsQuery=query(
+            collection(
+                database,
+                "blogs",
+                requestedBlogId,
+                "comments"
+            ),
+            orderBy("created_at","asc")
+        );
+
+        var result=await getDocs(commentsQuery);
+
+        if(result.empty){
+            var empty=document.createElement("p");
+            empty.className="empty_text";
+            empty.textContent="No comments yet.";
+            commentsList.appendChild(empty);
+            return;
+        }
+
+        result.forEach(function(commentSnapshot){
+            renderComment(
+                commentSnapshot.id,
+                commentSnapshot.data()
+            );
+        });
+
+    }catch(error){
+        console.error(error);
+        commentsList.textContent="Could not load comments.";
+    }
+}
+
+function renderComment(commentId,comment){
+
+    var box=document.createElement("div");
+    box.className="comment";
+
+    var top=document.createElement("div");
+    top.className="comment_top";
+
+    var username=document.createElement("div");
+    username.className="comment_username";
+    username.textContent=comment.username || "User";
+
+    var date=document.createElement("div");
+    date.className="comment_date";
+    date.textContent=formatDate(comment.created_at);
+
+    top.appendChild(username);
+    top.appendChild(date);
+
+    var text=document.createElement("p");
+    text.className="comment_text";
+    text.textContent=comment.text || "";
+
+    box.appendChild(top);
+    box.appendChild(text);
+
+    if(isAdmin()){
+        var actions=document.createElement("div");
+        actions.className="comment_admin_actions";
+
+        var edit=document.createElement("button");
+        edit.className="small_button";
+        edit.textContent="Edit";
+        edit.onclick=function(){
+            adminEditComment(commentId,comment);
+        };
+
+        var remove=document.createElement("button");
+        remove.className="small_button danger_button";
+        remove.textContent="Delete";
+        remove.onclick=function(){
+            adminDeleteComment(commentId);
+        };
+
+        actions.appendChild(edit);
+        actions.appendChild(remove);
+        box.appendChild(actions);
+    }
+
+    commentsList.appendChild(box);
+}
+
+commentButton.onclick=async function(){
+
+    if(!currentBlog){
+        return;
+    }
+
+    if(!currentAuthUser){
+        alert("Please login before commenting.");
+        window.location.href="login.html";
+        return;
+    }
+
+    var text=commentText.value.trim();
+
+    if(text===""){
+        return;
+    }
+
+    commentButton.disabled=true;
+
+    try{
+        var commentId=createId("comment");
+
+        await setDoc(
+            doc(
+                database,
+                "blogs",
+                requestedBlogId,
+                "comments",
+                commentId
+            ),
+            {
+                comment_id:commentId,
+                user_idx:currentProfile?.user_idx || "",
+                firebase_uid:currentAuthUser.uid,
+                username:currentProfile?.username || "User",
+                text:text,
+                created_at:serverTimestamp(),
+                edited_at:null
+            }
+        );
+
+        await setDoc(
+            doc(database,"blogs",requestedBlogId),
+            {
+                last_commented_at:serverTimestamp(),
+                comment_count:increment(1)
+            },
+            {merge:true}
+        );
+
+        commentText.value="";
+        await loadComments();
+
+    }catch(error){
+        console.error(error);
+        alert("Comment error: "+error.message);
+    }
+
+    commentButton.disabled=false;
+};
+
+async function adminEditComment(commentId,comment){
+
+    if(!isAdmin()){
+        return;
+    }
+
+    var newText=prompt("Edit comment:",comment.text || "");
+
+    if(newText===null){
+        return;
+    }
+
+    newText=newText.trim();
+
+    if(newText===""){
+        return;
+    }
+
+    try{
+        await setDoc(
+            doc(
+                database,
+                "blogs",
+                requestedBlogId,
+                "comments",
+                commentId
+            ),
+            {
+                text:newText,
+                edited_at:serverTimestamp()
+            },
+            {merge:true}
+        );
+
+        await loadComments();
+
+    }catch(error){
+        alert("Edit error: "+error.message);
+    }
+}
+
+async function adminDeleteComment(commentId){
+
+    if(!isAdmin()){
+        return;
+    }
+
+    if(!confirm("Delete this comment?")){
+        return;
+    }
+
+    try{
+        await deleteDoc(
+            doc(
+                database,
+                "blogs",
+                requestedBlogId,
+                "comments",
+                commentId
+            )
+        );
+
+        await setDoc(
+            doc(database,"blogs",requestedBlogId),
+            {
+                comment_count:increment(-1)
+            },
+            {merge:true}
+        );
+
+        await loadComments();
+
+    }catch(error){
+        alert("Delete error: "+error.message);
+    }
+}
+
+
+/* =========================================================
+   SHARING
+========================================================= */
+
+async function shareUrl(url,title){
+
+    try{
+        if(navigator.share){
+            await navigator.share({
+                title:title || "Blog",
+                url:url
+            });
+            return;
+        }
+    }catch(error){
+        if(error.name==="AbortError"){
+            return;
+        }
+    }
+
+    try{
+        await navigator.clipboard.writeText(url);
+        setStatus("Share link copied.","green");
+    }catch(error){
+        prompt("Copy this link:",url);
+    }
+}
+
+shareBlogButton.onclick=function(){
+
+    if(!requestedBlogId && editMode){
+        alert("Save the blog first before sharing it.");
+        return;
+    }
+
+    shareUrl(
+        window.location.origin+
+        window.location.pathname+
+        "?id="+
+        encodeURIComponent(activeBlogId),
+        currentBlog?.title || blogDraft?.title || "Blog"
+    );
+};
+
+function shareSection(sectionId,title){
+
+    var url=
+        window.location.origin+
+        window.location.pathname+
+        "?id="+
+        encodeURIComponent(activeBlogId)+
+        "#"+
+        encodeURIComponent(sectionId);
+
+    shareUrl(url,title);
+}
+
+
+/* =========================================================
+   EDIT BUTTON
+========================================================= */
+
+editButton.onclick=function(){
+
+    if(!canEditBlog()){
+        return;
+    }
+
+    editMode=true;
+    blogDraft=draftFromBlog(currentBlog);
+
+    var localDraft=getLocalDraft();
+
+    if(localDraft?.draft){
+        var restore=confirm(
+            "An unsaved local draft exists for this blog. Restore it?"
+        );
+
+        if(restore){
+            blogDraft=localDraft.draft;
+        }
+    }
+
+    renderEditor();
+};
+
+
+/* =========================================================
+   START PAGE
+========================================================= */
+
+async function startPage(){
+
+    if(pageStarted){
+        return;
+    }
+
+    pageStarted=true;
+
+    try{
+        if(requestedBlogId){
+
+            setStatus("Loading blog...");
+
+            currentBlog=await loadBlog();
+
+            if(!currentBlog){
+                setStatus("Blog not found.","red");
+                viewer.innerHTML="<p>Blog not found.</p>";
+                shareBlogButton.classList.add("hidden");
+                return;
+            }
+
+            activeBlogId=currentBlog.blog_id || requestedBlogId;
+            document.title=currentBlog.title || "Blog";
+
+            renderBlog();
+            await loadComments();
+            setStatus("");
+
+            if(window.location.hash){
+                setTimeout(function(){
+                    var target=document.getElementById(
+                        decodeURIComponent(window.location.hash.substring(1))
+                    );
+
+                    if(target){
+                        target.scrollIntoView({
+                            behavior:"smooth",
+                            block:"start"
+                        });
+                    }
+                },100);
+            }
+
+        }else{
+
+            if(!currentAuthUser){
+                setStatus(
+                    "Please login to create a blog.",
+                    "red"
+                );
+
+                viewer.innerHTML=
+                    '<p><a href="login.html">Login</a> to create a blog.</p>';
+
+                shareBlogButton.classList.add("hidden");
+                return;
+            }
+
+            var localDraft=getLocalDraft();
+
+            if(localDraft?.draft){
+                blogDraft=localDraft.draft;
+                activeBlogId=
+                    blogDraft.blog_id ||
+                    doc(collection(database,"blogs")).id;
+                blogDraft.blog_id=activeBlogId;
+                setStatus("Local draft restored.","green");
+            }else{
+                activeBlogId=doc(
+                    collection(database,"blogs")
+                ).id;
+
+                blogDraft=emptyBlogDraft(activeBlogId);
+            }
+
+            editMode=true;
+            renderEditor();
+        }
+
+    }catch(error){
+        console.error(error);
+        setStatus("Page error: "+error.message,"red");
+    }
+}
+
+
+/* =========================================================
+   AUTH START
+========================================================= */
+
+onAuthStateChanged(auth,async function(user){
+    currentAuthUser=user;
+    await loadCurrentProfile();
+    await startPage();
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Room</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding-top:75px;
+    font-family:Arial,sans-serif;
+    background:#f3f6fb;
+    color:#222;
+}
+
+#menu{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    background:white;
+    border-bottom:1px solid #ddd;
+    z-index:1000;
+}
+
+#menu a{
+    text-decoration:none;
+    color:#222;
+    font-weight:bold;
+}
+
+#create_room_page{
+    width:92%;
+    max-width:520px;
+    margin:30px auto;
+    padding:25px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:15px;
+}
+
+h1{
+    margin-top:0;
+    margin-bottom:8px;
+    text-align:center;
+}
+
+.page_description{
+    margin-top:0;
+    margin-bottom:25px;
+    text-align:center;
+    color:#666;
+}
+
+#current_user{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:22px;
+    padding:12px;
+    background:#f7f9fc;
+    border:1px solid #e0e5ee;
+    border-radius:10px;
+}
+
+#current_user_pic{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+    background:#e5e7eb;
+}
+
+#current_user_name{
+    margin:0;
+    font-weight:bold;
+}
+
+.small_text{
+    margin:3px 0 0;
+    color:#777;
+    font-size:13px;
+}
+
+.field{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:7px;
+    font-weight:bold;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #bbb;
+    border-radius:8px;
+    font-family:Arial,sans-serif;
+    font-size:16px;
+    outline:none;
+}
+
+textarea{
+    min-height:90px;
+    resize:vertical;
+}
+
+input:focus,
+textarea:focus{
+    border-color:#2864dc;
+}
+
+#character_count{
+    margin:6px 0 0;
+    text-align:right;
+    color:#777;
+    font-size:13px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#2864dc;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+#message{
+    min-height:20px;
+    margin-top:15px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.rooms_link{
+    margin-top:20px;
+    text-align:center;
+}
+
+.rooms_link a{
+    color:#2864dc;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+@media(max-width:600px){
+
+    #menu{
+        gap:12px;
+        padding:0 10px;
+        overflow-x:auto;
+        justify-content:flex-start;
+    }
+
+    #menu a{
+        white-space:nowrap;
+        font-size:14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+    <img src="bigo.png" class="bigo_icon" style="height: 75%;" />
+    <a href="index.html">Home</a>
+    <a href="register.html">Register</a>
+    <a href="login.html">Login</a>
+    <a href="create_room.html">Create Room</a>
+    <a href="view_rooms.html">Rooms</a>
+</div>
+
+<div id="create_room_page">
+
+    <h1>Create Room</h1>
+
+    <p class="page_description">
+        Create a new room for people to chat in.
+    </p>
+
+    <div id="current_user">
+        <img
+            id="current_user_pic"
+            alt="Profile picture"
+        >
+
+        <div>
+            <p id="current_user_name">Checking account...</p>
+            <p class="small_text">Room creator</p>
+        </div>
+    </div>
+
+    <div class="field">
+        <label for="room_title">Room Title</label>
+        <input
+            type="text"
+            id="room_title"
+            placeholder="Example: Hi everybody"
+            maxlength="80"
+        >
+        <p id="character_count">0 / 80</p>
+    </div>
+
+    <div class="field">
+        <label for="room_description">
+            Description <span style="font-weight:normal;color:#777;">(optional)</span>
+        </label>
+
+        <textarea
+            id="room_description"
+            placeholder="What is this room about?"
+            maxlength="300"
+        ></textarea>
+    </div>
+
+    <button id="create_room_button" type="button" disabled>
+        Create Room
+    </button>
+
+    <p id="message"></p>
+
+    <p class="rooms_link">
+        <a href="view_rooms.html">View existing rooms</a>
+    </p>
+
+</div>
+
+<script type="module">
+
+import{
+    initializeApp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+
+import{
+    getAuth,
+    onAuthStateChanged
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+
+import{
+    getFirestore,
+    doc,
+    writeBatch,
+    serverTimestamp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
+const firebaseConfig={
+    apiKey:"AIzaSyDVh4UFpUIGLIDllXgB4V03PPHncg6llIA",
+    authDomain:"two-todolist-project.firebaseapp.com",
+    projectId:"two-todolist-project",
+    storageBucket:"two-todolist-project.firebasestorage.app",
+    messagingSenderId:"981585696379",
+    appId:"1:981585696379:web:fcd35ed7176c86c64ef4de"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const database=getFirestore(app);
+
+var roomTitleInput=
+    document.getElementById(
+        "room_title"
+    );
+
+var roomDescriptionInput=
+    document.getElementById(
+        "room_description"
+    );
+
+var createRoomButton=
+    document.getElementById(
+        "create_room_button"
+    );
+
+var message=
+    document.getElementById(
+        "message"
+    );
+
+var currentUserName=
+    document.getElementById(
+        "current_user_name"
+    );
+
+var currentUserPic=
+    document.getElementById(
+        "current_user_pic"
+    );
+
+var characterCount=
+    document.getElementById(
+        "character_count"
+    );
+
+var account_details=null;
+var firebaseUser=null;
+
+function createRoomIdx(){
+
+    return "room_"+
+        Date.now()+
+        "_"+
+        Math.floor(
+            Math.random()*10000
+        );
+}
+
+function showMessage(text,colour){
+
+    message.textContent=text;
+    message.style.color=colour;
+}
+
+function getLocalAccountDetails(){
+
+    var savedAccount=
+        localStorage.getItem(
+            "account_details"
+        );
+
+    if(!savedAccount){
+        return null;
+    }
+
+    try{
+        return JSON.parse(savedAccount);
+    }catch(error){
+
+        console.error(error);
+
+        localStorage.removeItem(
+            "account_details"
+        );
+
+        return null;
+    }
+}
+
+function displayCurrentUser(){
+
+    if(!account_details){
+        return;
+    }
+
+    currentUserName.textContent=
+        "@"+account_details.username;
+
+    if(account_details.profile_pic){
+
+        currentUserPic.src=
+            account_details.profile_pic;
+
+    }else{
+
+        currentUserPic.removeAttribute(
+            "src"
+        );
+
+        currentUserPic.alt=
+            "No profile picture";
+    }
+}
+
+function accountIsValid(){
+
+    if(!account_details){
+        return false;
+    }
+
+    if(!firebaseUser){
+        return false;
+    }
+
+    if(
+        account_details.firebase_uid!==
+        firebaseUser.uid
+    ){
+        return false;
+    }
+
+    return true;
+}
+
+roomTitleInput.oninput=function(){
+
+    characterCount.textContent=
+        roomTitleInput.value.length+
+        " / 80";
+};
+
+async function createRoom(){
+
+    var room_title=
+        roomTitleInput.value.trim();
+
+    var room_description=
+        roomDescriptionInput.value.trim();
+
+    if(!accountIsValid()){
+
+        showMessage(
+            "Please login before creating a room.",
+            "red"
+        );
+
+        return;
+    }
+
+    if(room_title===""){
+
+        showMessage(
+            "Please enter a room title.",
+            "red"
+        );
+
+        roomTitleInput.focus();
+        return;
+    }
+
+    if(room_title.length<3){
+
+        showMessage(
+            "Room title must contain at least 3 characters.",
+            "red"
+        );
+
+        roomTitleInput.focus();
+        return;
+    }
+
+    createRoomButton.disabled=true;
+
+    showMessage(
+        "Creating room...",
+        "black"
+    );
+
+    try{
+
+        var room_idx=
+            createRoomIdx();
+
+        var created_at_ms=
+            Date.now();
+
+        var roomData={
+
+            room_idx:room_idx,
+            room_title:room_title,
+            room_title_lowercase:
+                room_title.toLowerCase(),
+
+            room_description:
+                room_description,
+
+            created_by_user_idx:
+                account_details.user_idx,
+
+            created_by_firebase_uid:
+                firebaseUser.uid,
+
+            created_by_username:
+                account_details.username,
+
+            time_created:
+                serverTimestamp(),
+
+            time_created_ms:
+                created_at_ms,
+
+            number_of_messages:0,
+
+            last_message_time:
+                serverTimestamp(),
+
+            last_message_time_ms:
+                created_at_ms,
+
+            last_message_preview:"",
+
+            last_three_messages:[],
+
+            member_count:1,
+
+            room_status:"active"
+        };
+
+        var creatorMemberData={
+
+            user_idx:
+                account_details.user_idx,
+
+            firebase_uid:
+                firebaseUser.uid,
+
+            username:
+                account_details.username,
+
+            profile_pic:
+                account_details.profile_pic || "",
+
+            joined_at:
+                serverTimestamp(),
+
+            unread_messages:0,
+
+            last_read_message_idx:"",
+
+            last_read_at:
+                serverTimestamp()
+        };
+
+        var batch=
+            writeBatch(
+                database
+            );
+
+        batch.set(
+            doc(
+                database,
+                "rooms_collection",
+                room_idx
+            ),
+            roomData
+        );
+
+        batch.set(
+            doc(
+                database,
+                "rooms_collection",
+                room_idx,
+                "members",
+                account_details.user_idx
+            ),
+            creatorMemberData
+        );
+
+        await batch.commit();
+
+        localStorage.setItem(
+            "current_room",
+            JSON.stringify({
+                room_idx:room_idx,
+                room_title:room_title
+            })
+        );
+
+        showMessage(
+            "Room created successfully. Room ID: "+
+            room_idx,
+            "green"
+        );
+
+        roomTitleInput.value="";
+        roomDescriptionInput.value="";
+        characterCount.textContent="0 / 80";
+        createRoomButton.disabled=false;
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "Could not create room: "+
+            error.message,
+            "red"
+        );
+
+        createRoomButton.disabled=false;
+    }
+}
+
+createRoomButton.onclick=function(){
+    createRoom();
+};
+
+roomTitleInput.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key==="Enter"){
+            createRoom();
+        }
+    }
+);
+
+account_details=
+    getLocalAccountDetails();
+
+if(!account_details){
+
+    window.location.href=
+        "login.html";
+
+}else{
+
+    displayCurrentUser();
+
+    onAuthStateChanged(
+        auth,
+        function(user){
+
+            if(!user){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            firebaseUser=user;
+
+            if(
+                account_details.firebase_uid!==
+                user.uid
+            ){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            createRoomButton.disabled=false;
+        }
+    );
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rooms</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding-top:75px;
+    font-family:Arial,sans-serif;
+    background:#f3f6fb;
+    color:#222;
+}
+
+#menu{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    background:white;
+    border-bottom:1px solid #ddd;
+    z-index:1000;
+}
+
+#menu a{
+    text-decoration:none;
+    color:#222;
+    font-weight:bold;
+}
+
+#rooms_page{
+    width:92%;
+    max-width:760px;
+    margin:30px auto;
+}
+
+.page_header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.page_header h1{
+    margin:0;
+}
+
+#create_room_link{
+    padding:10px 14px;
+    border-radius:8px;
+    background:#2864dc;
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+#current_user{
+    margin-bottom:20px;
+    padding:12px 15px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:12px;
+}
+
+#current_user_name{
+    margin:0;
+    font-weight:bold;
+}
+
+.small_text{
+    margin:4px 0 0;
+    color:#777;
+    font-size:13px;
+}
+
+#rooms_list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.room_card{
+    padding:18px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:14px;
+}
+
+.room_top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.room_title{
+    margin:0 0 5px;
+    font-size:20px;
+}
+
+.room_description{
+    margin:0;
+    color:#666;
+    line-height:1.4;
+}
+
+.unread_badge{
+    min-width:28px;
+    padding:5px 8px;
+    border-radius:20px;
+    background:#2864dc;
+    color:white;
+    text-align:center;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.room_information{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 16px;
+    margin-top:14px;
+    color:#666;
+    font-size:13px;
+}
+
+.last_message{
+    margin:14px 0 0;
+    padding:10px 12px;
+    border-radius:9px;
+    background:#f7f9fc;
+    color:#444;
+    word-break:break-word;
+}
+
+.room_bottom{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:14px;
+}
+
+.membership_text{
+    margin:0;
+    color:#777;
+    font-size:13px;
+}
+
+.open_room_button{
+    padding:9px 14px;
+    border:none;
+    border-radius:8px;
+    background:#2864dc;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.open_room_button:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+#message{
+    min-height:20px;
+    margin:15px 0;
+    text-align:center;
+    font-weight:bold;
+}
+
+.empty_message{
+    padding:30px 20px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:14px;
+    text-align:center;
+    color:#666;
+}
+
+@media(max-width:600px){
+
+    #menu{
+        gap:12px;
+        padding:0 10px;
+        overflow-x:auto;
+        justify-content:flex-start;
+    }
+
+    #menu a{
+        white-space:nowrap;
+        font-size:14px;
+    }
+
+    .page_header{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .room_bottom{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .open_room_button{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+    <img src="bigo.png" class="bigo_icon" style="height: 75%;" />
+    <a href="index.html">Home</a>
+    <a href="register.html">Register</a>
+    <a href="login.html">Login</a>
+    <a href="create_room.html">Create Room</a>
+    <a href="view_rooms.html">Rooms</a>
+</div>
+
+<div id="rooms_page">
+
+    <div class="page_header">
+        <div>
+            <h1>Chat Rooms</h1>
+            <p class="small_text">
+                Rooms are sorted by the latest activity.
+            </p>
+        </div>
+
+        <a id="create_room_link" href="create_room.html">
+            + Create Room
+        </a>
+    </div>
+
+    <div id="current_user">
+        <p id="current_user_name">Checking account...</p>
+        <p class="small_text">
+            Logged-in user
+        </p>
+    </div>
+
+    <p id="message"></p>
+
+    <div id="rooms_list"></div>
+
+</div>
+
+<script type="module">
+
+import{
+    initializeApp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+
+import{
+    getAuth,
+    onAuthStateChanged
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+
+import{
+    getFirestore,
+    collection,
+    query,
+    orderBy,
+    onSnapshot,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    increment,
+    serverTimestamp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
+const firebaseConfig={
+    apiKey:"AIzaSyDVh4UFpUIGLIDllXgB4V03PPHncg6llIA",
+    authDomain:"two-todolist-project.firebaseapp.com",
+    projectId:"two-todolist-project",
+    storageBucket:"two-todolist-project.firebasestorage.app",
+    messagingSenderId:"981585696379",
+    appId:"1:981585696379:web:fcd35ed7176c86c64ef4de"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const database=getFirestore(app);
+
+var roomsList=
+    document.getElementById(
+        "rooms_list"
+    );
+
+var message=
+    document.getElementById(
+        "message"
+    );
+
+var currentUserName=
+    document.getElementById(
+        "current_user_name"
+    );
+
+var account_details=null;
+var firebaseUser=null;
+var stopRoomsListener=null;
+
+function showMessage(
+    text,
+    colour
+){
+
+    message.textContent=text;
+    message.style.color=colour;
+}
+
+function getLocalAccountDetails(){
+
+    var savedAccount=
+        localStorage.getItem(
+            "account_details"
+        );
+
+    if(!savedAccount){
+        return null;
+    }
+
+    try{
+
+        return JSON.parse(
+            savedAccount
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        localStorage.removeItem(
+            "account_details"
+        );
+
+        return null;
+    }
+}
+
+function formatTime(
+    milliseconds
+){
+
+    if(!milliseconds){
+        return "No activity yet";
+    }
+
+    var date=
+        new Date(
+            milliseconds
+        );
+
+    return date.toLocaleString();
+}
+
+function createTextElement(
+    tagName,
+    className,
+    text
+){
+
+    var element=
+        document.createElement(
+            tagName
+        );
+
+    if(className){
+        element.className=
+            className;
+    }
+
+    element.textContent=text;
+
+    return element;
+}
+
+async function getMembership(
+    room_idx
+){
+
+    var memberReference=
+        doc(
+            database,
+            "rooms_collection",
+            room_idx,
+            "members",
+            account_details.user_idx
+        );
+
+    var memberSnapshot=
+        await getDoc(
+            memberReference
+        );
+
+    if(!memberSnapshot.exists()){
+
+        return{
+            is_member:false,
+            unread_messages:0
+        };
+    }
+
+    var memberData=
+        memberSnapshot.data();
+
+    return{
+        is_member:true,
+        unread_messages:
+            memberData.unread_messages || 0
+    };
+}
+
+async function joinRoomIfNeeded(
+    room
+){
+
+    var memberReference=
+        doc(
+            database,
+            "rooms_collection",
+            room.room_idx,
+            "members",
+            account_details.user_idx
+        );
+
+    var memberSnapshot=
+        await getDoc(
+            memberReference
+        );
+
+    if(memberSnapshot.exists()){
+        return;
+    }
+
+    await setDoc(
+        memberReference,
+        {
+            user_idx:
+                account_details.user_idx,
+
+            firebase_uid:
+                firebaseUser.uid,
+
+            username:
+                account_details.username,
+
+            profile_pic:
+                account_details.profile_pic || "",
+
+            joined_at:
+                serverTimestamp(),
+
+            unread_messages:0,
+
+            last_read_message_idx:"",
+
+            last_read_at:
+                serverTimestamp()
+        }
+    );
+
+    await updateDoc(
+        doc(
+            database,
+            "rooms_collection",
+            room.room_idx
+        ),
+        {
+            member_count:
+                increment(1)
+        }
+    );
+}
+
+async function openRoom(
+    room,
+    button
+){
+
+    try{
+
+        button.disabled=true;
+        button.textContent="Opening...";
+
+        await joinRoomIfNeeded(
+            room
+        );
+
+        localStorage.setItem(
+            "current_room",
+            JSON.stringify({
+                room_idx:
+                    room.room_idx,
+
+                room_title:
+                    room.room_title
+            })
+        );
+
+        window.location.href=
+            "room_chat.html";
+
+    }catch(error){
+
+        console.error(error);
+
+        button.disabled=false;
+        button.textContent="Open Room";
+
+        showMessage(
+            "Could not open room: "+
+            error.message,
+            "red"
+        );
+    }
+}
+
+async function createRoomCard(
+    room
+){
+
+    var membership=
+        await getMembership(
+            room.room_idx
+        );
+
+    var roomCard=
+        document.createElement(
+            "div"
+        );
+
+    roomCard.className=
+        "room_card";
+
+    var roomTop=
+        document.createElement(
+            "div"
+        );
+
+    roomTop.className=
+        "room_top";
+
+    var titleSection=
+        document.createElement(
+            "div"
+        );
+
+    var roomTitle=
+        createTextElement(
+            "h2",
+            "room_title",
+            room.room_title || "Untitled room"
+        );
+
+    var roomDescription=
+        createTextElement(
+            "p",
+            "room_description",
+            room.room_description ||
+            "No description."
+        );
+
+    titleSection.appendChild(
+        roomTitle
+    );
+
+    titleSection.appendChild(
+        roomDescription
+    );
+
+    roomTop.appendChild(
+        titleSection
+    );
+
+    if(
+        membership.unread_messages>0
+    ){
+
+        var unreadBadge=
+            createTextElement(
+                "span",
+                "unread_badge",
+                membership.unread_messages>99
+                ?"99+"
+                :String(
+                    membership.unread_messages
+                )
+            );
+
+        roomTop.appendChild(
+            unreadBadge
+        );
+    }
+
+    roomCard.appendChild(
+        roomTop
+    );
+
+    var roomInformation=
+        document.createElement(
+            "div"
+        );
+
+    roomInformation.className=
+        "room_information";
+
+    roomInformation.appendChild(
+        createTextElement(
+            "span",
+            "",
+            "Messages: "+
+            (room.number_of_messages || 0)
+        )
+    );
+
+    roomInformation.appendChild(
+        createTextElement(
+            "span",
+            "",
+            "Members: "+
+            (room.member_count || 0)
+        )
+    );
+
+    roomInformation.appendChild(
+        createTextElement(
+            "span",
+            "",
+            "Created by @"+
+            (
+                room.created_by_username ||
+                "Unknown"
+            )
+        )
+    );
+
+    roomInformation.appendChild(
+        createTextElement(
+            "span",
+            "",
+            "Latest: "+
+            formatTime(
+                room.last_message_time_ms
+            )
+        )
+    );
+
+    roomCard.appendChild(
+        roomInformation
+    );
+
+    var lastMessageText=
+        room.last_message_preview
+        ?"Last message: "+
+            room.last_message_preview
+        :"No messages have been sent yet.";
+
+    roomCard.appendChild(
+        createTextElement(
+            "p",
+            "last_message",
+            lastMessageText
+        )
+    );
+
+    var roomBottom=
+        document.createElement(
+            "div"
+        );
+
+    roomBottom.className=
+        "room_bottom";
+
+    var membershipText=
+        createTextElement(
+            "p",
+            "membership_text",
+            membership.is_member
+            ?"You are a member"
+            :"You will join when you open this room"
+        );
+
+    var openRoomButton=
+        document.createElement(
+            "button"
+        );
+
+    openRoomButton.type="button";
+
+    openRoomButton.className=
+        "open_room_button";
+
+    openRoomButton.textContent=
+        "Open Room";
+
+    openRoomButton.onclick=
+        function(){
+
+            openRoom(
+                room,
+                openRoomButton
+            );
+        };
+
+    roomBottom.appendChild(
+        membershipText
+    );
+
+    roomBottom.appendChild(
+        openRoomButton
+    );
+
+    roomCard.appendChild(
+        roomBottom
+    );
+
+    return roomCard;
+}
+
+async function renderRooms(
+    rooms
+){
+
+    roomsList.innerHTML="";
+
+    if(rooms.length===0){
+
+        roomsList.appendChild(
+            createTextElement(
+                "div",
+                "empty_message",
+                "No rooms have been created yet."
+            )
+        );
+
+        return;
+    }
+
+    for(
+        var i=0;
+        i<rooms.length;
+        i++
+    ){
+
+        var roomCard=
+            await createRoomCard(
+                rooms[i]
+            );
+
+        roomsList.appendChild(
+            roomCard
+        );
+    }
+}
+
+function listenForRooms(){
+
+    var roomsQuery=
+        query(
+            collection(
+                database,
+                "rooms_collection"
+            ),
+            orderBy(
+                "last_message_time_ms",
+                "desc"
+            )
+        );
+
+    stopRoomsListener=
+        onSnapshot(
+            roomsQuery,
+
+            async function(snapshot){
+
+                var rooms=[];
+
+                snapshot.forEach(
+                    function(roomDocument){
+
+                        rooms.push(
+                            roomDocument.data()
+                        );
+                    }
+                );
+
+                showMessage(
+                    "",
+                    ""
+                );
+
+                await renderRooms(
+                    rooms
+                );
+            },
+
+            function(error){
+
+                console.error(error);
+
+                showMessage(
+                    "Could not load rooms: "+
+                    error.message,
+                    "red"
+                );
+            }
+        );
+}
+
+account_details=
+    getLocalAccountDetails();
+
+if(!account_details){
+
+    window.location.href=
+        "login.html";
+
+}else{
+
+    currentUserName.textContent=
+        "@"+
+        account_details.username;
+
+    showMessage(
+        "Loading rooms...",
+        "black"
+    );
+
+    onAuthStateChanged(
+        auth,
+        function(user){
+
+            if(!user){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            firebaseUser=user;
+
+            if(
+                account_details.firebase_uid!==
+                user.uid
+            ){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            listenForRooms();
+        }
+    );
+}
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        if(stopRoomsListener){
+            stopRoomsListener();
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

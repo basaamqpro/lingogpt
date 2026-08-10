@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Settings</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding-top:75px;
+    font-family:Arial,sans-serif;
+    background:#f3f6fb;
+    color:#222;
+}
+
+button,
+input{
+    font:inherit;
+}
+
+#menu{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding:0 14px;
+    background:white;
+    border-bottom:1px solid #ddd;
+    z-index:1000;
+}
+
+#menu a{
+    color:#222;
+    text-decoration:none;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+#settings_page{
+    width:92%;
+    max-width:760px;
+    margin:25px auto 45px;
+}
+
+.page_header{
+    margin-bottom:20px;
+}
+
+.page_header h1{
+    margin:0 0 6px;
+}
+
+.page_description{
+    margin:0;
+    color:#667085;
+    line-height:1.5;
+}
+
+.user_card{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    margin-bottom:18px;
+    padding:14px;
+    background:white;
+    border:1px solid #dde3ec;
+    border-radius:13px;
+}
+
+#profile_picture{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border-radius:50%;
+    background:#dce5f3;
+    color:#344054;
+    font-weight:bold;
+}
+
+#profile_picture img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+#username{
+    margin:0;
+    font-weight:bold;
+}
+
+.small_text{
+    margin:4px 0 0;
+    color:#777;
+    font-size:13px;
+}
+
+.settings_card{
+    margin-bottom:16px;
+    padding:20px;
+    background:white;
+    border:1px solid #dde3ec;
+    border-radius:14px;
+}
+
+.settings_card h2{
+    margin:0 0 7px;
+    font-size:19px;
+}
+
+.settings_description{
+    margin:0 0 16px;
+    color:#667085;
+    line-height:1.5;
+}
+
+.setting_row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    padding:13px 0;
+    border-top:1px solid #edf0f4;
+}
+
+.setting_row:first-of-type{
+    border-top:0;
+}
+
+.setting_name{
+    margin:0;
+    font-weight:bold;
+}
+
+.setting_help{
+    margin:4px 0 0;
+    color:#777;
+    font-size:13px;
+    line-height:1.4;
+}
+
+.switch{
+    position:relative;
+    width:54px;
+    height:30px;
+    flex:0 0 54px;
+}
+
+.switch input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+.switch_slider{
+    position:absolute;
+    inset:0;
+    border-radius:30px;
+    background:#cfd6df;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.switch_slider:before{
+    content:"";
+    position:absolute;
+    width:24px;
+    height:24px;
+    left:3px;
+    top:3px;
+    border-radius:50%;
+    background:white;
+    box-shadow:0 1px 4px rgba(0,0,0,0.2);
+    transition:0.2s;
+}
+
+.switch input:checked + .switch_slider{
+    background:#2864dc;
+}
+
+.switch input:checked + .switch_slider:before{
+    transform:translateX(24px);
+}
+
+.notification_options{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+}
+
+.notification_option{
+    display:block;
+    cursor:pointer;
+}
+
+.notification_option input{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+
+.notification_option_content{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    padding:13px;
+    border:1px solid #dce2ea;
+    border-radius:11px;
+    background:#fafbfc;
+    transition:0.15s;
+}
+
+.custom_radio{
+    width:19px;
+    height:19px;
+    flex:0 0 19px;
+    margin-top:1px;
+    border:2px solid #aab4c3;
+    border-radius:50%;
+    background:white;
+}
+
+.notification_option input:checked +
+.notification_option_content{
+    border-color:#2864dc;
+    background:#edf4ff;
+}
+
+.notification_option input:checked +
+.notification_option_content
+.custom_radio{
+    border:5px solid #2864dc;
+}
+
+.option_title{
+    display:block;
+    margin-bottom:3px;
+    font-weight:bold;
+}
+
+.option_help{
+    color:#667085;
+    font-size:13px;
+    line-height:1.4;
+}
+
+.current_information{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.information_box{
+    padding:13px;
+    border:1px solid #e0e5ec;
+    border-radius:10px;
+    background:#f8fafc;
+}
+
+.information_label{
+    margin:0;
+    color:#667085;
+    font-size:12px;
+}
+
+.information_value{
+    margin:5px 0 0;
+    font-size:21px;
+    font-weight:bold;
+}
+
+#save_button{
+    width:100%;
+    padding:12px 16px;
+    border:0;
+    border-radius:10px;
+    background:#2864dc;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+#save_button:hover{
+    background:#174fbf;
+}
+
+#save_button:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+#message{
+    min-height:22px;
+    margin:12px 0 0;
+    text-align:center;
+    font-weight:bold;
+}
+
+.note{
+    margin-top:15px;
+    padding:12px;
+    border-radius:10px;
+    background:#fff8e7;
+    color:#725600;
+    font-size:13px;
+    line-height:1.5;
+}
+
+@media(max-width:600px){
+
+    #menu{
+        justify-content:flex-start;
+        gap:12px;
+        overflow-x:auto;
+    }
+
+    #menu a{
+        font-size:14px;
+    }
+
+    .settings_card{
+        padding:16px;
+    }
+
+    .setting_row{
+        align-items:flex-start;
+    }
+
+    .current_information{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+    <a href="index.html">Home</a>
+    <a href="create_room.html">Create Room</a>
+    <a href="view_rooms.html">Rooms</a>
+    <a href="settings.html">Settings</a>
+</div>
+
+<div id="settings_page">
+
+    <div class="page_header">
+        <h1>Chat Settings</h1>
+
+        <p class="page_description">
+            Choose when this account should receive chat notifications.
+        </p>
+    </div>
+
+    <div class="user_card">
+
+        <div id="profile_picture">
+            ?
+        </div>
+
+        <div>
+            <p id="username">Loading account...</p>
+
+            <p class="small_text">
+                These settings belong only to this user.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="settings_card">
+
+        <h2>Mentions</h2>
+
+        <p class="settings_description">
+            Control whether messages containing your @username should create a mention notification.
+        </p>
+
+        <div class="setting_row">
+
+            <div>
+                <p class="setting_name">
+                    Allow @mentions
+                </p>
+
+                <p class="setting_help">
+                    When enabled, people in a room can notify you by writing @yourusername.
+                </p>
+            </div>
+
+            <label class="switch">
+
+                <input
+                    type="checkbox"
+                    id="allow_mentions"
+                >
+
+                <span class="switch_slider"></span>
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <div class="settings_card">
+
+        <h2>Message notifications</h2>
+
+        <p class="settings_description">
+            Choose how frequently normal room messages should create notifications.
+        </p>
+
+        <div class="notification_options">
+
+            <label class="notification_option">
+
+                <input
+                    type="radio"
+                    name="notification_mode"
+                    value="all"
+                >
+
+                <span class="notification_option_content">
+
+                    <span class="custom_radio"></span>
+
+                    <span>
+                        <span class="option_title">
+                            Every message
+                        </span>
+
+                        <span class="option_help">
+                            Create a notification whenever another room member sends a message.
+                        </span>
+                    </span>
+
+                </span>
+
+            </label>
+
+            <label class="notification_option">
+
+                <input
+                    type="radio"
+                    name="notification_mode"
+                    value="every_5"
+                >
+
+                <span class="notification_option_content">
+
+                    <span class="custom_radio"></span>
+
+                    <span>
+                        <span class="option_title">
+                            Every 5 unread messages
+                        </span>
+
+                        <span class="option_help">
+                            Normal-message notifications appear when the unread count reaches 5, 10, 15 and so on.
+                        </span>
+                    </span>
+
+                </span>
+
+            </label>
+
+            <label class="notification_option">
+
+                <input
+                    type="radio"
+                    name="notification_mode"
+                    value="every_10"
+                >
+
+                <span class="notification_option_content">
+
+                    <span class="custom_radio"></span>
+
+                    <span>
+                        <span class="option_title">
+                            Every 10 unread messages
+                        </span>
+
+                        <span class="option_help">
+                            Normal-message notifications appear when the unread count reaches 10, 20, 30 and so on.
+                        </span>
+                    </span>
+
+                </span>
+
+            </label>
+
+            <label class="notification_option">
+
+                <input
+                    type="radio"
+                    name="notification_mode"
+                    value="mentions_only"
+                >
+
+                <span class="notification_option_content">
+
+                    <span class="custom_radio"></span>
+
+                    <span>
+                        <span class="option_title">
+                            Mentions and replies only
+                        </span>
+
+                        <span class="option_help">
+                            Normal messages do not create notifications. Mentions are controlled by the switch above, while direct replies still notify you.
+                        </span>
+                    </span>
+
+                </span>
+
+            </label>
+
+        </div>
+
+        <div class="note">
+            A direct reply to one of your messages still creates a notification because replies are specifically addressed to you.
+        </div>
+
+    </div>
+
+    <div class="settings_card">
+
+        <h2>Current account information</h2>
+
+        <div class="current_information">
+
+            <div class="information_box">
+
+                <p class="information_label">
+                    Total unread messages
+                </p>
+
+                <p
+                    class="information_value"
+                    id="total_unread_messages"
+                >
+                    0
+                </p>
+
+            </div>
+
+            <div class="information_box">
+
+                <p class="information_label">
+                    Current notification mode
+                </p>
+
+                <p
+                    class="information_value"
+                    id="current_notification_mode"
+                    style="font-size:16px;"
+                >
+                    -
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <button
+        id="save_button"
+        type="button"
+    >
+        Save Settings
+    </button>
+
+    <p id="message"></p>
+
+</div>
+
+<script type="module">
+
+import{
+    initializeApp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+
+import{
+    getAuth,
+    onAuthStateChanged
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+
+import{
+    getFirestore,
+    doc,
+    getDoc,
+    updateDoc,
+    serverTimestamp,
+    onSnapshot
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
+const firebaseConfig={
+    apiKey:"AIzaSyDVh4UFpUIGLIDllXgB4V03PPHncg6llIA",
+    authDomain:"two-todolist-project.firebaseapp.com",
+    projectId:"two-todolist-project",
+    storageBucket:"two-todolist-project.firebasestorage.app",
+    messagingSenderId:"981585696379",
+    appId:"1:981585696379:web:fcd35ed7176c86c64ef4de"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const database=getFirestore(app);
+
+var profilePicture=
+    document.getElementById(
+        "profile_picture"
+    );
+
+var usernameText=
+    document.getElementById(
+        "username"
+    );
+
+var allowMentions=
+    document.getElementById(
+        "allow_mentions"
+    );
+
+var totalUnreadMessages=
+    document.getElementById(
+        "total_unread_messages"
+    );
+
+var currentNotificationMode=
+    document.getElementById(
+        "current_notification_mode"
+    );
+
+var saveButton=
+    document.getElementById(
+        "save_button"
+    );
+
+var message=
+    document.getElementById(
+        "message"
+    );
+
+var account_details=null;
+var firebaseUser=null;
+var stopUserListener=null;
+
+function showMessage(
+    text,
+    colour
+){
+
+    message.textContent=text;
+    message.style.color=colour;
+}
+
+function getLocalAccountDetails(){
+
+    var savedAccount=
+        localStorage.getItem(
+            "account_details"
+        );
+
+    if(!savedAccount){
+        return null;
+    }
+
+    try{
+
+        return JSON.parse(
+            savedAccount
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        localStorage.removeItem(
+            "account_details"
+        );
+
+        return null;
+    }
+}
+
+function setProfilePicture(
+    profilePic,
+    username
+){
+
+    profilePicture.innerHTML="";
+
+    if(profilePic){
+
+        var image=
+            document.createElement(
+                "img"
+            );
+
+        image.src=profilePic;
+        image.alt=username;
+
+        profilePicture.appendChild(
+            image
+        );
+
+    }else{
+
+        profilePicture.textContent=
+            (
+                username ||
+                "?"
+            )
+            .charAt(0)
+            .toUpperCase();
+    }
+}
+
+function getSelectedNotificationMode(){
+
+    var selected=
+        document.querySelector(
+            'input[name="notification_mode"]:checked'
+        );
+
+    if(!selected){
+        return "all";
+    }
+
+    return selected.value;
+}
+
+function selectNotificationMode(
+    mode
+){
+
+    var allowedModes=[
+        "all",
+        "every_5",
+        "every_10",
+        "mentions_only"
+    ];
+
+    if(
+        !allowedModes.includes(
+            mode
+        )
+    ){
+        mode="all";
+    }
+
+    var input=
+        document.querySelector(
+            'input[name="notification_mode"][value="'+
+            mode+
+            '"]'
+        );
+
+    if(input){
+        input.checked=true;
+    }
+}
+
+function notificationModeLabel(
+    mode
+){
+
+    var labels={
+        all:"Every message",
+        every_5:"Every 5 unread",
+        every_10:"Every 10 unread",
+        mentions_only:"Mentions/replies"
+    };
+
+    return labels[mode] || "Every message";
+}
+
+function loadSettingsIntoPage(
+    userData
+){
+
+    var settings=
+        userData.settings || {};
+
+    var allowMentionsValue=
+        settings.allow_mentions;
+
+    if(
+        typeof allowMentionsValue!==
+        "boolean"
+    ){
+        allowMentionsValue=true;
+    }
+
+    var notificationMode=
+        settings.notification_mode ||
+        "all";
+
+    allowMentions.checked=
+        allowMentionsValue;
+
+    selectNotificationMode(
+        notificationMode
+    );
+
+    totalUnreadMessages.textContent=
+        userData.total_unread_messages ||
+        0;
+
+    currentNotificationMode.textContent=
+        notificationModeLabel(
+            notificationMode
+        );
+}
+
+async function saveSettings(){
+
+    if(
+        !account_details ||
+        !firebaseUser
+    ){
+        return;
+    }
+
+    var notificationMode=
+        getSelectedNotificationMode();
+
+    var notificationEvery=0;
+
+    if(
+        notificationMode===
+        "every_5"
+    ){
+        notificationEvery=5;
+    }
+
+    if(
+        notificationMode===
+        "every_10"
+    ){
+        notificationEvery=10;
+    }
+
+    saveButton.disabled=true;
+
+    showMessage(
+        "Saving settings...",
+        "#344054"
+    );
+
+    try{
+
+        await updateDoc(
+            doc(
+                database,
+                "user_db_details",
+                account_details.user_idx
+            ),
+            {
+                settings:{
+                    allow_mentions:
+                        allowMentions.checked,
+
+                    notification_mode:
+                        notificationMode,
+
+                    notification_every:
+                        notificationEvery
+                },
+
+                settings_last_updated:
+                    serverTimestamp(),
+
+                settings_last_updated_ms:
+                    Date.now()
+            }
+        );
+
+        showMessage(
+            "Settings saved successfully.",
+            "green"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "Could not save settings: "+
+            error.message,
+            "red"
+        );
+
+    }finally{
+
+        saveButton.disabled=false;
+    }
+}
+
+function listenToUserSettings(){
+
+    var userReference=
+        doc(
+            database,
+            "user_db_details",
+            account_details.user_idx
+        );
+
+    stopUserListener=
+        onSnapshot(
+            userReference,
+
+            function(snapshot){
+
+                if(!snapshot.exists()){
+
+                    showMessage(
+                        "Your user profile could not be found.",
+                        "red"
+                    );
+
+                    return;
+                }
+
+                var userData=
+                    snapshot.data();
+
+                usernameText.textContent=
+                    "@"+
+                    (
+                        userData.username ||
+                        account_details.username
+                    );
+
+                setProfilePicture(
+                    userData.profile_pic ||
+                    account_details.profile_pic ||
+                    "",
+                    userData.username ||
+                    account_details.username
+                );
+
+                loadSettingsIntoPage(
+                    userData
+                );
+            },
+
+            function(error){
+
+                console.error(error);
+
+                showMessage(
+                    "Could not load settings: "+
+                    error.message,
+                    "red"
+                );
+            }
+        );
+}
+
+saveButton.onclick=
+    function(){
+
+        saveSettings();
+    };
+
+account_details=
+    getLocalAccountDetails();
+
+if(!account_details){
+
+    window.location.href=
+        "login.html";
+
+}else{
+
+    usernameText.textContent=
+        "@"+
+        account_details.username;
+
+    setProfilePicture(
+        account_details.profile_pic ||
+        "",
+        account_details.username
+    );
+
+    showMessage(
+        "Loading settings...",
+        "#344054"
+    );
+
+    onAuthStateChanged(
+        auth,
+        async function(user){
+
+            if(!user){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            if(
+                account_details.firebase_uid!==
+                user.uid
+            ){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            firebaseUser=user;
+
+            try{
+
+                var userSnapshot=
+                    await getDoc(
+                        doc(
+                            database,
+                            "user_db_details",
+                            account_details.user_idx
+                        )
+                    );
+
+                if(!userSnapshot.exists()){
+
+                    throw new Error(
+                        "Your user profile does not exist."
+                    );
+                }
+
+                loadSettingsIntoPage(
+                    userSnapshot.data()
+                );
+
+                showMessage(
+                    "",
+                    ""
+                );
+
+                listenToUserSettings();
+
+            }catch(error){
+
+                console.error(error);
+
+                showMessage(
+                    "Could not load settings: "+
+                    error.message,
+                    "red"
+                );
+            }
+        }
+    );
+}
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        if(stopUserListener){
+            stopUserListener();
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

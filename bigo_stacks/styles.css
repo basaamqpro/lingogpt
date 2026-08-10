@@ -1,0 +1,1261 @@
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    height:100%;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f5f5f5;
+    color:#222;
+}
+
+/* =========================
+   TOP MENU
+========================= */
+
+#menu{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+
+    height:52px;
+
+    display:flex;
+    align-items:center;
+
+    gap:16px;
+
+    padding:0 14px;
+
+    background:#fff;
+
+    z-index:1000;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    white-space:nowrap;
+
+    scrollbar-width:none;
+
+    box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+
+#menu::-webkit-scrollbar{
+    display:none;
+}
+
+#menu a{
+    text-decoration:none;
+    color:#333;
+    font-size:13px;
+    font-weight:600;
+}
+
+
+/* =========================
+   NOTIFICATION BUTTON
+========================= */
+
+#notification_button{
+    position:relative;
+
+    border:none;
+    background:none;
+
+    padding:6px;
+
+    font-size:12px;
+    font-weight:600;
+
+    cursor:pointer;
+}
+
+#notification_badge{
+    position:absolute;
+
+    top:-2px;
+    right:-4px;
+
+    min-width:17px;
+    height:17px;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    padding:0 4px;
+
+    background:#e53935;
+    color:#fff;
+
+    border-radius:20px;
+
+    font-size:10px;
+}
+
+
+/* =========================
+   NOTIFICATION PANEL
+========================= */
+
+#notification_panel{
+    position:fixed;
+
+    top:57px;
+    right:8px;
+
+    width:min(360px,calc(100% - 16px));
+    max-height:65vh;
+
+    display:none;
+
+    padding:8px;
+
+    overflow-y:auto;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    box-shadow:
+        0 10px 35px
+        rgba(0,0,0,0.18);
+
+    z-index:1500;
+}
+
+#notification_panel.show{
+    display:block;
+}
+
+.notification_title{
+    margin:5px 7px 10px;
+    font-size:16px;
+}
+
+.notification_item{
+    width:100%;
+
+    padding:10px;
+
+    margin-bottom:5px;
+
+    border:none;
+    border-radius:9px;
+
+    background:#f6f6f6;
+
+    text-align:left;
+
+    cursor:pointer;
+}
+
+.notification_item.unread{
+    background:#eaf2ff;
+}
+
+.notification_item p{
+    margin:0;
+    font-size:13px;
+}
+
+.notification_time{
+    margin-top:4px !important;
+    color:#888;
+    font-size:10px !important;
+}
+
+
+/* =========================
+   MAIN CHAT PAGE
+========================= */
+
+#chat_page{
+    width:100%;
+    max-width:900px;
+
+    height:100vh;
+
+    margin:0 auto;
+
+    padding-top:52px;
+
+    display:flex;
+    flex-direction:column;
+
+    background:#fff;
+}
+
+
+/* =========================
+   ROOM HEADER
+========================= */
+
+#room_header{
+    flex:0 0 auto;
+
+    padding:10px 12px 5px;
+
+    background:#fff;
+
+    z-index:100;
+}
+
+.room_header_top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:10px;
+}
+
+#room_title{
+    margin:0;
+
+    font-size:17px;
+    font-weight:700;
+}
+
+#room_description{
+    margin:2px 0 0;
+
+    font-size:11px;
+    color:#888;
+}
+
+#unread_total{
+    padding:5px 8px;
+
+    background:#f1f3f6;
+
+    border-radius:15px;
+
+    font-size:10px;
+
+    white-space:nowrap;
+}
+
+#typing_indicator{
+    min-height:16px;
+
+    margin-top:3px;
+
+    font-size:11px;
+
+    color:#777;
+}
+
+
+/* =========================
+   ROOM USERS
+========================= */
+
+#room_members_wrapper{
+    width:100%;
+
+    overflow:hidden;
+
+    margin-top:3px;
+}
+
+#room_members{
+    display:flex;
+
+    gap:4px;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    padding:3px 0 5px;
+
+    scroll-behavior:smooth;
+
+    -webkit-overflow-scrolling:touch;
+
+    scrollbar-width:none;
+}
+
+#room_members::-webkit-scrollbar{
+    display:none;
+}
+
+.user_container{
+    flex:0 0 auto;
+
+    width:56px;
+
+    padding:3px;
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    text-align:center;
+}
+
+.user_container:active{
+    transform:scale(.95);
+}
+
+.member_profile_picture{
+    width:37px;
+    height:37px;
+
+    margin:auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    border-radius:50%;
+
+    background:#e3e7ed;
+
+    font-size:13px;
+    font-weight:bold;
+}
+
+.member_profile_picture img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+}
+
+.member_username{
+    display:block;
+
+    margin-top:2px;
+
+    overflow:hidden;
+
+    white-space:nowrap;
+    text-overflow:ellipsis;
+
+    font-size:9px;
+
+    color:#555;
+}
+
+
+/* =========================
+   CHAT MESSAGES AREA
+========================= */
+
+#chat_messages{
+    flex:1;
+
+    min-height:0;
+
+    overflow-y:auto;
+
+    padding:8px 8px 12px;
+
+    background:#f4f5f7;
+
+    scroll-behavior:smooth;
+}
+
+.empty_chat{
+    padding:40px 15px;
+
+    text-align:center;
+
+    color:#888;
+
+    font-size:13px;
+}
+
+
+/* =========================
+   MESSAGE ROW
+========================= */
+
+.message_row{
+    display:flex;
+
+    align-items:flex-end;
+
+    gap:5px;
+
+    margin-bottom:7px;
+}
+
+.message_row.mine{
+    flex-direction:row-reverse;
+}
+
+
+/* =========================
+   MESSAGE PROFILE PICTURE
+========================= */
+
+.avatar{
+    width:28px;
+    height:28px;
+
+    flex:0 0 28px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    border-radius:50%;
+
+    background:#dde3eb;
+
+    font-size:11px;
+    font-weight:bold;
+}
+
+.avatar img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+}
+
+
+/* =========================
+   MESSAGE COLUMN
+========================= */
+
+.message_column{
+    max-width:78%;
+}
+
+.message_row.mine .message_column{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+}
+
+.message_meta{
+    margin:0 4px 2px;
+
+    font-size:9px;
+
+    color:#888;
+}
+
+
+/* =========================
+   MESSAGE BUBBLE
+========================= */
+
+.message_bubble{
+    padding:8px 10px;
+
+    background:#fff;
+
+    border-radius:
+        4px 14px 14px 14px;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 1px 2px
+        rgba(0,0,0,0.06);
+}
+
+.message_row.mine .message_bubble{
+    background:#dfeaff;
+
+    border-radius:
+        14px 4px 14px 14px;
+}
+
+.message_text{
+    margin:0;
+
+    font-size:14px;
+
+    line-height:1.35;
+
+    white-space:pre-wrap;
+
+    overflow-wrap:anywhere;
+}
+
+
+/* =========================
+   REPLY PREVIEW
+========================= */
+
+.reply_preview{
+    margin-bottom:5px;
+
+    padding:5px 7px;
+
+    border-left:2px solid #2864dc;
+
+    background:rgba(255,255,255,.6);
+
+    border-radius:5px;
+
+    font-size:10px;
+
+    color:#555;
+}
+
+.reply_preview strong{
+    display:block;
+
+    margin-bottom:1px;
+
+    font-size:10px;
+}
+
+
+/* =========================
+   @MENTION
+========================= */
+
+.mention{
+    padding:1px 3px;
+
+    background:#fff0a8;
+
+    border-radius:3px;
+
+    font-weight:bold;
+
+    color:#665000;
+}
+
+
+/* =========================
+   ATTACHMENTS
+========================= */
+
+.attachment{
+    margin-top:6px;
+}
+
+.attachment img{
+    display:block;
+
+    width:auto;
+    max-width:100%;
+
+    max-height:320px;
+
+    border-radius:9px;
+}
+
+.attachment video{
+    display:block;
+
+    width:100%;
+
+    max-height:340px;
+
+    border-radius:9px;
+
+    background:#000;
+}
+
+.attachment audio{
+    display:block;
+
+    width:100%;
+
+    max-width:300px;
+
+    height:38px;
+}
+
+.youtube_frame{
+    width:100%;
+
+    max-width:450px;
+
+    aspect-ratio:16/9;
+
+    border:none;
+
+    border-radius:9px;
+}
+
+.file_link{
+    display:inline-block;
+
+    padding:7px 9px;
+
+    background:#eef2f7;
+
+    border-radius:7px;
+
+    text-decoration:none;
+
+    color:#2864dc;
+
+    font-size:12px;
+    font-weight:bold;
+}
+
+
+/* =========================
+   MESSAGE ACTIONS
+========================= */
+
+.message_actions{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+
+    gap:3px;
+
+    margin-top:2px;
+}
+
+.message_action_button{
+    padding:2px 5px;
+
+    border:none;
+
+    background:transparent;
+
+    cursor:pointer;
+
+    border-radius:5px;
+
+    font-size:10px;
+
+    color:#777;
+}
+
+.message_action_button:hover{
+    background:#eee;
+}
+
+.message_action_button.edit_button{
+    color:#2864dc;
+
+    background:transparent;
+
+    border:none;
+}
+
+.message_action_button.delete_button{
+    color:#d32f2f;
+
+    background:transparent;
+
+    border:none;
+}
+
+
+/* =========================
+   REACTIONS
+========================= */
+
+.reaction_summary{
+    display:flex;
+    flex-wrap:wrap;
+
+    gap:3px;
+
+    margin-top:3px;
+}
+
+.reaction_chip{
+    padding:2px 5px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#fff;
+
+    font-size:10px;
+
+    box-shadow:
+        0 1px 2px
+        rgba(0,0,0,.08);
+}
+
+.reaction_chip.mine{
+    background:#dce9ff;
+}
+
+
+/* =========================
+   COMPOSER
+========================= */
+
+#composer{
+    flex:0 0 auto;
+
+    padding:6px 8px 8px;
+
+    background:#fff;
+
+    box-shadow:
+        0 -1px 5px
+        rgba(0,0,0,.06);
+}
+
+
+/* =========================
+   REPLY BOX
+========================= */
+
+#reply_box{
+    display:none;
+
+    align-items:center;
+    justify-content:space-between;
+
+    gap:5px;
+
+    margin-bottom:5px;
+
+    padding:6px 8px;
+
+    background:#eef4ff;
+
+    border-radius:7px;
+
+    font-size:11px;
+}
+
+#reply_box.show{
+    display:flex;
+}
+
+#reply_box_text{
+    margin:0;
+
+    overflow:hidden;
+
+    white-space:nowrap;
+
+    text-overflow:ellipsis;
+}
+
+#cancel_reply_button{
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+    font-size:11px;
+}
+
+
+/* =========================
+   EDIT BOX
+========================= */
+
+#edit_box{
+    margin-bottom:5px !important;
+
+    padding:6px 8px !important;
+
+    border:none !important;
+
+    border-radius:7px !important;
+
+    background:#fff3d6 !important;
+}
+
+
+/* =========================
+   SELECTED ATTACHMENT
+========================= */
+
+#selected_attachment_box{
+    display:none;
+
+    margin-bottom:5px;
+
+    padding:6px 8px;
+
+    background:#f3f4f6;
+
+    border:none;
+
+    border-radius:7px;
+
+    font-size:11px;
+}
+
+#selected_attachment_box.show{
+    display:block;
+}
+
+#selected_attachment_text{
+    margin:0 0 4px;
+
+    font-size:11px;
+}
+
+#recorded_audio_preview{
+    width:100%;
+
+    height:38px;
+
+    margin-top:3px;
+}
+
+
+/* =========================
+   TEXT INPUT
+========================= */
+
+#message_input{
+    width:100%;
+
+    min-height:43px;
+    max-height:110px;
+
+    padding:10px 11px;
+
+    resize:none;
+
+    border:none;
+
+    border-radius:18px;
+
+    outline:none;
+
+    background:#f1f3f5;
+
+    font-size:14px;
+
+    line-height:1.3;
+}
+
+#message_input:focus{
+    background:#eceff3;
+}
+
+
+/* =========================
+   MEDIA LINK
+========================= */
+
+.link_section{
+    display:flex;
+
+    gap:5px;
+
+    margin-top:5px;
+}
+
+#link_type{
+    width:115px;
+}
+
+#link_type,
+#media_link{
+    padding:7px;
+
+    border:none;
+
+    border-radius:7px;
+
+    outline:none;
+
+    background:#f1f3f5;
+
+    font-size:11px;
+}
+
+#media_link{
+    flex:1;
+
+    min-width:0;
+}
+
+
+/* =========================
+   COMPOSER BUTTONS
+========================= */
+
+.composer_tools{
+    display:flex;
+
+    align-items:center;
+
+    gap:4px;
+
+    margin-top:5px;
+}
+
+.tool_button,
+#send_button{
+    border:none;
+
+    cursor:pointer;
+
+    font-weight:bold;
+}
+
+
+/* Picture icon */
+
+#image_button{
+    width:38px;
+    height:38px;
+
+    padding:0;
+
+    border-radius:50%;
+
+    background:#f0f2f5;
+
+    font-size:0;
+}
+
+#image_button::before{
+    content:"🖼️";
+
+    font-size:18px;
+}
+
+
+/* Video icon */
+
+#video_button{
+    width:38px;
+    height:38px;
+
+    padding:0;
+
+    border-radius:50%;
+
+    background:#f0f2f5;
+
+    font-size:0;
+}
+
+#video_button::before{
+    content:"🎥";
+
+    font-size:18px;
+}
+
+
+/* PDF icon */
+
+#pdf_button{
+    width:38px;
+    height:38px;
+
+    padding:0;
+
+    border-radius:50%;
+
+    background:#f0f2f5;
+
+    font-size:0;
+}
+
+#pdf_button::before{
+    content:"📄";
+
+    font-size:18px;
+}
+
+
+/* Audio icon */
+
+#record_audio_button{
+    width:38px;
+    height:38px;
+
+    padding:0;
+
+    border-radius:50%;
+
+    background:#f0f2f5;
+
+    font-size:0;
+}
+
+#record_audio_button::before{
+    content:"🎙️";
+
+    font-size:18px;
+}
+
+#record_audio_button.recording{
+    background:#ffdcdc;
+}
+
+#record_audio_button.recording::before{
+    content:"⏹️";
+}
+
+
+/* Send */
+
+#send_button{
+    width:43px;
+    height:38px;
+
+    margin-left:auto;
+
+    padding:0;
+
+    border-radius:20px;
+
+    background:#2864dc;
+
+    color:white;
+
+    font-size:0;
+}
+
+#send_button::before{
+    content:"➤";
+
+    font-size:18px;
+}
+
+#send_button:disabled,
+.tool_button:disabled{
+    opacity:.5;
+
+    cursor:not-allowed;
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+#send_status{
+    min-height:12px;
+
+    margin:3px 0 0;
+
+    text-align:center;
+
+    font-size:10px;
+
+    color:#777;
+}
+
+
+/* =========================
+   HIDDEN INPUTS
+========================= */
+
+.hidden_file_input{
+    display:none;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+    #menu{
+        height:48px;
+
+        gap:12px;
+
+        padding:0 10px;
+    }
+
+    #menu a{
+        font-size:11px;
+    }
+
+    #chat_page{
+        height:100dvh;
+
+        padding-top:48px;
+    }
+
+    #room_header{
+        padding:
+            7px 8px
+            3px;
+    }
+
+    #room_title{
+        font-size:15px;
+    }
+
+    #room_description{
+        font-size:9px;
+    }
+
+    #unread_total{
+        padding:4px 6px;
+
+        font-size:9px;
+    }
+
+    #typing_indicator{
+        min-height:13px;
+
+        font-size:9px;
+    }
+
+    .user_container{
+        width:50px;
+    }
+
+    .member_profile_picture{
+        width:34px;
+        height:34px;
+    }
+
+    .member_username{
+        font-size:8px;
+    }
+
+    #chat_messages{
+        padding:
+            6px
+            5px
+            10px;
+    }
+
+    .message_row{
+        gap:4px;
+
+        margin-bottom:6px;
+    }
+
+    .avatar{
+        width:25px;
+        height:25px;
+
+        flex-basis:25px;
+    }
+
+    .message_column{
+        max-width:82%;
+    }
+
+    .message_bubble{
+        padding:7px 9px;
+    }
+
+    .message_text{
+        font-size:13px;
+    }
+
+    .message_meta{
+        font-size:8px;
+    }
+
+    #composer{
+        padding:
+            5px
+            6px
+            calc(6px + env(safe-area-inset-bottom));
+    }
+
+    #message_input{
+        min-height:40px;
+
+        padding:9px 10px;
+
+        font-size:13px;
+    }
+
+    .link_section{
+        gap:4px;
+    }
+
+    #link_type{
+        width:105px;
+    }
+
+    #link_type,
+    #media_link{
+        padding:6px;
+
+        font-size:10px;
+    }
+
+    .composer_tools{
+        gap:3px;
+    }
+
+    #image_button,
+    #video_button,
+    #pdf_button,
+    #record_audio_button{
+        width:35px;
+        height:35px;
+    }
+
+    #send_button{
+        width:40px;
+        height:35px;
+    }
+
+    #notification_panel{
+        top:53px;
+
+        right:5px;
+
+        width:calc(100% - 10px);
+    }
+}
+
+
+/* =========================
+   VERY SMALL PHONES
+========================= */
+
+@media(max-width:380px){
+
+    #room_description{
+        display:none;
+    }
+
+    #unread_total{
+        font-size:8px;
+    }
+
+    .message_column{
+        max-width:85%;
+    }
+
+    .avatar{
+        width:23px;
+        height:23px;
+
+        flex-basis:23px;
+    }
+
+    #image_button,
+    #video_button,
+    #pdf_button,
+    #record_audio_button{
+        width:33px;
+        height:33px;
+    }
+
+    #send_button{
+        width:38px;
+        height:33px;
+    }
+}

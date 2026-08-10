@@ -1,0 +1,416 @@
+{
+  "lesson_id": 1,
+  "lesson_code": "lesson01",
+  "standard": 1,
+  "title": "Greetings",
+  "main_target": "Greetings",
+
+  "main_target_description": "Teach the learner how to greet people, respond to greetings, ask about another person's wellbeing, respond when asked about wellbeing, use greetings appropriate to different times and situations, greet someone when meeting for the first time, and end a simple greeting conversation politely.",
+
+  "difficulty": {
+    "starting_level": "absolute_beginner",
+    "ending_level": "beginner",
+    "assumed_previous_knowledge": "none"
+  },
+
+  "lesson_role": {
+    "type": "foundation",
+    "purpose": "Introduce the learner to the target language through simple, useful and natural greeting expressions.",
+    "priority": "communication_first"
+  },
+
+  "objectives": [
+    "Understand very basic greeting expressions.",
+    "Produce a basic greeting independently.",
+    "Recognize common ways of greeting another person.",
+    "Ask another person about their wellbeing.",
+    "Respond to a wellbeing question.",
+    "Use simple polite expressions during greetings.",
+    "Understand greetings that depend on time of day.",
+    "Understand expressions used when meeting someone for the first time.",
+    "Understand expressions used when leaving or ending a conversation.",
+    "Participate in a short greeting conversation."
+  ],
+
+  "completion_requirements": [
+    "The learner can greet another person without assistance.",
+    "The learner can recognize at least several common greeting expressions.",
+    "The learner can ask another person how they are.",
+    "The learner can give at least two appropriate responses when asked about wellbeing.",
+    "The learner can understand the difference between opening and closing a conversation.",
+    "The learner can participate in a short greeting exchange.",
+    "The learner can understand the important vocabulary introduced in this lesson."
+  ],
+
+  "teaching_principles": [
+    "Teach from simple to more complex.",
+    "Assume the learner has no knowledge of the target language.",
+    "Teach useful communication before advanced grammar terminology.",
+    "Use the learner's source language for explanations.",
+    "Use the target language for the expressions being learned.",
+    "Explain important target-language words individually when useful.",
+    "Explain grammar only when it improves understanding.",
+    "Explain pronunciation when pronunciation may be unclear to the learner.",
+    "Compare the target language with the learner's source language when useful.",
+    "Do not force the target language to follow English grammar or English cultural conventions.",
+    "Choose expressions that are natural in the target language.",
+    "Explain formal and informal differences when they exist.",
+    "Explain important cultural differences when they affect greeting behaviour.",
+    "Reuse previously introduced words and structures.",
+    "Avoid unnecessary advanced vocabulary.",
+    "Avoid unnecessarily advanced grammar.",
+    "Prefer practical examples over abstract explanations.",
+    "Use several examples when introducing an important pattern.",
+    "Gradually combine individual expressions into short conversations."
+  ],
+
+  "language_adaptation_rules": [
+    "The curriculum blueprint is written in English but must work for any source language and any target language.",
+    "Do not simply translate English greeting expressions literally when the target language normally uses a different expression.",
+    "Choose the most natural greeting expressions used by speakers of the target language.",
+    "If the target language distinguishes formal and informal greetings, explain the distinction.",
+    "If the target language changes expressions according to gender, number, age, social status or relationship, introduce the distinction gradually.",
+    "If the target language has culturally important greeting expressions that do not have a direct equivalent in the learner's source language, explain their meaning and usage.",
+    "If a direct word-for-word translation would be misleading, prioritize natural meaning and explain the difference.",
+    "The source language must primarily be used for teaching explanations unless the learner's progress indicates that more target-language explanation is appropriate."
+  ],
+
+  "recommended_progression": [
+    {
+      "part_group": 1,
+      "name": "Basic Greetings",
+      "goal": "Introduce the simplest and most common ways of greeting another person.",
+      "suggested_concepts": [
+        "hello",
+        "hi or an equivalent informal greeting",
+        "one or more culturally common greetings"
+      ]
+    },
+
+    {
+      "part_group": 2,
+      "name": "Asking About Wellbeing",
+      "goal": "Teach the learner how to ask how another person is feeling or doing.",
+      "suggested_concepts": [
+        "how are you",
+        "how are you today",
+        "informal wellbeing questions",
+        "formal wellbeing questions when applicable"
+      ]
+    },
+
+    {
+      "part_group": 3,
+      "name": "Responding About Wellbeing",
+      "goal": "Teach common responses when someone asks about the learner's wellbeing.",
+      "suggested_concepts": [
+        "I am fine",
+        "I am good",
+        "I am very well",
+        "I am okay",
+        "not bad",
+        "thank you",
+        "and you"
+      ]
+    },
+
+    {
+      "part_group": 4,
+      "name": "Time-Based Greetings",
+      "goal": "Teach greetings associated with different times of day when they exist in the target language.",
+      "suggested_concepts": [
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "other culturally appropriate time-based greetings"
+      ]
+    },
+
+    {
+      "part_group": 5,
+      "name": "Meeting Someone",
+      "goal": "Teach simple expressions used when greeting someone for the first time.",
+      "suggested_concepts": [
+        "nice to meet you",
+        "pleased to meet you",
+        "welcome",
+        "appropriate responses"
+      ]
+    },
+
+    {
+      "part_group": 6,
+      "name": "Ending a Greeting Conversation",
+      "goal": "Teach simple expressions used when leaving or ending an interaction.",
+      "suggested_concepts": [
+        "goodbye",
+        "bye",
+        "see you later",
+        "see you soon",
+        "have a good day",
+        "other natural closing expressions"
+      ]
+    },
+
+    {
+      "part_group": 7,
+      "name": "Greeting Conversations",
+      "goal": "Combine previously learned expressions into realistic short conversations.",
+      "suggested_concepts": [
+        "opening a conversation",
+        "asking about wellbeing",
+        "responding",
+        "returning the question",
+        "closing the conversation"
+      ]
+    },
+
+    {
+      "part_group": 8,
+      "name": "Greeting Review and Mastery",
+      "goal": "Review and test the learner's ability to understand and use the lesson independently.",
+      "suggested_concepts": [
+        "recognition",
+        "translation",
+        "sentence building",
+        "response selection",
+        "short dialogue completion",
+        "independent greeting conversation"
+      ]
+    }
+  ],
+
+  "part_generation_rules": {
+    "minimum_parts": 6,
+    "maximum_parts": 30,
+    "fixed_number_of_parts": false,
+
+    "rules": [
+      "Generate only one new lesson part at a time unless explicitly requested otherwise.",
+      "Each new part must remain inside the main target of Greetings.",
+      "Each part should have a clear communication goal.",
+      "Each part should normally introduce one main expression or one closely related group of expressions.",
+      "The next part must build logically on completed parts.",
+      "Do not unnecessarily repeat a previously completed part.",
+      "Previously learned vocabulary may be reused without completely explaining it again.",
+      "Important previously learned concepts may be briefly revised when needed.",
+      "Do not move to another main lesson simply because one greeting expression has been taught.",
+      "Continue until the completion requirements of the main lesson have been sufficiently covered.",
+      "The number and ordering of generated parts may adapt to the target language."
+    ]
+  },
+
+  "lesson_part_blueprint": {
+    "required_sections": [
+      "title",
+      "main_target_expression",
+      "meaning",
+      "explanation",
+      "examples",
+      "practice"
+    ],
+
+    "optional_sections": [
+      "pronunciation",
+      "word_breakdown",
+      "phrase_breakdown",
+      "grammar",
+      "usage_notes",
+      "formal_vs_informal",
+      "cultural_note",
+      "source_language_comparison",
+      "common_mistakes",
+      "mini_dialogue",
+      "memory_tip",
+      "revision"
+    ],
+
+    "generation_instruction": "Use only the sections that are educationally useful for the current expression. Do not force every generated lesson part to have exactly the same structure."
+  },
+
+  "target_expression_rules": [
+    "Choose expressions that are common and useful.",
+    "Prefer natural target-language expressions over literal translations.",
+    "Start with short expressions.",
+    "Increase complexity gradually.",
+    "Avoid introducing too many new words in one part.",
+    "Reuse known vocabulary wherever useful.",
+    "Provide translation into the learner's source language.",
+    "Provide pronunciation support when useful.",
+    "If the target language uses a different script, explain the script or transliteration only when appropriate."
+  ],
+
+  "word_teaching_rules": [
+    "Explain important new words individually.",
+    "Give the meaning of each important word in the learner's source language.",
+    "Explain what the word does in the sentence when useful.",
+    "Explain how the word is commonly used.",
+    "Give additional simple examples when useful.",
+    "Do not give advanced grammatical terminology unless it benefits the learner.",
+    "If a target-language word has several meanings, teach only meanings relevant to the current lesson unless an additional meaning is necessary."
+  ],
+
+  "grammar_teaching_rules": [
+    "Teach grammar through examples before giving complicated terminology.",
+    "Explain why the sentence is constructed that way when useful.",
+    "Compare with the learner's source language when the comparison improves understanding.",
+    "Do not introduce unrelated grammar.",
+    "Do not overwhelm absolute beginners with grammar rules.",
+    "When the same grammar appears in later parts, build on the previous explanation instead of restarting from zero."
+  ],
+
+  "pronunciation_teaching_rules": [
+    "Give pronunciation help when the target expression may be difficult for the learner.",
+    "Use an easy pronunciation guide appropriate for the learner.",
+    "Do not replace the real target-language writing with transliteration.",
+    "If transliteration is used, display it as secondary support.",
+    "Mention important sounds that do not exist in the learner's source language when useful.",
+    "Avoid overly technical phonetic terminology for beginners unless specifically requested."
+  ],
+
+  "example_generation_rules": {
+    "minimum_examples": 3,
+    "recommended_examples": 5,
+    "maximum_examples": 10,
+
+    "rules": [
+      "Examples must stay close to the current concept.",
+      "Examples should be understandable using mostly known vocabulary.",
+      "Examples should demonstrate how the expression changes in realistic situations.",
+      "Include source-language meanings for examples.",
+      "Prefer useful everyday examples."
+    ]
+  },
+
+  "dialogue_rules": [
+    "Introduce short dialogues after enough vocabulary has been taught.",
+    "Use previously learned expressions inside dialogues.",
+    "Keep early dialogues short.",
+    "Provide source-language meaning.",
+    "Gradually reduce translation dependence as the learner progresses.",
+    "Dialogues should sound natural rather than being artificially created only to demonstrate grammar."
+  ],
+
+  "practice_rules": [
+    "Practice must focus on concepts already introduced.",
+    "Begin with easy recognition activities.",
+    "Progress toward production activities.",
+    "Use translation in both directions when appropriate.",
+    "Include sentence completion when useful.",
+    "Include dialogue completion when useful.",
+    "Include independent response practice.",
+    "Do not introduce new major concepts inside assessment questions.",
+    "Provide answers or feedback after the learner attempts the exercise when the application supports interactive practice."
+  ],
+
+  "recommended_practice_types": [
+    "recognize_meaning",
+    "choose_correct_response",
+    "translate_to_target",
+    "translate_to_source",
+    "complete_expression",
+    "reorder_words",
+    "build_sentence",
+    "complete_dialogue",
+    "respond_naturally",
+    "short_conversation"
+  ],
+
+  "adaptation_rules": {
+    "beginner": [
+      "Use more explanations in the learner's source language.",
+      "Use shorter target-language sentences.",
+      "Introduce fewer new words per lesson part.",
+      "Provide more translation support.",
+      "Provide pronunciation support frequently when useful."
+    ],
+
+    "improving": [
+      "Reuse previously learned target-language vocabulary more often.",
+      "Reduce unnecessary translation.",
+      "Use slightly longer examples.",
+      "Encourage the learner to produce answers independently."
+    ],
+
+    "struggling": [
+      "Reduce the number of new concepts.",
+      "Provide simpler explanations.",
+      "Provide more examples.",
+      "Review prerequisite vocabulary.",
+      "Do not advance until the concept is sufficiently clear."
+    ]
+  },
+
+  "knowledge_tracking": {
+    "track_vocabulary": true,
+    "track_grammar": true,
+    "track_expressions": true,
+    "track_pronunciation_concepts": true,
+    "track_common_mistakes": true,
+
+    "statuses": [
+      "new",
+      "introduced",
+      "learning",
+      "reviewing",
+      "learned",
+      "weak"
+    ]
+  },
+
+  "generated_part_output_requirements": {
+    "return_metadata": true,
+    "return_knowledge_update": true,
+    "return_progress_recommendation": true,
+
+    "metadata_fields": [
+      "standard",
+      "lesson_id",
+      "part_id",
+      "part_group",
+      "title",
+      "main_target"
+    ],
+
+    "knowledge_update_fields": [
+      "vocabulary_introduced",
+      "expressions_introduced",
+      "grammar_introduced",
+      "pronunciation_introduced",
+      "concepts_reviewed"
+    ],
+
+    "progress_fields": [
+      "lesson_target_coverage",
+      "recommended_next_part_group",
+      "ready_to_complete_lesson"
+    ]
+  },
+
+  "progression_policy": {
+    "allow_automatic_completion": false,
+
+    "rules": [
+      "The AI may recommend that the lesson is ready for completion.",
+      "The machine engine controls actual lesson advancement.",
+      "Do not advance to Lesson 2 automatically.",
+      "Do not mark Lesson 1 complete based only on the number of generated parts.",
+      "Completion should depend on coverage of the lesson objectives and completion requirements."
+    ]
+  },
+
+  "restrictions": [
+    "Do not assume the target language is English.",
+    "Do not assume the learner's language is English.",
+    "Do not hardcode translations for any specific language pair.",
+    "Do not teach unrelated topics such as family, possession or advanced tense structures unless they are naturally required for a greeting example.",
+    "Do not move beyond the Greetings main target.",
+    "Do not generate excessively advanced grammar for an absolute beginner.",
+    "Do not present literal translations as natural language when they are not natural.",
+    "Do not repeatedly explain already learned vocabulary from zero.",
+    "Do not invent cultural rules when uncertain.",
+    "Do not make every generated part structurally identical."
+  ],
+
+  "lesson_end_goal": "By the end of Lesson 1, the learner should be able to understand and participate in a simple natural greeting exchange in the target language, including opening the interaction, asking or responding about wellbeing, and ending the interaction appropriately."
+}

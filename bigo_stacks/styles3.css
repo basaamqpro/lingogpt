@@ -1,0 +1,74 @@
+/* Style the toggle button */
+.menu-btn {
+  font-size: 18px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Style the sliding full-screen panel */
+.slide-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%; /* Closed by default */
+  height: 100%;
+  background-color: #222;
+  overflow-x: hidden; /* Hides content when width is 0% */
+  transition: width 0.5s ease; /* Animate the width change */
+  z-index: 1000;
+}
+
+/* Active class added via JavaScript */
+.slide-menu.open {
+  width: 100%; /* Expands to full screen */
+}
+
+/* Center menu links on the full screen */
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100vw; /* Keeps contents from shrinking as menu opens */
+}
+
+.slide-menu ul {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+}
+
+.slide-menu ul li {
+  margin: 25px 0;
+}
+
+.slide-menu ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 32px; /* Larger font for full screen */
+  transition: color 0.3s;
+}
+
+.slide-menu ul li a:hover {
+  color: #ff6b6b;
+}
+
+/* Close button layout */
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 35px;
+  font-size: 50px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+
+.room_description {
+    display: none;
+}

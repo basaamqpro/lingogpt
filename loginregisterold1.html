@@ -225,15 +225,9 @@
       </p>
     </div>
 
-    <div
-      id="authMessage"
-      class="message"
-      role="status"
-      aria-live="polite"
-    ></div>
+    <div id="authMessage" class="message"></div>
 
     <div class="auth_tabs">
-
       <button
         id="showLoginButton"
         class="active"
@@ -248,10 +242,11 @@
       >
         Register
       </button>
-
     </div>
 
     <div class="auth_container">
+
+      <!-- LOGIN -->
 
       <form
         id="loginForm"
@@ -270,7 +265,6 @@
 
         <input
           id="loginUsername"
-          name="username"
           type="text"
           autocomplete="username"
           required
@@ -284,7 +278,6 @@
 
           <input
             id="loginPassword"
-            name="password"
             type="password"
             autocomplete="current-password"
             required
@@ -323,6 +316,8 @@
       </form>
 
 
+      <!-- REGISTER -->
+
       <form
         id="registerForm"
         class="panel"
@@ -341,7 +336,6 @@
 
         <input
           id="registerName"
-          name="name"
           type="text"
           autocomplete="name"
           required
@@ -353,7 +347,6 @@
 
         <input
           id="registerUsername"
-          name="username"
           type="text"
           autocomplete="username"
           required
@@ -365,7 +358,6 @@
 
         <input
           id="registerEmail"
-          name="email"
           type="email"
           autocomplete="email"
           required
@@ -379,7 +371,6 @@
 
           <input
             id="registerPassword"
-            name="password"
             type="password"
             autocomplete="new-password"
             required
@@ -403,7 +394,6 @@
 
           <input
             id="confirmPassword"
-            name="confirmPassword"
             type="password"
             autocomplete="new-password"
             required
@@ -446,39 +436,195 @@
   </main>
 
 
-  <!--
-    firebase.js will handle:
-
-    - Firebase configuration
-    - Firestore connection
-    - loading users
-    - registration
-    - login check
-    - saving the logged-in user to localStorage
-    - redirecting to welcome.html
-  -->
-
-  <script type="module" src="firebase.js"></script>
-
-
   <script>
     "use strict";
 
 
     /*
     ==================================================
-    MESSAGE UI
-
-    firebase.js can call:
-
-    window.showAuthMessage(
-      "Login successful.",
-      "success"
-    );
+    LOCAL STORAGE
     ==================================================
     */
 
-    function showAuthMessage(
+    const STORAGE_KEYS = {
+      users: "lingo_user_details",
+      data: "lingo_user_data",
+      session: "lingo_logged_in_user"
+    };
+
+
+    /*
+    ==================================================
+    DEFAULT USERS
+
+    These are only created when user data does not
+    already exist in localStorage.
+    ==================================================
+    */
+
+    const DEFAULT_USERS = [
+      {
+        name: "Basaam Daniel",
+        email: "Basaamqpro@gmail.com",
+        website: "portfolio1.com",
+        experience: 5,
+        username: "Basaamqpro",
+        user_idx: "user_basaam",
+        profile_pic: "Basaam.jpg",
+        cv: "BasaamCV.pdf",
+        password: "12345"
+      },
+
+      {
+        name: "John Oliver",
+        hide_name: false,
+        email: "john_o@gmail.com",
+        website: "portfolio2.com",
+        experience: 6,
+        username: "khalidAliyu",
+        user_idx: "user_khalid",
+        profile_pic: "john.jpg",
+        cv: "JohnCV.pdf",
+        password: "12345"
+      }
+    ];
+
+
+    /*
+    ==================================================
+    LOAD DATA
+    ==================================================
+    */
+
+    function clone(value) {
+      return JSON.parse(
+        JSON.stringify(value)
+      );
+    }
+
+
+    function loadUsers() {
+      const savedUsers =
+        localStorage.getItem(
+          STORAGE_KEYS.users
+        );
+
+      if (savedUsers) {
+        try {
+          return JSON.parse(savedUsers);
+        } catch (error) {
+          console.warn(
+            "Invalid saved users.",
+            error
+          );
+        }
+      }
+
+      const users =
+        clone(DEFAULT_USERS);
+
+      localStorage.setItem(
+        STORAGE_KEYS.users,
+        JSON.stringify(users)
+      );
+
+      return users;
+    }
+
+
+    function loadLingoData() {
+      const savedData =
+        localStorage.getItem(
+          STORAGE_KEYS.data
+        );
+
+      if (savedData) {
+        try {
+          return JSON.parse(savedData);
+        } catch (error) {
+          console.warn(
+            "Invalid saved LingoGPT data.",
+            error
+          );
+        }
+      }
+
+      const initialData = [];
+
+      DEFAULT_USERS.forEach(
+        function(user) {
+          initialData.push({
+            user_idx:
+              user.user_idx,
+
+            username:
+              user.username,
+
+            rooms: []
+          });
+        }
+      );
+
+      localStorage.setItem(
+        STORAGE_KEYS.data,
+        JSON.stringify(initialData)
+      );
+
+      return initialData;
+    }
+
+
+    let user_details =
+      loadUsers();
+
+    let userLingo_data =
+      loadLingoData();
+
+
+    /*
+    ==================================================
+    HELPERS
+    ==================================================
+    */
+
+    function createId(prefix) {
+      return (
+        prefix +
+        "_" +
+        Date.now() +
+        "_" +
+        Math.floor(
+          Math.random() * 10000
+        )
+      );
+    }
+
+
+    function saveUsers() {
+      localStorage.setItem(
+        STORAGE_KEYS.users,
+        JSON.stringify(user_details)
+      );
+    }
+
+
+    function saveLingoData() {
+      localStorage.setItem(
+        STORAGE_KEYS.data,
+        JSON.stringify(userLingo_data)
+      );
+    }
+
+
+    function saveSession(userIdx) {
+      localStorage.setItem(
+        STORAGE_KEYS.session,
+        userIdx
+      );
+    }
+
+
+    function showMessage(
       message,
       type
     ) {
@@ -504,18 +650,19 @@
     }
 
 
-    window.showAuthMessage =
-      showAuthMessage;
+    function clearMessage() {
+      showMessage("");
+    }
 
 
     /*
     ==================================================
-    LOGIN / REGISTER UI
+    SWITCH LOGIN / REGISTER
     ==================================================
     */
 
     function showLogin() {
-      showAuthMessage("");
+      clearMessage();
 
       document
         .getElementById(
@@ -558,7 +705,7 @@
 
 
     function showRegister() {
-      showAuthMessage("");
+      clearMessage();
 
       document
         .getElementById(
@@ -602,14 +749,297 @@
 
     /*
     ==================================================
+    LOGIN
+    ==================================================
+    */
+
+    function login() {
+      const username =
+        document
+          .getElementById(
+            "loginUsername"
+          )
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById(
+            "loginPassword"
+          )
+          .value;
+
+      if (
+        !username ||
+        !password
+      ) {
+        showMessage(
+          "Enter your username and password.",
+          "error"
+        );
+
+        return;
+      }
+
+      const user =
+        user_details.find(
+          function(item) {
+            return (
+              String(
+                item.username
+              )
+                .toLowerCase() ===
+                username.toLowerCase() &&
+
+              String(
+                item.password
+              ) ===
+                String(password)
+            );
+          }
+        );
+
+      if (!user) {
+        showMessage(
+          "Incorrect username or password.",
+          "error"
+        );
+
+        return;
+      }
+
+      saveSession(
+        user.user_idx
+      );
+
+      showMessage(
+        "Login successful.",
+        "success"
+      );
+
+      /*
+      Go to main LingoGPT page.
+      */
+
+      window.location.href =
+        "index.html";
+    }
+
+
+    /*
+    ==================================================
+    REGISTER
+    ==================================================
+    */
+
+    function register() {
+      const name =
+        document
+          .getElementById(
+            "registerName"
+          )
+          .value
+          .trim();
+
+      const username =
+        document
+          .getElementById(
+            "registerUsername"
+          )
+          .value
+          .trim();
+
+      const email =
+        document
+          .getElementById(
+            "registerEmail"
+          )
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById(
+            "registerPassword"
+          )
+          .value;
+
+      const confirmPassword =
+        document
+          .getElementById(
+            "confirmPassword"
+          )
+          .value;
+
+
+      if (
+        !name ||
+        !username ||
+        !email ||
+        !password ||
+        !confirmPassword
+      ) {
+        showMessage(
+          "Complete all registration fields.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (
+        password !==
+        confirmPassword
+      ) {
+        showMessage(
+          "The passwords do not match.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const usernameExists =
+        user_details.some(
+          function(user) {
+            return (
+              String(
+                user.username
+              )
+                .toLowerCase() ===
+              username.toLowerCase()
+            );
+          }
+        );
+
+
+      if (usernameExists) {
+        showMessage(
+          "That username already exists.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const emailExists =
+        user_details.some(
+          function(user) {
+            return (
+              String(
+                user.email || ""
+              )
+                .toLowerCase() ===
+              email.toLowerCase()
+            );
+          }
+        );
+
+
+      if (emailExists) {
+        showMessage(
+          "An account already uses that email.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      const newUser = {
+        name: name,
+
+        email: email,
+
+        website: "",
+
+        experience: 0,
+
+        username:
+          username,
+
+        user_idx:
+          createId("user"),
+
+        profile_pic: "",
+
+        cv: "",
+
+        password:
+          password
+      };
+
+
+      /*
+      Add account.
+      */
+
+      user_details.push(
+        newUser
+      );
+
+
+      /*
+      Create this user's own
+      LingoGPT data area.
+      */
+
+      userLingo_data.push({
+        user_idx:
+          newUser.user_idx,
+
+        username:
+          newUser.username,
+
+        rooms: []
+      });
+
+
+      saveUsers();
+      saveLingoData();
+
+
+      /*
+      Automatically log in
+      after registration.
+      */
+
+      saveSession(
+        newUser.user_idx
+      );
+
+
+      showMessage(
+        "Account created successfully.",
+        "success"
+      );
+
+
+      /*
+      Go to main page.
+      */
+
+      window.location.href =
+        "index.html";
+    }
+
+
+    /*
+    ==================================================
     SHOW / HIDE PASSWORD
     ==================================================
     */
 
     function togglePassword(button) {
+      const inputId =
+        button.dataset.passwordInput;
+
       const input =
         document.getElementById(
-          button.dataset.passwordInput
+          inputId
         );
 
       if (!input) {
@@ -634,15 +1064,35 @@
 
     /*
     ==================================================
-    UI EVENTS
-
-    firebase.js will attach the actual:
-    - loginForm submit
-    - registerForm submit
-
-    This HTML only controls the interface.
+    EVENTS
     ==================================================
     */
+
+    document
+      .getElementById(
+        "loginForm"
+      )
+      .addEventListener(
+        "submit",
+        function(event) {
+          event.preventDefault();
+          login();
+        }
+      );
+
+
+    document
+      .getElementById(
+        "registerForm"
+      )
+      .addEventListener(
+        "submit",
+        function(event) {
+          event.preventDefault();
+          register();
+        }
+      );
+
 
     document
       .getElementById(
@@ -700,6 +1150,44 @@
           );
         }
       );
+
+
+    /*
+    ==================================================
+    EXISTING SESSION
+
+    If somebody is already logged in,
+    send them directly to index.html.
+    ==================================================
+    */
+
+    const savedSession =
+      localStorage.getItem(
+        STORAGE_KEYS.session
+      );
+
+
+    if (savedSession) {
+      const validSession =
+        user_details.some(
+          function(user) {
+            return (
+              user.user_idx ===
+              savedSession
+            );
+          }
+        );
+
+      if (validSession) {
+        window.location.replace(
+          "index.html"
+        );
+      } else {
+        localStorage.removeItem(
+          STORAGE_KEYS.session
+        );
+      }
+    }
   </script>
 
 </body>

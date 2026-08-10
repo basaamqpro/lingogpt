@@ -1,0 +1,5139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Chat</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding-top:60px;
+    font-family:Arial,sans-serif;
+    background:#eef2f7;
+    color:#222;
+}
+
+button,
+input,
+textarea,
+select{
+    font:inherit;
+}
+
+#menu{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding:0 14px;
+    background:white;
+    border-bottom:1px solid #ddd;
+    z-index:1000;
+}
+
+#menu a{
+    color:#222;
+    text-decoration:none;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+#notification_button{
+    position:relative;
+    padding:8px 11px;
+    border:1px solid #d6dbe3;
+    border-radius:8px;
+    background:#f8fafc;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+#notification_badge{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    min-width:20px;
+    height:20px;
+    padding:2px 5px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    border-radius:20px;
+    background:#d92d20;
+    color:white;
+    font-size:11px;
+}
+
+#notification_panel{
+    position:fixed;
+    top:66px;
+    right:18px;
+    width:min(390px,calc(100% - 30px));
+    max-height:470px;
+    display:none;
+    overflow:auto;
+    padding:12px;
+    background:white;
+    border:1px solid #d8dee8;
+    border-radius:13px;
+    box-shadow:0 15px 45px rgba(0,0,0,0.16);
+    z-index:1200;
+}
+
+#notification_panel.show{
+    display:block;
+}
+
+.notification_title{
+    margin:2px 3px 10px;
+}
+
+.notification_item{
+    width:100%;
+    margin-bottom:8px;
+    padding:11px;
+    border:1px solid #e1e6ee;
+    border-radius:10px;
+    background:white;
+    text-align:left;
+    cursor:pointer;
+}
+
+.notification_item.unread{
+    background:#edf4ff;
+    border-color:#b8d0ff;
+}
+
+.notification_item p{
+    margin:0;
+}
+
+.notification_item .notification_time{
+    margin-top:6px;
+    color:#777;
+    font-size:12px;
+}
+
+#chat_page{
+    width:100%;
+    max-width:1000px;
+    min-height:calc(100vh - 60px);
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    background:white;
+    border-left:1px solid #ddd;
+    border-right:1px solid #ddd;
+}
+
+#room_header{
+    position:sticky;
+    top:60px;
+    z-index:100;
+    padding:14px 18px;
+    background:white;
+    border-bottom:1px solid #ddd;
+}
+
+.room_header_top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+}
+
+#room_title{
+    margin:0;
+    font-size:21px;
+}
+
+#room_description{
+    margin:4px 0 0;
+    color:#777;
+    font-size:13px;
+}
+
+#unread_total{
+    padding:7px 10px;
+    border-radius:20px;
+    background:#f1f5f9;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+#typing_indicator{
+    min-height:20px;
+    margin-top:7px;
+    color:#667085;
+    font-size:13px;
+}
+
+#room_members_wrapper{
+    margin-top:9px;
+    overflow:hidden;
+}
+
+#room_members{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:4px 2px 7px;
+    scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+}
+
+#room_members::-webkit-scrollbar{
+    display:none;
+}
+
+.user_container{
+    min-width:67px;
+    max-width:76px;
+    flex:0 0 auto;
+    padding:6px 4px;
+    border:0;
+    border-radius:10px;
+    background:transparent;
+    cursor:pointer;
+    text-align:center;
+}
+
+.user_container:hover{
+    background:#f1f5f9;
+}
+
+.user_container:active{
+    transform:scale(0.97);
+}
+
+.member_profile_picture{
+    width:45px;
+    height:45px;
+    margin:0 auto 5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border-radius:50%;
+    background:#dce5f3;
+    color:#344054;
+    font-weight:bold;
+}
+
+.member_profile_picture img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.member_username{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#344054;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.message_bubble{
+    cursor:pointer;
+}
+
+#chat_messages{
+    flex:1;
+    min-height:480px;
+    padding:18px;
+    overflow-y:auto;
+    background:#f7f9fc;
+}
+
+.empty_chat{
+    padding:35px 20px;
+    color:#777;
+    text-align:center;
+}
+
+.message_row{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    margin-bottom:17px;
+}
+
+.message_row.mine{
+    flex-direction:row-reverse;
+}
+
+.avatar{
+    width:38px;
+    height:38px;
+    flex:0 0 38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border-radius:50%;
+    background:#dce5f3;
+    color:#344054;
+    font-weight:bold;
+}
+
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.message_column{
+    max-width:min(76%,680px);
+}
+
+.message_row.mine .message_column{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+}
+
+.message_meta{
+    margin:0 4px 5px;
+    color:#667085;
+    font-size:12px;
+}
+
+.message_bubble{
+    min-width:90px;
+    padding:11px 13px;
+    border:1px solid #dce2eb;
+    border-radius:5px 16px 16px 16px;
+    background:white;
+    box-shadow:0 2px 8px rgba(0,0,0,0.03);
+}
+
+.message_row.mine .message_bubble{
+    border-color:#bfd2ff;
+    border-radius:16px 5px 16px 16px;
+    background:#eaf1ff;
+}
+
+.reply_preview{
+    margin-bottom:8px;
+    padding:8px 9px;
+    border-left:3px solid #2864dc;
+    border-radius:6px;
+    background:rgba(255,255,255,0.72);
+    color:#555;
+    font-size:12px;
+}
+
+.reply_preview strong{
+    display:block;
+    margin-bottom:3px;
+}
+
+.message_text{
+    margin:0;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    line-height:1.45;
+}
+
+.mention{
+    padding:1px 4px;
+    border-radius:4px;
+    background:#fff0b8;
+    color:#694d00;
+    font-weight:bold;
+}
+
+.attachment{
+    margin-top:9px;
+}
+
+.attachment img{
+    display:block;
+    max-width:100%;
+    max-height:380px;
+    border-radius:10px;
+}
+
+.attachment video{
+    width:100%;
+    max-height:390px;
+    border-radius:10px;
+    background:#111;
+}
+
+.attachment audio{
+    width:min(100%,430px);
+}
+
+.youtube_frame{
+    width:min(100%,560px);
+    aspect-ratio:16/9;
+    border:0;
+    border-radius:10px;
+}
+
+.file_link{
+    display:inline-block;
+    padding:9px 11px;
+    border:1px solid #cad4e4;
+    border-radius:8px;
+    background:#f8fafc;
+    color:#2864dc;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.message_actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:6px;
+}
+
+.message_action_button{
+    padding:4px 7px;
+    border:1px solid #d6dce5;
+    border-radius:7px;
+    background:white;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.message_action_button.edit_button{
+    border-color:#9db7ef;
+    background:#f1f5ff;
+    color:#174fbf;
+}
+
+.message_action_button.delete_button{
+    border-color:#efb1b1;
+    background:#fff2f2;
+    color:#a32020;
+}
+
+.reaction_summary{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:6px;
+}
+
+.reaction_chip{
+    padding:3px 7px;
+    border:1px solid #d8dee8;
+    border-radius:20px;
+    background:white;
+    font-size:12px;
+}
+
+.reaction_chip.mine{
+    border-color:#2864dc;
+    background:#edf4ff;
+}
+
+#composer{
+    position:sticky;
+    bottom:0;
+    z-index:90;
+    padding:12px;
+    background:white;
+    border-top:1px solid #ddd;
+}
+
+#reply_box{
+    display:none;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:9px;
+    padding:9px 11px;
+    border-left:4px solid #2864dc;
+    border-radius:8px;
+    background:#f0f5ff;
+}
+
+#reply_box.show{
+    display:flex;
+}
+
+#reply_box_text{
+    margin:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:13px;
+}
+
+#cancel_reply_button{
+    flex:0 0 auto;
+    padding:4px 8px;
+    border:0;
+    border-radius:6px;
+    background:#dfe7f5;
+    cursor:pointer;
+}
+
+#selected_attachment_box{
+    display:none;
+    margin-bottom:9px;
+    padding:9px 11px;
+    border-radius:8px;
+    background:#f7f9fc;
+    border:1px solid #dfe5ed;
+}
+
+#selected_attachment_box.show{
+    display:block;
+}
+
+#selected_attachment_text{
+    margin:0 0 7px;
+    font-size:13px;
+}
+
+#recorded_audio_preview{
+    width:100%;
+    margin-top:5px;
+}
+
+#message_input{
+    width:100%;
+    min-height:70px;
+    max-height:180px;
+    padding:11px 12px;
+    resize:vertical;
+    border:1px solid #cfd6e1;
+    border-radius:10px;
+    outline:none;
+}
+
+#message_input:focus,
+#media_link:focus,
+#link_type:focus{
+    border-color:#2864dc;
+}
+
+.composer_tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top:8px;
+}
+
+.tool_button,
+#send_button{
+    padding:8px 11px;
+    border:0;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.tool_button{
+    background:#edf1f6;
+    color:#344054;
+}
+
+#record_audio_button.recording{
+    background:#ffe0e0;
+    color:#a30000;
+}
+
+#send_button{
+    margin-left:auto;
+    background:#2864dc;
+    color:white;
+}
+
+#send_button:disabled,
+.tool_button:disabled{
+    opacity:0.55;
+    cursor:not-allowed;
+}
+
+.link_section{
+    display:grid;
+    grid-template-columns:150px 1fr;
+    gap:8px;
+    margin-top:8px;
+}
+
+#link_type,
+#media_link{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid #cfd6e1;
+    border-radius:8px;
+    outline:none;
+}
+
+#send_status{
+    min-height:18px;
+    margin:8px 0 0;
+    color:#667085;
+    font-size:13px;
+    text-align:center;
+}
+
+.hidden_file_input{
+    display:none;
+}
+
+@media(max-width:700px){
+
+    #menu{
+        justify-content:flex-start;
+        gap:12px;
+        overflow-x:auto;
+    }
+
+    #menu a{
+        font-size:14px;
+    }
+
+    #chat_page{
+        border:0;
+    }
+
+    #room_header{
+        top:60px;
+        padding:12px;
+    }
+
+    #room_members{
+        gap:7px;
+        padding-bottom:5px;
+    }
+
+    .user_container{
+        min-width:60px;
+        max-width:66px;
+        padding:5px 3px;
+    }
+
+    .member_profile_picture{
+        width:40px;
+        height:40px;
+    }
+
+    .member_username{
+        font-size:10px;
+    }
+
+    #chat_messages{
+        min-height:430px;
+        padding:12px;
+    }
+
+    .message_column{
+        max-width:86%;
+    }
+
+    .link_section{
+        grid-template-columns:1fr;
+    }
+
+    #send_button{
+        margin-left:0;
+    }
+
+    .composer_tools{
+        display:grid;
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+
+</style>
+
+
+</head>
+
+<body>
+
+<div id="menu">
+    <a href="index.html">Home</a>
+    <a href="create_room.html">Create Room</a>
+    <a href="view_rooms.html">Rooms</a>
+    <a href="settings.html">Settings</a>
+
+    <button id="notification_button" type="button">
+        Notifications
+        <span id="notification_badge">0</span>
+    </button>
+</div>
+
+<div id="notification_panel">
+    <h3 class="notification_title">Notifications</h3>
+    <div id="notification_list">
+        <p class="small_text">Loading...</p>
+    </div>
+</div>
+
+<div id="chat_page">
+
+    <div id="room_header">
+
+        <div class="room_header_top">
+            <div>
+                <h1 id="room_title">Loading room...</h1>
+                <p id="room_description"></p>
+            </div>
+
+            <div id="unread_total">
+                Unread messages: <strong id="unread_total_number">0</strong>
+            </div>
+        </div>
+
+        <div id="typing_indicator"></div>
+
+        <div id="room_members_wrapper">
+            <div id="room_members"></div>
+        </div>
+
+    </div>
+
+    <div id="chat_messages">
+        <div class="empty_chat">Loading messages...</div>
+    </div>
+
+    <div id="composer">
+
+        <div id="reply_box">
+            <p id="reply_box_text"></p>
+            <button id="cancel_reply_button" type="button">Cancel</button>
+        </div>
+
+        <div id="edit_box" style="display:none;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px;padding:9px 11px;border-left:4px solid #c47a00;border-radius:8px;background:#fff7e8;">
+            <p id="edit_box_text" style="margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;"></p>
+            <button id="cancel_edit_button" type="button" style="flex:0 0 auto;padding:4px 8px;border:0;border-radius:6px;background:#f1dfba;cursor:pointer;">Cancel</button>
+        </div>
+
+        <div id="selected_attachment_box">
+            <p id="selected_attachment_text"></p>
+            <audio id="recorded_audio_preview" controls style="display:none;"></audio>
+            <button id="remove_attachment_button" class="tool_button" type="button">
+                Remove attachment
+            </button>
+        </div>
+
+        <textarea
+            id="message_input"
+            placeholder="Write a message... Use @username to tag somebody."
+            maxlength="5000"
+        ></textarea>
+
+        <div class="link_section">
+
+            <select id="link_type">
+                <option value="">No media link</option>
+                <option value="image_link">Picture link</option>
+                <option value="video_link">Video link</option>
+                <option value="youtube_link">YouTube link</option>
+                <option value="pdf_link">PDF link</option>
+            </select>
+
+            <input
+                type="url"
+                id="media_link"
+                placeholder="Paste the selected media link here"
+            >
+
+        </div>
+
+        <input
+            class="hidden_file_input"
+            type="file"
+            id="image_file"
+            accept="image/*"
+        >
+
+        <input
+            class="hidden_file_input"
+            type="file"
+            id="video_file"
+            accept="video/*"
+        >
+
+        <input
+            class="hidden_file_input"
+            type="file"
+            id="pdf_file"
+            accept="application/pdf,.pdf"
+        >
+
+        <div class="composer_tools">
+
+            <button id="image_button" class="tool_button" type="button">
+                Picture
+            </button>
+
+            <button id="video_button" class="tool_button" type="button">
+                Video
+            </button>
+
+            <button id="pdf_button" class="tool_button" type="button">
+                PDF
+            </button>
+
+            <button id="record_audio_button" class="tool_button" type="button">
+                Record Audio
+            </button>
+
+            <button id="send_button" type="button">
+                Send
+            </button>
+
+        </div>
+
+        <p id="send_status"></p>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+import{
+    initializeApp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+
+import{
+    getAuth,
+    onAuthStateChanged
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+
+import{
+    getFirestore,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    updateDoc,
+    writeBatch,
+    query,
+    where,
+    orderBy,
+    limitToLast,
+    onSnapshot,
+    serverTimestamp,
+    increment,
+    runTransaction
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
+import{
+    getStorage,
+    ref,
+    uploadBytesResumable,
+    getDownloadURL,
+    deleteObject
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-storage.js";
+
+const firebaseConfig={
+    apiKey:"AIzaSyDVh4UFpUIGLIDllXgB4V03PPHncg6llIA",
+    authDomain:"two-todolist-project.firebaseapp.com",
+    projectId:"two-todolist-project",
+    storageBucket:"two-todolist-project.firebasestorage.app",
+    messagingSenderId:"981585696379",
+    appId:"1:981585696379:web:fcd35ed7176c86c64ef4de"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const database=getFirestore(app);
+const storage=getStorage(app);
+
+var roomTitle=
+    document.getElementById(
+        "room_title"
+    );
+
+var roomDescription=
+    document.getElementById(
+        "room_description"
+    );
+
+var unreadTotalNumber=
+    document.getElementById(
+        "unread_total_number"
+    );
+
+var typingIndicator=
+    document.getElementById(
+        "typing_indicator"
+    );
+
+var roomMembersContainer=
+    document.getElementById(
+        "room_members"
+    );
+
+var chatMessages=
+    document.getElementById(
+        "chat_messages"
+    );
+
+var messageInput=
+    document.getElementById(
+        "message_input"
+    );
+
+var linkType=
+    document.getElementById(
+        "link_type"
+    );
+
+var mediaLink=
+    document.getElementById(
+        "media_link"
+    );
+
+var imageFile=
+    document.getElementById(
+        "image_file"
+    );
+
+var videoFile=
+    document.getElementById(
+        "video_file"
+    );
+
+var pdfFile=
+    document.getElementById(
+        "pdf_file"
+    );
+
+var imageButton=
+    document.getElementById(
+        "image_button"
+    );
+
+var videoButton=
+    document.getElementById(
+        "video_button"
+    );
+
+var pdfButton=
+    document.getElementById(
+        "pdf_button"
+    );
+
+var recordAudioButton=
+    document.getElementById(
+        "record_audio_button"
+    );
+
+var sendButton=
+    document.getElementById(
+        "send_button"
+    );
+
+var sendStatus=
+    document.getElementById(
+        "send_status"
+    );
+
+var replyBox=
+    document.getElementById(
+        "reply_box"
+    );
+
+var replyBoxText=
+    document.getElementById(
+        "reply_box_text"
+    );
+
+var cancelReplyButton=
+    document.getElementById(
+        "cancel_reply_button"
+    );
+
+var editBox=
+    document.getElementById(
+        "edit_box"
+    );
+
+var editBoxText=
+    document.getElementById(
+        "edit_box_text"
+    );
+
+var cancelEditButton=
+    document.getElementById(
+        "cancel_edit_button"
+    );
+
+var selectedAttachmentBox=
+    document.getElementById(
+        "selected_attachment_box"
+    );
+
+var selectedAttachmentText=
+    document.getElementById(
+        "selected_attachment_text"
+    );
+
+var removeAttachmentButton=
+    document.getElementById(
+        "remove_attachment_button"
+    );
+
+var recordedAudioPreview=
+    document.getElementById(
+        "recorded_audio_preview"
+    );
+
+var notificationButton=
+    document.getElementById(
+        "notification_button"
+    );
+
+var notificationBadge=
+    document.getElementById(
+        "notification_badge"
+    );
+
+var notificationPanel=
+    document.getElementById(
+        "notification_panel"
+    );
+
+var notificationList=
+    document.getElementById(
+        "notification_list"
+    );
+
+var account_details=null;
+var firebaseUser=null;
+var current_room=null;
+var currentRoomData=null;
+
+var selectedFile=null;
+var selectedFileType="";
+var recordedAudioBlob=null;
+var recordedAudioURL="";
+var mediaRecorder=null;
+var mediaStream=null;
+var audioChunks=[];
+
+var currentReply=null;
+var currentEditingMessage=null;
+var latestChatIdx="";
+
+var roomMembers=[];
+var membersByUsername={};
+
+var typingUsers=[];
+var typingTimeout=null;
+var typingRenderInterval=null;
+
+var stopMessagesListener=null;
+var stopMembersListener=null;
+var stopTypingListener=null;
+var stopNotificationsListener=null;
+var stopCurrentUserListener=null;
+
+var firstMessageRender=true;
+var readTimeout=null;
+
+function createChatIdx(){
+
+    return "chat_"+
+        Date.now()+
+        "_"+
+        Math.floor(
+            Math.random()*10000
+        );
+}
+
+function createNotificationIdx(){
+
+    return "notification_"+
+        Date.now()+
+        "_"+
+        Math.floor(
+            Math.random()*100000
+        );
+}
+
+function showSendStatus(
+    text,
+    colour
+){
+
+    sendStatus.textContent=text;
+    sendStatus.style.color=colour || "#667085";
+}
+
+function getLocalData(
+    key
+){
+
+    var savedValue=
+        localStorage.getItem(
+            key
+        );
+
+    if(!savedValue){
+        return null;
+    }
+
+    try{
+
+        return JSON.parse(
+            savedValue
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        localStorage.removeItem(
+            key
+        );
+
+        return null;
+    }
+}
+
+function formatTime(
+    milliseconds
+){
+
+    if(!milliseconds){
+        return "";
+    }
+
+    return new Date(
+        milliseconds
+    ).toLocaleString();
+}
+
+function addMentionToInput(
+    username
+){
+
+    if(!username){
+        return;
+    }
+
+    var mention=
+        "@"+
+        username;
+
+    var currentValue=
+        messageInput.value;
+
+    if(
+        currentValue!=="" &&
+        !currentValue.endsWith(" ")
+    ){
+        currentValue+=" ";
+    }
+
+    messageInput.value=
+        currentValue+
+        mention+
+        " ";
+
+    messageInput.focus();
+
+    messageInput.selectionStart=
+        messageInput.value.length;
+
+    messageInput.selectionEnd=
+        messageInput.value.length;
+
+    messageInput.dispatchEvent(
+        new Event(
+            "input",
+            {
+                bubbles:true
+            }
+        )
+    );
+}
+
+function createPreview(
+    chatValue,
+    attachment
+){
+
+    var text=
+        chatValue.trim();
+
+    if(text!==""){
+
+        if(text.length>90){
+            return text.slice(0,87)+"...";
+        }
+
+        return text;
+    }
+
+    if(!attachment){
+        return "New message";
+    }
+
+    var previewNames={
+        image:"Picture",
+        image_link:"Picture link",
+        video:"Video",
+        video_link:"Video link",
+        youtube_link:"YouTube video",
+        pdf:"PDF",
+        pdf_link:"PDF link",
+        audio:"Audio"
+    };
+
+    return previewNames[
+        attachment.type
+    ] || "Attachment";
+}
+
+function safeFileName(
+    fileName
+){
+
+    return fileName.replace(
+        /[^a-zA-Z0-9._-]/g,
+        "_"
+    );
+}
+
+function clearRecordedAudio(){
+
+    if(recordedAudioURL){
+
+        URL.revokeObjectURL(
+            recordedAudioURL
+        );
+    }
+
+    recordedAudioURL="";
+    recordedAudioBlob=null;
+
+    recordedAudioPreview.pause();
+    recordedAudioPreview.removeAttribute(
+        "src"
+    );
+
+    recordedAudioPreview.style.display=
+        "none";
+}
+
+function clearSelectedAttachment(){
+
+    selectedFile=null;
+    selectedFileType="";
+
+    imageFile.value="";
+    videoFile.value="";
+    pdfFile.value="";
+
+    clearRecordedAudio();
+
+    selectedAttachmentBox.classList.remove(
+        "show"
+    );
+
+    selectedAttachmentText.textContent="";
+}
+
+function showSelectedFile(
+    file,
+    type
+){
+
+    clearSelectedAttachment();
+
+    selectedFile=file;
+    selectedFileType=type;
+
+    selectedAttachmentText.textContent=
+        file.name+
+        " ("+
+        (
+            file.size/
+            1024/
+            1024
+        ).toFixed(2)+
+        " MB)";
+
+    selectedAttachmentBox.classList.add(
+        "show"
+    );
+}
+
+function validateSelectedFile(
+    file,
+    type
+){
+
+    if(!file){
+        return false;
+    }
+
+    var maximumSize=0;
+
+    if(type==="image"){
+
+        maximumSize=
+            10*1024*1024;
+
+        if(
+            !file.type.startsWith(
+                "image/"
+            )
+        ){
+
+            showSendStatus(
+                "Please choose a valid image.",
+                "red"
+            );
+
+            return false;
+        }
+    }
+
+    if(type==="video"){
+
+        maximumSize=
+            50*1024*1024;
+
+        if(
+            !file.type.startsWith(
+                "video/"
+            )
+        ){
+
+            showSendStatus(
+                "Please choose a valid video.",
+                "red"
+            );
+
+            return false;
+        }
+    }
+
+    if(type==="pdf"){
+
+        maximumSize=
+            20*1024*1024;
+
+        var isPDF=
+            file.type===
+            "application/pdf" ||
+            file.name
+            .toLowerCase()
+            .endsWith(".pdf");
+
+        if(!isPDF){
+
+            showSendStatus(
+                "Please choose a PDF file.",
+                "red"
+            );
+
+            return false;
+        }
+    }
+
+    if(
+        maximumSize>0 &&
+        file.size>maximumSize
+    ){
+
+        showSendStatus(
+            "The selected file is too large.",
+            "red"
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+function validateMediaLink(){
+
+    var selectedType=
+        linkType.value;
+
+    var url=
+        mediaLink.value.trim();
+
+    if(selectedType==="" && url===""){
+        return true;
+    }
+
+    if(selectedType==="" && url!==""){
+
+        showSendStatus(
+            "Choose the type of media link.",
+            "red"
+        );
+
+        return false;
+    }
+
+    if(selectedType!=="" && url===""){
+
+        showSendStatus(
+            "Paste the media link.",
+            "red"
+        );
+
+        return false;
+    }
+
+    try{
+
+        var parsedURL=
+            new URL(url);
+
+        if(
+            parsedURL.protocol!=="http:" &&
+            parsedURL.protocol!=="https:"
+        ){
+
+            throw new Error(
+                "Invalid protocol"
+            );
+        }
+
+    }catch(error){
+
+        showSendStatus(
+            "Please enter a valid http or https link.",
+            "red"
+        );
+
+        return false;
+    }
+
+    if(
+        selectedType==="youtube_link" &&
+        !getYouTubeEmbedURL(url)
+    ){
+
+        showSendStatus(
+            "Please enter a valid YouTube link.",
+            "red"
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+function getYouTubeEmbedURL(
+    url
+){
+
+    try{
+
+        var parsed=
+            new URL(url);
+
+        var host=
+            parsed.hostname
+            .replace(/^www\./,"")
+            .toLowerCase();
+
+        var videoId="";
+
+        if(host==="youtu.be"){
+
+            videoId=
+                parsed.pathname
+                .split("/")
+                .filter(Boolean)[0] || "";
+
+        }else if(
+            host==="youtube.com" ||
+            host==="m.youtube.com"
+        ){
+
+            if(
+                parsed.pathname===
+                "/watch"
+            ){
+
+                videoId=
+                    parsed.searchParams
+                    .get("v") || "";
+
+            }else{
+
+                var parts=
+                    parsed.pathname
+                    .split("/")
+                    .filter(Boolean);
+
+                if(
+                    parts[0]==="shorts" ||
+                    parts[0]==="embed"
+                ){
+
+                    videoId=
+                        parts[1] || "";
+                }
+            }
+        }
+
+        if(
+            !/^[a-zA-Z0-9_-]{6,20}$/
+            .test(videoId)
+        ){
+            return "";
+        }
+
+        return "https://www.youtube.com/embed/"+
+            videoId;
+
+    }catch(error){
+
+        return "";
+    }
+}
+
+function appendMessageText(
+    container,
+    text
+){
+
+    var mentionPattern=
+        /@([a-zA-Z0-9_]{3,20})/g;
+
+    var lastIndex=0;
+    var match;
+
+    while(
+        (
+            match=
+                mentionPattern.exec(
+                    text
+                )
+        )!==null
+    ){
+
+        if(match.index>lastIndex){
+
+            container.appendChild(
+                document.createTextNode(
+                    text.slice(
+                        lastIndex,
+                        match.index
+                    )
+                )
+            );
+        }
+
+        var mentionSpan=
+            document.createElement(
+                "span"
+            );
+
+        mentionSpan.className=
+            "mention";
+
+        mentionSpan.textContent=
+            match[0];
+
+        container.appendChild(
+            mentionSpan
+        );
+
+        lastIndex=
+            mentionPattern.lastIndex;
+    }
+
+    if(lastIndex<text.length){
+
+        container.appendChild(
+            document.createTextNode(
+                text.slice(
+                    lastIndex
+                )
+            )
+        );
+    }
+}
+
+function createAvatar(
+    message
+){
+
+    var avatar=
+        document.createElement(
+            "div"
+        );
+
+    avatar.className=
+        "avatar";
+
+    if(message.profile_pic){
+
+        var image=
+            document.createElement(
+                "img"
+            );
+
+        image.src=
+            message.profile_pic;
+
+        image.alt=
+            message.username ||
+            "User";
+
+        avatar.appendChild(
+            image
+        );
+
+    }else{
+
+        avatar.textContent=
+            (
+                message.username ||
+                "?"
+            )
+            .charAt(0)
+            .toUpperCase();
+    }
+
+    return avatar;
+}
+
+function renderAttachment(
+    attachment
+){
+
+    if(!attachment){
+        return null;
+    }
+
+    var wrapper=
+        document.createElement(
+            "div"
+        );
+
+    wrapper.className=
+        "attachment";
+
+    if(
+        attachment.type==="image" ||
+        attachment.type==="image_link"
+    ){
+
+        var image=
+            document.createElement(
+                "img"
+            );
+
+        image.src=
+            attachment.url;
+
+        image.alt=
+            attachment.name ||
+            "Chat picture";
+
+        image.loading="lazy";
+
+        wrapper.appendChild(
+            image
+        );
+
+        return wrapper;
+    }
+
+    if(
+        attachment.type==="video" ||
+        attachment.type==="video_link"
+    ){
+
+        var video=
+            document.createElement(
+                "video"
+            );
+
+        video.src=
+            attachment.url;
+
+        video.controls=true;
+        video.preload="metadata";
+
+        wrapper.appendChild(
+            video
+        );
+
+        return wrapper;
+    }
+
+    if(
+        attachment.type==="audio"
+    ){
+
+        var audio=
+            document.createElement(
+                "audio"
+            );
+
+        audio.src=
+            attachment.url;
+
+        audio.controls=true;
+        audio.preload="metadata";
+
+        wrapper.appendChild(
+            audio
+        );
+
+        return wrapper;
+    }
+
+    if(
+        attachment.type==="youtube_link"
+    ){
+
+        var embedURL=
+            getYouTubeEmbedURL(
+                attachment.url
+            );
+
+        if(embedURL){
+
+            var frame=
+                document.createElement(
+                    "iframe"
+                );
+
+            frame.className=
+                "youtube_frame";
+
+            frame.src=embedURL;
+
+            frame.title=
+                "YouTube video";
+
+            frame.allow=
+                "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+
+            frame.allowFullscreen=true;
+
+            wrapper.appendChild(
+                frame
+            );
+
+            return wrapper;
+        }
+    }
+
+    if(
+        attachment.type==="pdf" ||
+        attachment.type==="pdf_link"
+    ){
+
+        var pdfLink=
+            document.createElement(
+                "a"
+            );
+
+        pdfLink.className=
+            "file_link";
+
+        pdfLink.href=
+            attachment.url;
+
+        pdfLink.target="_blank";
+
+        pdfLink.rel=
+            "noopener noreferrer";
+
+        pdfLink.textContent=
+            attachment.name
+            ?"Open PDF: "+
+                attachment.name
+            :"Open PDF";
+
+        wrapper.appendChild(
+            pdfLink
+        );
+
+        return wrapper;
+    }
+
+    var normalLink=
+        document.createElement(
+            "a"
+        );
+
+    normalLink.className=
+        "file_link";
+
+    normalLink.href=
+        attachment.url;
+
+    normalLink.target="_blank";
+
+    normalLink.rel=
+        "noopener noreferrer";
+
+    normalLink.textContent=
+        "Open attachment";
+
+    wrapper.appendChild(
+        normalLink
+    );
+
+    return wrapper;
+}
+
+function reactionGroups(
+    reactions
+){
+
+    var groups={};
+
+    var reactionValues=
+        Object.values(
+            reactions || {}
+        );
+
+    for(
+        var i=0;
+        i<reactionValues.length;
+        i++
+    ){
+
+        var reaction=
+            reactionValues[i];
+
+        if(
+            !reaction ||
+            !reaction.emoji
+        ){
+            continue;
+        }
+
+        if(!groups[reaction.emoji]){
+
+            groups[reaction.emoji]={
+                count:0,
+                mine:false
+            };
+        }
+
+        groups[
+            reaction.emoji
+        ].count++;
+
+        if(
+            reaction.user_idx===
+            account_details.user_idx
+        ){
+
+            groups[
+                reaction.emoji
+            ].mine=true;
+        }
+    }
+
+    return groups;
+}
+
+function createMessageCard(
+    message
+){
+
+    var mine=
+        message.user_idx===
+        account_details.user_idx;
+
+    var row=
+        document.createElement(
+            "div"
+        );
+
+    row.className=
+        mine
+        ?"message_row mine"
+        :"message_row";
+
+    row.dataset.chatIdx=
+        message.chat_idx;
+
+    row.appendChild(
+        createAvatar(
+            message
+        )
+    );
+
+    var column=
+        document.createElement(
+            "div"
+        );
+
+    column.className=
+        "message_column";
+
+    var meta=
+        document.createElement(
+            "p"
+        );
+
+    meta.className=
+        "message_meta";
+
+    meta.textContent=
+        "@"+
+        (
+            message.username ||
+            "Unknown"
+        )+
+        " • "+
+        formatTime(
+            message.time_created_ms
+        )+
+        (
+            message.edited
+            ?" • edited"
+            :""
+        );
+
+    column.appendChild(
+        meta
+    );
+
+    var bubble=
+        document.createElement(
+            "div"
+        );
+
+    bubble.className=
+        "message_bubble";
+
+    bubble.title=
+        "Click to tag @"+
+        (
+            message.username ||
+            "user"
+        );
+
+    bubble.onclick=
+        function(event){
+
+            if(
+                event.target.closest(
+                    "a,button,audio,video,iframe"
+                )
+            ){
+                return;
+            }
+
+            addMentionToInput(
+                message.username
+            );
+        };
+
+    if(
+        message.reply_to &&
+        message.reply_to.chat_idx
+    ){
+
+        var replyPreview=
+            document.createElement(
+                "div"
+            );
+
+        replyPreview.className=
+            "reply_preview";
+
+        var replyName=
+            document.createElement(
+                "strong"
+            );
+
+        replyName.textContent=
+            "Replying to @"+
+            (
+                message.reply_to.username ||
+                "user"
+            );
+
+        replyPreview.appendChild(
+            replyName
+        );
+
+        replyPreview.appendChild(
+            document.createTextNode(
+                message.reply_to.preview ||
+                "Message"
+            )
+        );
+
+        bubble.appendChild(
+            replyPreview
+        );
+    }
+
+    if(
+        message.chat_value
+    ){
+
+        var text=
+            document.createElement(
+                "p"
+            );
+
+        text.className=
+            "message_text";
+
+        appendMessageText(
+            text,
+            message.chat_value
+        );
+
+        bubble.appendChild(
+            text
+        );
+    }
+
+    var attachmentElement=
+        renderAttachment(
+            message.attachment
+        );
+
+    if(attachmentElement){
+
+        bubble.appendChild(
+            attachmentElement
+        );
+    }
+
+    column.appendChild(
+        bubble
+    );
+
+    var reactionSummary=
+        document.createElement(
+            "div"
+        );
+
+    reactionSummary.className=
+        "reaction_summary";
+
+    var groups=
+        reactionGroups(
+            message.reactions
+        );
+
+    var groupEmojis=
+        Object.keys(groups);
+
+    for(
+        var i=0;
+        i<groupEmojis.length;
+        i++
+    ){
+
+        var emoji=
+            groupEmojis[i];
+
+        var chip=
+            document.createElement(
+                "span"
+            );
+
+        chip.className=
+            groups[emoji].mine
+            ?"reaction_chip mine"
+            :"reaction_chip";
+
+        chip.textContent=
+            emoji+
+            " "+
+            groups[emoji].count;
+
+        reactionSummary.appendChild(
+            chip
+        );
+    }
+
+    if(groupEmojis.length>0){
+
+        column.appendChild(
+            reactionSummary
+        );
+    }
+
+    if(message.deleted!==true){
+
+        var actions=
+            document.createElement(
+                "div"
+            );
+
+        actions.className=
+            "message_actions";
+
+        var replyButton=
+            document.createElement(
+                "button"
+            );
+
+        replyButton.className=
+            "message_action_button";
+
+        replyButton.type="button";
+
+        replyButton.textContent=
+            "Reply";
+
+        replyButton.onclick=
+            function(){
+
+                selectReply(
+                    message
+                );
+            };
+
+        actions.appendChild(
+            replyButton
+        );
+
+        if(mine){
+
+            var editButton=
+                document.createElement(
+                    "button"
+                );
+
+            editButton.className=
+                "message_action_button edit_button";
+
+            editButton.type="button";
+
+            editButton.textContent=
+                "Edit";
+
+            editButton.onclick=
+                function(){
+
+                    startEditingMessage(
+                        message
+                    );
+                };
+
+            actions.appendChild(
+                editButton
+            );
+
+            var deleteButton=
+                document.createElement(
+                    "button"
+                );
+
+            deleteButton.className=
+                "message_action_button delete_button";
+
+            deleteButton.type="button";
+
+            deleteButton.textContent=
+                "Delete";
+
+            deleteButton.onclick=
+                function(){
+
+                    deleteOwnMessage(
+                        message
+                    );
+                };
+
+            actions.appendChild(
+                deleteButton
+            );
+        }
+
+        var reactionOptions=[
+            "👍",
+            "❤️",
+            "😂",
+            "😮",
+            "😢"
+        ];
+
+        for(
+            var r=0;
+            r<reactionOptions.length;
+            r++
+        ){
+
+            let emoji=
+                reactionOptions[r];
+
+            var reactionButton=
+                document.createElement(
+                    "button"
+                );
+
+            reactionButton.className=
+                "message_action_button";
+
+            reactionButton.type="button";
+
+            reactionButton.textContent=
+                emoji;
+
+            reactionButton.onclick=
+                function(){
+
+                    toggleReaction(
+                        message.chat_idx,
+                        emoji
+                    );
+                };
+
+            actions.appendChild(
+                reactionButton
+            );
+        }
+
+        column.appendChild(
+            actions
+        );
+    }
+
+    row.appendChild(
+        column
+    );
+
+    return row;
+}
+
+function renderMessages(
+    messages
+){
+
+    var shouldScroll=
+        firstMessageRender ||
+        (
+            chatMessages.scrollHeight-
+            chatMessages.scrollTop-
+            chatMessages.clientHeight
+        )<180;
+
+    chatMessages.innerHTML="";
+
+    if(messages.length===0){
+
+        var empty=
+            document.createElement(
+                "div"
+            );
+
+        empty.className=
+            "empty_chat";
+
+        empty.textContent=
+            "No messages yet. Send the first message.";
+
+        chatMessages.appendChild(
+            empty
+        );
+
+        firstMessageRender=false;
+        return;
+    }
+
+    var visibleMessages=
+        messages.filter(
+            function(message){
+
+                return message.deleted!==true;
+            }
+        );
+
+    if(visibleMessages.length===0){
+
+        var emptyVisible=
+            document.createElement(
+                "div"
+            );
+
+        emptyVisible.className=
+            "empty_chat";
+
+        emptyVisible.textContent=
+            "No messages yet. Send the first message.";
+
+        chatMessages.appendChild(
+            emptyVisible
+        );
+
+        latestChatIdx="";
+        firstMessageRender=false;
+        return;
+    }
+
+    for(
+        var i=0;
+        i<visibleMessages.length;
+        i++
+    ){
+
+        chatMessages.appendChild(
+            createMessageCard(
+                visibleMessages[i]
+            )
+        );
+    }
+
+    latestChatIdx=
+        visibleMessages[
+            visibleMessages.length-1
+        ].chat_idx;
+
+    if(shouldScroll){
+
+        chatMessages.scrollTop=
+            chatMessages.scrollHeight;
+    }
+
+    firstMessageRender=false;
+}
+
+function selectReply(
+    message
+){
+
+    if(currentEditingMessage){
+        cancelEditingMessage();
+    }
+
+    currentReply={
+        chat_idx:
+            message.chat_idx,
+
+        user_idx:
+            message.user_idx,
+
+        username:
+            message.username,
+
+        preview:
+            createPreview(
+                message.chat_value || "",
+                message.attachment
+            )
+    };
+
+    replyBoxText.textContent=
+        "Replying to @"+
+        currentReply.username+
+        ": "+
+        currentReply.preview;
+
+    replyBox.classList.add(
+        "show"
+    );
+
+    messageInput.focus();
+}
+
+function cancelReply(){
+
+    currentReply=null;
+
+    replyBox.classList.remove(
+        "show"
+    );
+
+    replyBoxText.textContent="";
+}
+
+function startEditingMessage(
+    message
+){
+
+    if(
+        message.user_idx!==
+        account_details.user_idx ||
+        message.deleted===true
+    ){
+        return;
+    }
+
+    currentEditingMessage=message;
+
+    cancelReply();
+
+    messageInput.value=
+        message.chat_value || "";
+
+    editBoxText.textContent=
+        "Editing your message";
+
+    editBox.style.display=
+        "flex";
+
+    sendButton.textContent=
+        "Save Edit";
+
+    messageInput.focus();
+}
+
+function cancelEditingMessage(){
+
+    currentEditingMessage=null;
+
+    editBox.style.display=
+        "none";
+
+    editBoxText.textContent="";
+
+    sendButton.textContent=
+        "Send";
+
+    messageInput.value="";
+}
+
+async function saveEditedMessage(){
+
+    if(!currentEditingMessage){
+        return;
+    }
+
+    var newText=
+        messageInput.value.trim();
+
+    if(
+        newText==="" &&
+        !currentEditingMessage.attachment
+    ){
+
+        showSendStatus(
+            "The edited message cannot be empty.",
+            "red"
+        );
+
+        return;
+    }
+
+    if(
+        currentEditingMessage.user_idx!==
+        account_details.user_idx
+    ){
+
+        showSendStatus(
+            "You can only edit your own messages.",
+            "red"
+        );
+
+        cancelEditingMessage();
+        return;
+    }
+
+    sendButton.disabled=true;
+
+    try{
+
+        var messageReference=
+            doc(
+                database,
+                "rooms_collection",
+                current_room.room_idx,
+                "messages",
+                currentEditingMessage.chat_idx
+            );
+
+        var snapshot=
+            await getDoc(
+                messageReference
+            );
+
+        if(!snapshot.exists()){
+
+            throw new Error(
+                "The message no longer exists."
+            );
+        }
+
+        var freshMessage=
+            snapshot.data();
+
+        if(
+            freshMessage.user_idx!==
+            account_details.user_idx
+        ){
+
+            throw new Error(
+                "You can only edit your own messages."
+            );
+        }
+
+        if(freshMessage.deleted===true){
+
+            throw new Error(
+                "Deleted messages cannot be edited."
+            );
+        }
+
+        var mentionedMembers=
+            getMentionedMembers(
+                newText
+            );
+
+        await updateDoc(
+            messageReference,
+            {
+                chat_value:
+                    newText,
+
+                mentions:
+                    mentionedMembers.map(
+                        function(member){
+
+                            return member.user_idx;
+                        }
+                    ),
+
+                mention_usernames:
+                    mentionedMembers.map(
+                        function(member){
+
+                            return member.username;
+                        }
+                    ),
+
+                time_last_edited:
+                    serverTimestamp(),
+
+                time_last_edited_ms:
+                    Date.now(),
+
+                edited:true
+            }
+        );
+
+        showSendStatus(
+            "Message edited.",
+            "green"
+        );
+
+        cancelEditingMessage();
+
+    }catch(error){
+
+        console.error(error);
+
+        showSendStatus(
+            "Could not edit message: "+
+            error.message,
+            "red"
+        );
+
+    }finally{
+
+        sendButton.disabled=false;
+    }
+}
+
+async function deleteOwnMessage(
+    message
+){
+
+    if(
+        message.user_idx!==
+        account_details.user_idx
+    ){
+
+        showSendStatus(
+            "You can only delete your own messages.",
+            "red"
+        );
+
+        return;
+    }
+
+    var confirmed=
+        confirm(
+            "Delete this message?"
+        );
+
+    if(!confirmed){
+        return;
+    }
+
+    try{
+
+        var messageReference=
+            doc(
+                database,
+                "rooms_collection",
+                current_room.room_idx,
+                "messages",
+                message.chat_idx
+            );
+
+        var snapshot=
+            await getDoc(
+                messageReference
+            );
+
+        if(!snapshot.exists()){
+            return;
+        }
+
+        var freshMessage=
+            snapshot.data();
+
+        if(
+            freshMessage.user_idx!==
+            account_details.user_idx
+        ){
+
+            throw new Error(
+                "You can only delete your own messages."
+            );
+        }
+
+        if(
+            freshMessage.attachment &&
+            freshMessage.attachment.storage_path
+        ){
+
+            try{
+
+                await deleteObject(
+                    ref(
+                        storage,
+                        freshMessage.attachment.storage_path
+                    )
+                );
+
+            }catch(storageError){
+
+                console.warn(
+                    "Attachment could not be removed:",
+                    storageError
+                );
+            }
+        }
+
+        await updateDoc(
+            messageReference,
+            {
+                chat_value:"",
+                attachment:null,
+                mentions:[],
+                mention_usernames:[],
+                reactions:{},
+
+                deleted:true,
+
+                deleted_at:
+                    serverTimestamp(),
+
+                deleted_at_ms:
+                    Date.now(),
+
+                time_last_edited:
+                    serverTimestamp(),
+
+                time_last_edited_ms:
+                    Date.now()
+            }
+        );
+
+        if(
+            currentEditingMessage &&
+            currentEditingMessage.chat_idx===
+            message.chat_idx
+        ){
+            cancelEditingMessage();
+        }
+
+        if(
+            currentReply &&
+            currentReply.chat_idx===
+            message.chat_idx
+        ){
+            cancelReply();
+        }
+
+        showSendStatus(
+            "Message deleted and removed from the chat.",
+            "green"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        showSendStatus(
+            "Could not delete message: "+
+            error.message,
+            "red"
+        );
+    }
+}
+
+async function toggleReaction(
+    chat_idx,
+    emoji
+){
+
+    if(!firebaseUser){
+        return;
+    }
+
+    var messageReference=
+        doc(
+            database,
+            "rooms_collection",
+            current_room.room_idx,
+            "messages",
+            chat_idx
+        );
+
+    try{
+
+        await runTransaction(
+            database,
+            async function(transaction){
+
+                var messageSnapshot=
+                    await transaction.get(
+                        messageReference
+                    );
+
+                if(
+                    !messageSnapshot.exists()
+                ){
+                    return;
+                }
+
+                var messageData=
+                    messageSnapshot.data();
+
+                var reactions=
+                    Object.assign(
+                        {},
+                        messageData.reactions ||
+                        {}
+                    );
+
+                var oldReaction=
+                    reactions[
+                        account_details.user_idx
+                    ];
+
+                if(
+                    oldReaction &&
+                    oldReaction.emoji===
+                    emoji
+                ){
+
+                    delete reactions[
+                        account_details.user_idx
+                    ];
+
+                }else{
+
+                    reactions[
+                        account_details.user_idx
+                    ]={
+                        user_idx:
+                            account_details.user_idx,
+
+                        username:
+                            account_details.username,
+
+                        emoji:emoji,
+
+                        reacted_at_ms:
+                            Date.now()
+                    };
+                }
+
+                transaction.update(
+                    messageReference,
+                    {
+                        reactions:
+                            reactions
+                    }
+                );
+            }
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        showSendStatus(
+            "Could not update reaction: "+
+            error.message,
+            "red"
+        );
+    }
+}
+
+async function uploadAttachment(
+    blobOrFile,
+    chat_idx,
+    type
+){
+
+    var fileName="";
+
+    if(
+        blobOrFile instanceof File
+    ){
+
+        fileName=
+            safeFileName(
+                blobOrFile.name
+            );
+
+    }else{
+
+        fileName=
+            "recording_"+
+            Date.now()+
+            ".webm";
+    }
+
+    var storagePath=
+        "chat_rooms/"+
+        current_room.room_idx+
+        "/messages/"+
+        chat_idx+
+        "/"+
+        Date.now()+
+        "_"+
+        fileName;
+
+    var storageReference=
+        ref(
+            storage,
+            storagePath
+        );
+
+    return new Promise(
+        function(resolve,reject){
+
+            var uploadTask=
+                uploadBytesResumable(
+                    storageReference,
+                    blobOrFile,
+                    {
+                        contentType:
+                            blobOrFile.type ||
+                            "application/octet-stream"
+                    }
+                );
+
+            uploadTask.on(
+
+                "state_changed",
+
+                function(snapshot){
+
+                    var percentage=
+                        snapshot.bytesTransferred/
+                        snapshot.totalBytes*
+                        100;
+
+                    showSendStatus(
+                        "Uploading: "+
+                        percentage.toFixed(0)+
+                        "%",
+                        "#344054"
+                    );
+                },
+
+                function(error){
+
+                    reject(error);
+                },
+
+                async function(){
+
+                    try{
+
+                        var url=
+                            await getDownloadURL(
+                                uploadTask.snapshot.ref
+                            );
+
+                        resolve({
+                            type:type,
+                            url:url,
+                            name:fileName,
+                            storage_path:
+                                storagePath
+                        });
+
+                    }catch(error){
+
+                        reject(error);
+                    }
+                }
+            );
+        }
+    );
+}
+
+function getMentionedMembers(
+    text
+){
+
+    var result=[];
+    var foundUserIdx={};
+
+    var mentionPattern=
+        /@([a-zA-Z0-9_]{3,20})/g;
+
+    var match;
+
+    while(
+        (
+            match=
+                mentionPattern.exec(
+                    text
+                )
+        )!==null
+    ){
+
+        var usernameLowercase=
+            match[1]
+            .toLowerCase();
+
+        var member=
+            membersByUsername[
+                usernameLowercase
+            ];
+
+        if(
+            member &&
+            member.user_idx!==
+                account_details.user_idx &&
+            !foundUserIdx[
+                member.user_idx
+            ]
+        ){
+
+            foundUserIdx[
+                member.user_idx
+            ]=true;
+
+            result.push(
+                member
+            );
+        }
+    }
+
+    return result;
+}
+
+async function createNotificationsForMessage(
+    batch,
+    otherMembers,
+    mentionedMembers,
+    messageData
+){
+
+    var mentionedUserIdx={};
+
+    for(
+        var i=0;
+        i<mentionedMembers.length;
+        i++
+    ){
+
+        mentionedUserIdx[
+            mentionedMembers[i].user_idx
+        ]=true;
+    }
+
+    var memberUserSnapshots=
+        await Promise.all(
+
+            otherMembers.map(
+                function(member){
+
+                    return getDoc(
+                        doc(
+                            database,
+                            "user_db_details",
+                            member.user_idx
+                        )
+                    );
+                }
+            )
+        );
+
+    for(
+        var m=0;
+        m<otherMembers.length;
+        m++
+    ){
+
+        var member=
+            otherMembers[m];
+
+        var userSnapshot=
+            memberUserSnapshots[m];
+
+        var userData=
+            userSnapshot.exists()
+            ?userSnapshot.data()
+            :{};
+
+        var settings=
+            userData.settings || {};
+
+        var notificationMode=
+            settings.notification_mode ||
+            "all";
+
+        var allowMentions=
+            settings.allow_mentions!==
+            false;
+
+        var isMention=
+            Boolean(
+                mentionedUserIdx[
+                    member.user_idx
+                ]
+            );
+
+        var isReply=
+            Boolean(
+                currentReply &&
+                currentReply.user_idx===
+                member.user_idx
+            );
+
+        var unreadAfter=
+            (
+                member.unread_messages ||
+                0
+            )+
+            1;
+
+        var notificationType="";
+
+        if(
+            isReply &&
+            isMention &&
+            allowMentions
+        ){
+
+            notificationType=
+                "reply_mention";
+
+        }else if(isReply){
+
+            notificationType=
+                "reply";
+
+        }else if(
+            isMention &&
+            allowMentions
+        ){
+
+            notificationType=
+                "mention";
+
+        }else if(
+            notificationMode==="all"
+        ){
+
+            notificationType=
+                "message";
+
+        }else if(
+            notificationMode===
+                "every_5" &&
+            unreadAfter%5===0
+        ){
+
+            notificationType=
+                "message_batch";
+
+        }else if(
+            notificationMode===
+                "every_10" &&
+            unreadAfter%10===0
+        ){
+
+            notificationType=
+                "message_batch";
+        }
+
+        if(notificationType===""){
+            continue;
+        }
+
+        var notification_idx=
+            createNotificationIdx();
+
+        var notificationData={
+
+            notification_idx:
+                notification_idx,
+
+            recipient_user_idx:
+                member.user_idx,
+
+            recipient_username:
+                member.username || "",
+
+            sender_user_idx:
+                account_details.user_idx,
+
+            sender_username:
+                account_details.username,
+
+            room_idx:
+                current_room.room_idx,
+
+            room_title:
+                currentRoomData.room_title ||
+                current_room.room_title ||
+                "",
+
+            chat_idx:
+                messageData.chat_idx,
+
+            type:
+                notificationType,
+
+            message_preview:
+                createPreview(
+                    messageData.chat_value,
+                    messageData.attachment
+                ),
+
+            created_at:
+                serverTimestamp(),
+
+            created_at_ms:
+                messageData.time_created_ms,
+
+            read:false
+        };
+
+        batch.set(
+            doc(
+                database,
+                "notifications",
+                notification_idx
+            ),
+            notificationData
+        );
+    }
+}
+
+async function sendMessage(){
+
+    if(currentEditingMessage){
+
+        await saveEditedMessage();
+        return;
+    }
+
+    if(
+        !firebaseUser ||
+        !account_details ||
+        !current_room
+    ){
+
+        showSendStatus(
+            "Please login and choose a room.",
+            "red"
+        );
+
+        return;
+    }
+
+    var chatValue=
+        messageInput.value.trim();
+
+    var selectedLinkType=
+        linkType.value;
+
+    var selectedLink=
+        mediaLink.value.trim();
+
+    if(!validateMediaLink()){
+        return;
+    }
+
+    var hasUpload=
+        Boolean(
+            selectedFile ||
+            recordedAudioBlob
+        );
+
+    var hasLink=
+        selectedLinkType!=="" &&
+        selectedLink!=="";
+
+    if(
+        hasUpload &&
+        hasLink
+    ){
+
+        showSendStatus(
+            "Use one uploaded attachment or one media link per message.",
+            "red"
+        );
+
+        return;
+    }
+
+    if(
+        chatValue==="" &&
+        !hasUpload &&
+        !hasLink
+    ){
+
+        showSendStatus(
+            "Write a message or add an attachment.",
+            "red"
+        );
+
+        return;
+    }
+
+    sendButton.disabled=true;
+    imageButton.disabled=true;
+    videoButton.disabled=true;
+    pdfButton.disabled=true;
+    recordAudioButton.disabled=true;
+
+    showSendStatus(
+        "Sending...",
+        "#344054"
+    );
+
+    var uploadedStoragePath="";
+
+    try{
+
+        var chat_idx=
+            createChatIdx();
+
+        var createdAtMs=
+            Date.now();
+
+        var attachment=null;
+
+        if(selectedFile){
+
+            attachment=
+                await uploadAttachment(
+                    selectedFile,
+                    chat_idx,
+                    selectedFileType
+                );
+
+            uploadedStoragePath=
+                attachment.storage_path;
+        }
+
+        if(recordedAudioBlob){
+
+            attachment=
+                await uploadAttachment(
+                    recordedAudioBlob,
+                    chat_idx,
+                    "audio"
+                );
+
+            uploadedStoragePath=
+                attachment.storage_path;
+        }
+
+        if(hasLink){
+
+            attachment={
+                type:selectedLinkType,
+                url:selectedLink,
+                name:"",
+                storage_path:""
+            };
+        }
+
+        var mentionedMembers=
+            getMentionedMembers(
+                chatValue
+            );
+
+        var mentionUserIdx=
+            mentionedMembers.map(
+                function(member){
+
+                    return member.user_idx;
+                }
+            );
+
+        var mentionUsernames=
+            mentionedMembers.map(
+                function(member){
+
+                    return member.username;
+                }
+            );
+
+        var replyData=null;
+
+        if(currentReply){
+
+            replyData={
+                chat_idx:
+                    currentReply.chat_idx,
+
+                user_idx:
+                    currentReply.user_idx,
+
+                username:
+                    currentReply.username,
+
+                preview:
+                    currentReply.preview
+            };
+        }
+
+        var messageData={
+
+            room_idx:
+                current_room.room_idx,
+
+            user_idx:
+                account_details.user_idx,
+
+            firebase_uid:
+                firebaseUser.uid,
+
+            username:
+                account_details.username,
+
+            profile_pic:
+                account_details.profile_pic ||
+                "",
+
+            chat_value:
+                chatValue,
+
+            chat_idx:
+                chat_idx,
+
+            message_type:
+                attachment
+                ?attachment.type
+                :"text",
+
+            attachment:
+                attachment,
+
+            reply_to:
+                replyData,
+
+            mentions:
+                mentionUserIdx,
+
+            mention_usernames:
+                mentionUsernames,
+
+            reactions:{},
+
+            time_created:
+                serverTimestamp(),
+
+            time_created_ms:
+                createdAtMs,
+
+            time_last_edited:
+                serverTimestamp(),
+
+            time_last_edited_ms:
+                createdAtMs,
+
+            edited:false,
+            deleted:false
+        };
+
+        var membersSnapshot=
+            await getDocs(
+                collection(
+                    database,
+                    "rooms_collection",
+                    current_room.room_idx,
+                    "members"
+                )
+            );
+
+        var allMembers=[];
+
+        membersSnapshot.forEach(
+            function(memberDocument){
+
+                allMembers.push(
+                    memberDocument.data()
+                );
+            }
+        );
+
+        var otherMembers=
+            allMembers.filter(
+                function(member){
+
+                    return member.user_idx!==
+                        account_details.user_idx;
+                }
+            );
+
+        var roomReference=
+            doc(
+                database,
+                "rooms_collection",
+                current_room.room_idx
+            );
+
+        var freshRoomSnapshot=
+            await getDoc(
+                roomReference
+            );
+
+        if(
+            !freshRoomSnapshot.exists()
+        ){
+
+            throw new Error(
+                "This room no longer exists."
+            );
+        }
+
+        var freshRoomData=
+            freshRoomSnapshot.data();
+
+        currentRoomData=
+            freshRoomData;
+
+        var newLastThree=
+            (
+                freshRoomData
+                .last_three_messages ||
+                []
+            )
+            .slice(-2);
+
+        newLastThree.push({
+            chat_idx:
+                chat_idx,
+
+            user_idx:
+                account_details.user_idx,
+
+            username:
+                account_details.username,
+
+            preview:
+                createPreview(
+                    chatValue,
+                    attachment
+                ),
+
+            time_created_ms:
+                createdAtMs,
+
+            message_type:
+                messageData.message_type
+        });
+
+        var batch=
+            writeBatch(
+                database
+            );
+
+        batch.set(
+            doc(
+                database,
+                "rooms_collection",
+                current_room.room_idx,
+                "messages",
+                chat_idx
+            ),
+            messageData
+        );
+
+        batch.update(
+            roomReference,
+            {
+                number_of_messages:
+                    increment(1),
+
+                last_message_time:
+                    serverTimestamp(),
+
+                last_message_time_ms:
+                    createdAtMs,
+
+                last_message_preview:
+                    createPreview(
+                        chatValue,
+                        attachment
+                    ),
+
+                last_three_messages:
+                    newLastThree
+            }
+        );
+
+        for(
+            var i=0;
+            i<otherMembers.length;
+            i++
+        ){
+
+            var member=
+                otherMembers[i];
+
+            batch.update(
+                doc(
+                    database,
+                    "rooms_collection",
+                    current_room.room_idx,
+                    "members",
+                    member.user_idx
+                ),
+                {
+                    unread_messages:
+                        increment(1)
+                }
+            );
+
+            batch.update(
+                doc(
+                    database,
+                    "user_db_details",
+                    member.user_idx
+                ),
+                {
+                    total_unread_messages:
+                        increment(1)
+                }
+            );
+        }
+
+        await createNotificationsForMessage(
+            batch,
+            otherMembers,
+            mentionedMembers,
+            messageData
+        );
+
+        await batch.commit();
+
+        messageInput.value="";
+        mediaLink.value="";
+        linkType.value="";
+
+        clearSelectedAttachment();
+        cancelReply();
+
+        await setTypingState(
+            false
+        );
+
+        showSendStatus(
+            "Message sent.",
+            "green"
+        );
+
+        setTimeout(
+            function(){
+
+                if(
+                    sendStatus.textContent===
+                    "Message sent."
+                ){
+
+                    showSendStatus(
+                        "",
+                        ""
+                    );
+                }
+            },
+            1200
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        if(uploadedStoragePath){
+
+            try{
+
+                await deleteObject(
+                    ref(
+                        storage,
+                        uploadedStoragePath
+                    )
+                );
+
+            }catch(cleanupError){
+
+                console.warn(
+                    cleanupError
+                );
+            }
+        }
+
+        showSendStatus(
+            "Could not send message: "+
+            error.message,
+            "red"
+        );
+
+    }finally{
+
+        sendButton.disabled=false;
+        imageButton.disabled=false;
+        videoButton.disabled=false;
+        pdfButton.disabled=false;
+        recordAudioButton.disabled=false;
+    }
+}
+
+async function ensureMembership(){
+
+    var memberReference=
+        doc(
+            database,
+            "rooms_collection",
+            current_room.room_idx,
+            "members",
+            account_details.user_idx
+        );
+
+    var memberSnapshot=
+        await getDoc(
+            memberReference
+        );
+
+    if(memberSnapshot.exists()){
+        return;
+    }
+
+    await setDoc(
+        memberReference,
+        {
+            user_idx:
+                account_details.user_idx,
+
+            firebase_uid:
+                firebaseUser.uid,
+
+            username:
+                account_details.username,
+
+            profile_pic:
+                account_details.profile_pic ||
+                "",
+
+            joined_at:
+                serverTimestamp(),
+
+            unread_messages:0,
+
+            last_read_message_idx:"",
+
+            last_read_at:
+                serverTimestamp()
+        }
+    );
+
+    await updateDoc(
+        doc(
+            database,
+            "rooms_collection",
+            current_room.room_idx
+        ),
+        {
+            member_count:
+                increment(1)
+        }
+    );
+}
+
+async function markRoomRead(){
+
+    if(
+        !account_details ||
+        !current_room ||
+        !firebaseUser
+    ){
+        return;
+    }
+
+    var memberReference=
+        doc(
+            database,
+            "rooms_collection",
+            current_room.room_idx,
+            "members",
+            account_details.user_idx
+        );
+
+    var userReference=
+        doc(
+            database,
+            "user_db_details",
+            account_details.user_idx
+        );
+
+    try{
+
+        await runTransaction(
+            database,
+            async function(transaction){
+
+                var memberSnapshot=
+                    await transaction.get(
+                        memberReference
+                    );
+
+                var userSnapshot=
+                    await transaction.get(
+                        userReference
+                    );
+
+                if(
+                    !memberSnapshot.exists() ||
+                    !userSnapshot.exists()
+                ){
+                    return;
+                }
+
+                var unreadInRoom=
+                    Number(
+                        memberSnapshot
+                        .data()
+                        .unread_messages ||
+                        0
+                    );
+
+                if(unreadInRoom<=0){
+
+                    transaction.update(
+                        memberReference,
+                        {
+                            last_read_at:
+                                serverTimestamp(),
+
+                            last_read_message_idx:
+                                latestChatIdx || ""
+                        }
+                    );
+
+                    return;
+                }
+
+                var totalUnread=
+                    Number(
+                        userSnapshot
+                        .data()
+                        .total_unread_messages ||
+                        0
+                    );
+
+                transaction.update(
+                    memberReference,
+                    {
+                        unread_messages:0,
+
+                        last_read_at:
+                            serverTimestamp(),
+
+                        last_read_message_idx:
+                            latestChatIdx || ""
+                    }
+                );
+
+                transaction.update(
+                    userReference,
+                    {
+                        total_unread_messages:
+                            Math.max(
+                                0,
+                                totalUnread-
+                                unreadInRoom
+                            )
+                    }
+                );
+            }
+        );
+
+    }catch(error){
+
+        console.error(
+            "Could not mark room read:",
+            error
+        );
+    }
+}
+
+function scheduleMarkRoomRead(){
+
+    clearTimeout(
+        readTimeout
+    );
+
+    if(document.hidden){
+        return;
+    }
+
+    readTimeout=
+        setTimeout(
+            function(){
+
+                markRoomRead();
+            },
+            450
+        );
+}
+
+async function setTypingState(
+    isTyping
+){
+
+    if(
+        !account_details ||
+        !current_room ||
+        !firebaseUser
+    ){
+        return;
+    }
+
+    try{
+
+        await setDoc(
+            doc(
+                database,
+                "rooms_collection",
+                current_room.room_idx,
+                "typing",
+                account_details.user_idx
+            ),
+            {
+                user_idx:
+                    account_details.user_idx,
+
+                username:
+                    account_details.username,
+
+                is_typing:
+                    isTyping,
+
+                last_typing_ms:
+                    Date.now()
+            },
+            {
+                merge:true
+            }
+        );
+
+    }catch(error){
+
+        console.warn(
+            "Typing indicator error:",
+            error
+        );
+    }
+}
+
+function renderTypingIndicator(){
+
+    var now=
+        Date.now();
+
+    var activeUsers=
+        typingUsers.filter(
+            function(user){
+
+                return(
+                    user.user_idx!==
+                        account_details.user_idx &&
+                    user.is_typing===true &&
+                    now-
+                    (
+                        user.last_typing_ms ||
+                        0
+                    )<
+                    5000
+                );
+            }
+        );
+
+    if(activeUsers.length===0){
+
+        typingIndicator.textContent="";
+        return;
+    }
+
+    var names=
+        activeUsers
+        .slice(0,3)
+        .map(
+            function(user){
+
+                return "@"+
+                    user.username;
+            }
+        );
+
+    if(activeUsers.length===1){
+
+        typingIndicator.textContent=
+            names[0]+
+            " is typing...";
+
+    }else{
+
+        typingIndicator.textContent=
+            names.join(", ")+
+            " are typing...";
+    }
+}
+
+function createMemberCard(
+    member
+){
+
+    var userContainer=
+        document.createElement(
+            "button"
+        );
+
+    userContainer.type="button";
+    userContainer.className=
+        "user_container";
+
+    userContainer.title=
+        "Tag @"+
+        (
+            member.username ||
+            "user"
+        );
+
+    var profile=
+        document.createElement(
+            "div"
+        );
+
+    profile.className=
+        "member_profile_picture";
+
+    if(member.profile_pic){
+
+        var image=
+            document.createElement(
+                "img"
+            );
+
+        image.src=
+            member.profile_pic;
+
+        image.alt=
+            member.username ||
+            "User";
+
+        profile.appendChild(
+            image
+        );
+
+    }else{
+
+        profile.textContent=
+            (
+                member.username ||
+                "?"
+            )
+            .charAt(0)
+            .toUpperCase();
+    }
+
+    var username=
+        document.createElement(
+            "span"
+        );
+
+    username.className=
+        "member_username";
+
+    username.textContent=
+        "@"+
+        (
+            member.username ||
+            "user"
+        );
+
+    userContainer.appendChild(
+        profile
+    );
+
+    userContainer.appendChild(
+        username
+    );
+
+    userContainer.onclick=
+        function(){
+
+            addMentionToInput(
+                member.username
+            );
+        };
+
+    return userContainer;
+}
+
+function renderRoomMembers(){
+
+    roomMembersContainer.innerHTML="";
+
+    var sortedMembers=
+        roomMembers
+        .slice()
+        .sort(
+            function(a,b){
+
+                if(
+                    a.user_idx===
+                    account_details.user_idx
+                ){
+                    return -1;
+                }
+
+                if(
+                    b.user_idx===
+                    account_details.user_idx
+                ){
+                    return 1;
+                }
+
+                return(
+                    (
+                        a.username ||
+                        ""
+                    )
+                    .localeCompare(
+                        b.username ||
+                        ""
+                    )
+                );
+            }
+        );
+
+    for(
+        var i=0;
+        i<sortedMembers.length;
+        i++
+    ){
+
+        roomMembersContainer.appendChild(
+            createMemberCard(
+                sortedMembers[i]
+            )
+        );
+    }
+}
+
+function listenToMembers(){
+
+    stopMembersListener=
+        onSnapshot(
+            collection(
+                database,
+                "rooms_collection",
+                current_room.room_idx,
+                "members"
+            ),
+            function(snapshot){
+
+                roomMembers=[];
+                membersByUsername={};
+
+                snapshot.forEach(
+                    function(memberDocument){
+
+                        var member=
+                            memberDocument.data();
+
+                        roomMembers.push(
+                            member
+                        );
+
+                        if(member.username){
+
+                            membersByUsername[
+                                member.username
+                                .toLowerCase()
+                            ]=
+                                member;
+                        }
+                    }
+                );
+
+                renderRoomMembers();
+            },
+            function(error){
+
+                console.error(error);
+            }
+        );
+}
+
+function listenToTyping(){
+
+    stopTypingListener=
+        onSnapshot(
+            collection(
+                database,
+                "rooms_collection",
+                current_room.room_idx,
+                "typing"
+            ),
+            function(snapshot){
+
+                typingUsers=[];
+
+                snapshot.forEach(
+                    function(typingDocument){
+
+                        typingUsers.push(
+                            typingDocument.data()
+                        );
+                    }
+                );
+
+                renderTypingIndicator();
+            },
+            function(error){
+
+                console.error(error);
+            }
+        );
+
+    typingRenderInterval=
+        setInterval(
+            renderTypingIndicator,
+            1000
+        );
+}
+
+function listenToMessages(){
+
+    var messagesQuery=
+        query(
+            collection(
+                database,
+                "rooms_collection",
+                current_room.room_idx,
+                "messages"
+            ),
+            orderBy(
+                "time_created_ms",
+                "asc"
+            ),
+            limitToLast(100)
+        );
+
+    stopMessagesListener=
+        onSnapshot(
+            messagesQuery,
+            function(snapshot){
+
+                var messages=[];
+
+                snapshot.forEach(
+                    function(messageDocument){
+
+                        messages.push(
+                            messageDocument.data()
+                        );
+                    }
+                );
+
+                renderMessages(
+                    messages
+                );
+
+                scheduleMarkRoomRead();
+            },
+            function(error){
+
+                console.error(error);
+
+                chatMessages.innerHTML="";
+
+                var errorText=
+                    document.createElement(
+                        "div"
+                    );
+
+                errorText.className=
+                    "empty_chat";
+
+                errorText.textContent=
+                    "Could not load messages: "+
+                    error.message;
+
+                chatMessages.appendChild(
+                    errorText
+                );
+            }
+        );
+}
+
+function notificationText(
+    notification
+){
+
+    if(
+        notification.type===
+        "mention"
+    ){
+
+        return "@"+
+            notification.sender_username+
+            " tagged you: "+
+            notification.message_preview;
+    }
+
+    if(
+        notification.type===
+        "reply"
+    ){
+
+        return "@"+
+            notification.sender_username+
+            " replied to your message: "+
+            notification.message_preview;
+    }
+
+    if(
+        notification.type===
+        "reply_mention"
+    ){
+
+        return "@"+
+            notification.sender_username+
+            " replied and tagged you: "+
+            notification.message_preview;
+    }
+
+    if(
+        notification.type===
+        "message_batch"
+    ){
+
+        return "New messages in "+
+            notification.room_title+
+            ": "+
+            notification.message_preview;
+    }
+
+    return "New message from @"+
+        notification.sender_username+
+        ": "+
+        notification.message_preview;
+}
+
+function renderNotifications(
+    notifications
+){
+
+    notificationList.innerHTML="";
+
+    var unreadCount=
+        notifications.filter(
+            function(item){
+
+                return item.read!==true;
+            }
+        ).length;
+
+    notificationBadge.textContent=
+        unreadCount>99
+        ?"99+"
+        :String(unreadCount);
+
+    notificationBadge.style.display=
+        unreadCount>0
+        ?"flex"
+        :"none";
+
+    if(notifications.length===0){
+
+        var empty=
+            document.createElement(
+                "p"
+            );
+
+        empty.className=
+            "small_text";
+
+        empty.textContent=
+            "No notifications yet.";
+
+        notificationList.appendChild(
+            empty
+        );
+
+        return;
+    }
+
+    for(
+        var i=0;
+        i<notifications.length;
+        i++
+    ){
+
+        var notification=
+            notifications[i];
+
+        var item=
+            document.createElement(
+                "button"
+            );
+
+        item.type="button";
+
+        item.className=
+            notification.read===true
+            ?"notification_item"
+            :"notification_item unread";
+
+        var text=
+            document.createElement(
+                "p"
+            );
+
+        text.textContent=
+            notificationText(
+                notification
+            );
+
+        var time=
+            document.createElement(
+                "p"
+            );
+
+        time.className=
+            "notification_time";
+
+        time.textContent=
+            (
+                notification.room_title ||
+                "Room"
+            )+
+            " • "+
+            formatTime(
+                notification.created_at_ms
+            );
+
+        item.appendChild(
+            text
+        );
+
+        item.appendChild(
+            time
+        );
+
+        item.onclick=
+            function(notificationCopy){
+
+                return function(){
+
+                    openNotification(
+                        notificationCopy
+                    );
+                };
+
+            }(notification);
+
+        notificationList.appendChild(
+            item
+        );
+    }
+}
+
+async function openNotification(
+    notification
+){
+
+    try{
+
+        if(notification.read!==true){
+
+            await updateDoc(
+                doc(
+                    database,
+                    "notifications",
+                    notification.notification_idx
+                ),
+                {
+                    read:true,
+                    read_at:
+                        serverTimestamp()
+                }
+            );
+        }
+
+        notificationPanel.classList.remove(
+            "show"
+        );
+
+        if(
+            notification.room_idx===
+            current_room.room_idx
+        ){
+
+            var target=
+                chatMessages
+                .querySelector(
+                    '[data-chat-idx="'+
+                    notification.chat_idx+
+                    '"]'
+                );
+
+            if(target){
+
+                target.scrollIntoView({
+                    behavior:"smooth",
+                    block:"center"
+                });
+            }
+
+            return;
+        }
+
+        localStorage.setItem(
+            "current_room",
+            JSON.stringify({
+                room_idx:
+                    notification.room_idx,
+
+                room_title:
+                    notification.room_title
+            })
+        );
+
+        window.location.href=
+            "room_chat.html";
+
+    }catch(error){
+
+        console.error(error);
+    }
+}
+
+function listenToNotifications(){
+
+    var notificationQuery=
+        query(
+            collection(
+                database,
+                "notifications"
+            ),
+            where(
+                "recipient_user_idx",
+                "==",
+                account_details.user_idx
+            )
+        );
+
+    stopNotificationsListener=
+        onSnapshot(
+            notificationQuery,
+            function(snapshot){
+
+                var notifications=[];
+
+                snapshot.forEach(
+                    function(notificationDocument){
+
+                        notifications.push(
+                            notificationDocument.data()
+                        );
+                    }
+                );
+
+                notifications.sort(
+                    function(a,b){
+
+                        return(
+                            (
+                                b.created_at_ms ||
+                                0
+                            )-
+                            (
+                                a.created_at_ms ||
+                                0
+                            )
+                        );
+                    }
+                );
+
+                renderNotifications(
+                    notifications.slice(
+                        0,
+                        30
+                    )
+                );
+            },
+            function(error){
+
+                console.error(error);
+
+                notificationList.textContent=
+                    "Could not load notifications.";
+            }
+        );
+}
+
+function listenToCurrentUser(){
+
+    stopCurrentUserListener=
+        onSnapshot(
+            doc(
+                database,
+                "user_db_details",
+                account_details.user_idx
+            ),
+            function(snapshot){
+
+                if(!snapshot.exists()){
+                    return;
+                }
+
+                unreadTotalNumber.textContent=
+                    snapshot
+                    .data()
+                    .total_unread_messages ||
+                    0;
+            },
+            function(error){
+
+                console.error(error);
+            }
+        );
+}
+
+async function loadRoom(){
+
+    var roomSnapshot=
+        await getDoc(
+            doc(
+                database,
+                "rooms_collection",
+                current_room.room_idx
+            )
+        );
+
+    if(!roomSnapshot.exists()){
+
+        throw new Error(
+            "The selected room does not exist."
+        );
+    }
+
+    currentRoomData=
+        roomSnapshot.data();
+
+    roomTitle.textContent=
+        currentRoomData.room_title ||
+        current_room.room_title ||
+        "Chat Room";
+
+    roomDescription.textContent=
+        currentRoomData.room_description ||
+        "";
+}
+
+async function startAudioRecording(){
+
+    if(
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia ||
+        typeof MediaRecorder===
+            "undefined"
+    ){
+
+        showSendStatus(
+            "Audio recording is not supported by this browser.",
+            "red"
+        );
+
+        return;
+    }
+
+    if(mediaRecorder){
+
+        stopAudioRecording();
+        return;
+    }
+
+    clearSelectedAttachment();
+
+    try{
+
+        mediaStream=
+            await navigator
+            .mediaDevices
+            .getUserMedia({
+                audio:true
+            });
+
+        audioChunks=[];
+
+        mediaRecorder=
+            new MediaRecorder(
+                mediaStream
+            );
+
+        mediaRecorder.ondataavailable=
+            function(event){
+
+                if(event.data.size>0){
+
+                    audioChunks.push(
+                        event.data
+                    );
+                }
+            };
+
+        mediaRecorder.onstop=
+            function(){
+
+                var mimeType=
+                    mediaRecorder.mimeType ||
+                    "audio/webm";
+
+                recordedAudioBlob=
+                    new Blob(
+                        audioChunks,
+                        {
+                            type:mimeType
+                        }
+                    );
+
+                recordedAudioURL=
+                    URL.createObjectURL(
+                        recordedAudioBlob
+                    );
+
+                recordedAudioPreview.src=
+                    recordedAudioURL;
+
+                recordedAudioPreview.style.display=
+                    "block";
+
+                selectedAttachmentText.textContent=
+                    "Recorded audio ("+
+                    (
+                        recordedAudioBlob.size/
+                        1024/
+                        1024
+                    ).toFixed(2)+
+                    " MB)";
+
+                selectedAttachmentBox.classList.add(
+                    "show"
+                );
+
+                if(mediaStream){
+
+                    mediaStream
+                    .getTracks()
+                    .forEach(
+                        function(track){
+
+                            track.stop();
+                        }
+                    );
+                }
+
+                mediaStream=null;
+                mediaRecorder=null;
+
+                recordAudioButton.textContent=
+                    "Record Audio";
+
+                recordAudioButton.classList.remove(
+                    "recording"
+                );
+
+                showSendStatus(
+                    "Audio recording ready.",
+                    "green"
+                );
+            };
+
+        mediaRecorder.start();
+
+        recordAudioButton.textContent=
+            "Stop Recording";
+
+        recordAudioButton.classList.add(
+            "recording"
+        );
+
+        showSendStatus(
+            "Recording audio...",
+            "#a30000"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        mediaRecorder=null;
+
+        if(mediaStream){
+
+            mediaStream
+            .getTracks()
+            .forEach(
+                function(track){
+
+                    track.stop();
+                }
+            );
+        }
+
+        mediaStream=null;
+
+        showSendStatus(
+            "Could not access the microphone: "+
+            error.message,
+            "red"
+        );
+    }
+}
+
+function stopAudioRecording(){
+
+    if(
+        mediaRecorder &&
+        mediaRecorder.state!==
+        "inactive"
+    ){
+
+        mediaRecorder.stop();
+    }
+}
+
+imageButton.onclick=
+    function(){
+
+        imageFile.click();
+    };
+
+videoButton.onclick=
+    function(){
+
+        videoFile.click();
+    };
+
+pdfButton.onclick=
+    function(){
+
+        pdfFile.click();
+    };
+
+imageFile.onchange=
+    function(){
+
+        var file=
+            imageFile.files[0];
+
+        if(
+            file &&
+            validateSelectedFile(
+                file,
+                "image"
+            )
+        ){
+
+            showSelectedFile(
+                file,
+                "image"
+            );
+        }
+    };
+
+videoFile.onchange=
+    function(){
+
+        var file=
+            videoFile.files[0];
+
+        if(
+            file &&
+            validateSelectedFile(
+                file,
+                "video"
+            )
+        ){
+
+            showSelectedFile(
+                file,
+                "video"
+            );
+        }
+    };
+
+pdfFile.onchange=
+    function(){
+
+        var file=
+            pdfFile.files[0];
+
+        if(
+            file &&
+            validateSelectedFile(
+                file,
+                "pdf"
+            )
+        ){
+
+            showSelectedFile(
+                file,
+                "pdf"
+            );
+        }
+    };
+
+removeAttachmentButton.onclick=
+    function(){
+
+        clearSelectedAttachment();
+
+        showSendStatus(
+            "",
+            ""
+        );
+    };
+
+recordAudioButton.onclick=
+    function(){
+
+        startAudioRecording();
+    };
+
+sendButton.onclick=
+    function(){
+
+        sendMessage();
+    };
+
+cancelReplyButton.onclick=
+    function(){
+
+        cancelReply();
+    };
+
+cancelEditButton.onclick=
+    function(){
+
+        cancelEditingMessage();
+    };
+
+notificationButton.onclick=
+    function(){
+
+        notificationPanel.classList.toggle(
+            "show"
+        );
+    };
+
+document.addEventListener(
+    "click",
+    function(event){
+
+        if(
+            !notificationPanel.contains(
+                event.target
+            ) &&
+            !notificationButton.contains(
+                event.target
+            )
+        ){
+
+            notificationPanel.classList.remove(
+                "show"
+            );
+        }
+    }
+);
+
+messageInput.addEventListener(
+    "input",
+    function(){
+
+        clearTimeout(
+            typingTimeout
+        );
+
+        if(
+            messageInput.value.trim()===
+            ""
+        ){
+
+            setTypingState(
+                false
+            );
+
+            return;
+        }
+
+        setTypingState(
+            true
+        );
+
+        typingTimeout=
+            setTimeout(
+                function(){
+
+                    setTypingState(
+                        false
+                    );
+                },
+                1600
+            );
+    }
+);
+
+messageInput.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key==="Enter" &&
+            !event.shiftKey
+        ){
+
+            event.preventDefault();
+
+            sendMessage();
+        }
+    }
+);
+
+document.addEventListener(
+    "visibilitychange",
+    function(){
+
+        if(document.hidden){
+
+            setTypingState(
+                false
+            );
+
+        }else{
+
+            scheduleMarkRoomRead();
+        }
+    }
+);
+
+async function initializeChat(){
+
+    account_details=
+        getLocalData(
+            "account_details"
+        );
+
+    current_room=
+        getLocalData(
+            "current_room"
+        );
+
+    if(!account_details){
+
+        window.location.href=
+            "login.html";
+
+        return;
+    }
+
+    if(
+        !current_room ||
+        !current_room.room_idx
+    ){
+
+        window.location.href=
+            "view_rooms.html";
+
+        return;
+    }
+
+    onAuthStateChanged(
+        auth,
+        async function(user){
+
+            if(!user){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            if(
+                account_details.firebase_uid!==
+                user.uid
+            ){
+
+                localStorage.removeItem(
+                    "account_details"
+                );
+
+                window.location.href=
+                    "login.html";
+
+                return;
+            }
+
+            firebaseUser=user;
+
+            try{
+
+                await loadRoom();
+
+                await ensureMembership();
+
+                listenToMembers();
+                listenToTyping();
+                listenToMessages();
+                listenToNotifications();
+                listenToCurrentUser();
+
+                scheduleMarkRoomRead();
+
+                messageInput.focus();
+
+            }catch(error){
+
+                console.error(error);
+
+                chatMessages.innerHTML="";
+
+                var errorBox=
+                    document.createElement(
+                        "div"
+                    );
+
+                errorBox.className=
+                    "empty_chat";
+
+                errorBox.textContent=
+                    error.message;
+
+                chatMessages.appendChild(
+                    errorBox
+                );
+            }
+        }
+    );
+}
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        if(stopMessagesListener){
+            stopMessagesListener();
+        }
+
+        if(stopMembersListener){
+            stopMembersListener();
+        }
+
+        if(stopTypingListener){
+            stopTypingListener();
+        }
+
+        if(stopNotificationsListener){
+            stopNotificationsListener();
+        }
+
+        if(stopCurrentUserListener){
+            stopCurrentUserListener();
+        }
+
+        clearInterval(
+            typingRenderInterval
+        );
+
+        clearTimeout(
+            typingTimeout
+        );
+
+        clearTimeout(
+            readTimeout
+        );
+
+        if(mediaStream){
+
+            mediaStream
+            .getTracks()
+            .forEach(
+                function(track){
+
+                    track.stop();
+                }
+            );
+        }
+
+        setTypingState(
+            false
+        );
+    }
+);
+
+initializeChat();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding-top:75px;
+    font-family:Arial,sans-serif;
+    background:#f3f6fb;
+}
+
+#menu{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    background:white;
+    border-bottom:1px solid #ddd;
+    z-index:1000;
+}
+
+#menu a{
+    text-decoration:none;
+    color:#222;
+    font-weight:bold;
+}
+
+#login_page{
+    width:92%;
+    max-width:480px;
+    margin:30px auto;
+    padding:25px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:15px;
+}
+
+h1{
+    margin-top:0;
+    text-align:center;
+}
+
+.field{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:7px;
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:1px solid #bbb;
+    border-radius:8px;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#2864dc;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+#message{
+    min-height:20px;
+    margin-top:15px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.register_link{
+    margin-top:20px;
+    text-align:center;
+}
+
+.register_link a{
+    color:#2864dc;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+@media (max-width: 600px) {
+    #menu {
+        gap: 12px;
+        padding: 0 10px;
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+    <img src="bigo.png" class="bigo_icon" style="height: 75%;" />
+    <a href="index.html">Home</a>
+    <a href="register.html">Register</a>
+    <a href="login.html">Login</a>
+    <a href="create_room.html">Create Room</a>
+    <a href="view_rooms.html">Rooms</a>
+</div>
+
+<div id="login_page">
+
+    <h1>Login</h1>
+
+    <div class="field">
+        <label for="username">Username</label>
+        <input
+            type="text"
+            id="username"
+            placeholder="Enter your username"
+            autocomplete="username"
+        >
+    </div>
+
+    <div class="field">
+        <label for="password">Password</label>
+        <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+        >
+    </div>
+
+    <button id="login_button" type="button">
+        Login
+    </button>
+
+    <p id="message"></p>
+
+    <p class="register_link">
+        No account?
+        <a href="register.html">Register</a>
+    </p>
+
+</div>
+
+<script type="module">
+
+import{
+    initializeApp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+
+import{
+    getAuth,
+    signInWithEmailAndPassword
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-auth.js";
+
+import{
+    getFirestore,
+    collection,
+    query,
+    where,
+    limit,
+    getDocs
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
+const firebaseConfig={
+    apiKey:"AIzaSyDVh4UFpUIGLIDllXgB4V03PPHncg6llIA",
+    authDomain:"two-todolist-project.firebaseapp.com",
+    projectId:"two-todolist-project",
+    storageBucket:"two-todolist-project.firebasestorage.app",
+    messagingSenderId:"981585696379",
+    appId:"1:981585696379:web:fcd35ed7176c86c64ef4de"
+};
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const database=getFirestore(app);
+
+var usernameInput=
+    document.getElementById(
+        "username"
+    );
+
+var passwordInput=
+    document.getElementById(
+        "password"
+    );
+
+var loginButton=
+    document.getElementById(
+        "login_button"
+    );
+
+var message=
+    document.getElementById(
+        "message"
+    );
+
+function createFirebaseLoginEmail(username){
+
+    return username
+        .trim()
+        .toLowerCase()+
+        "@chat-tutorial.example.com";
+}
+
+function showMessage(text,colour){
+
+    message.textContent=text;
+    message.style.color=colour;
+}
+
+async function getUserDetails(firebase_uid){
+
+    var userQuery=query(
+        collection(
+            database,
+            "user_db_details"
+        ),
+        where(
+            "firebase_uid",
+            "==",
+            firebase_uid
+        ),
+        limit(1)
+    );
+
+    var result=
+        await getDocs(
+            userQuery
+        );
+
+    if(result.empty){
+        return null;
+    }
+
+    return result.docs[0].data();
+}
+
+async function loginUser(){
+
+    var username=
+        usernameInput.value.trim();
+
+    var password=
+        passwordInput.value;
+
+    if(
+        username==="" ||
+        password===""
+    ){
+        showMessage(
+            "Username and password are required.",
+            "red"
+        );
+        return;
+    }
+
+    loginButton.disabled=true;
+
+    showMessage(
+        "Logging in...",
+        "black"
+    );
+
+    try{
+
+        var firebaseLoginEmail=
+            createFirebaseLoginEmail(
+                username
+            );
+
+        var authResult=
+            await signInWithEmailAndPassword(
+                auth,
+                firebaseLoginEmail,
+                password
+            );
+
+        var firebase_uid=
+            authResult.user.uid;
+
+        var userDetails=
+            await getUserDetails(
+                firebase_uid
+            );
+
+        if(!userDetails){
+
+            showMessage(
+                "User details could not be found.",
+                "red"
+            );
+
+            loginButton.disabled=false;
+            return;
+        }
+
+        var account_details={
+            user_idx:
+                userDetails.user_idx,
+            firebase_uid:
+                firebase_uid,
+            username:
+                userDetails.username,
+            profile_pic:
+                userDetails.profile_pic || ""
+        };
+
+        localStorage.setItem(
+            "account_details",
+            JSON.stringify(
+                account_details
+            )
+        );
+
+        showMessage(
+            "Login successful.",
+            "green"
+        );
+
+        window.location.href=
+            "view_rooms.html";
+
+    }catch(error){
+
+        console.error(error);
+
+        if(
+            error.code===
+            "auth/invalid-credential"
+        ){
+            showMessage(
+                "Incorrect username or password.",
+                "red"
+            );
+        }else if(
+            error.code===
+            "auth/too-many-requests"
+        ){
+            showMessage(
+                "Too many login attempts. Try again later.",
+                "red"
+            );
+        }else{
+            showMessage(
+                "Login error: "+
+                error.message,
+                "red"
+            );
+        }
+
+        loginButton.disabled=false;
+    }
+}
+
+loginButton.onclick=function(){
+    loginUser();
+};
+
+passwordInput.addEventListener(
+    "keydown",
+    function(event){
+
+        if(event.key==="Enter"){
+            loginUser();
+        }
+    }
+);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Blogs</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f7f7f7;
+    color:#202020;
+}
+
+button,
+input,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+a{
+    color:inherit;
+}
+
+#topbar{
+    position:sticky;
+    top:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 4%;
+    background:white;
+    border-bottom:1px solid #ddd;
+}
+
+#topbar a{
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.topbar_actions{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.page_button,
+.small_button{
+    border:1px solid #ccc;
+    background:white;
+    color:#222;
+    border-radius:8px;
+    text-decoration:none;
+}
+
+.page_button{
+    padding:9px 13px;
+}
+
+.small_button{
+    padding:7px 10px;
+}
+
+.primary_button{
+    border-color:#222;
+    background:#222;
+    color:white;
+}
+
+#page{
+    width:94%;
+    max-width:900px;
+    margin:24px auto 80px;
+}
+
+.page_head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:18px;
+    margin-bottom:22px;
+}
+
+.page_head h1{
+    margin:0 0 6px;
+    font-size:clamp(30px,6vw,48px);
+}
+
+.page_head p{
+    margin:0;
+    color:#666;
+}
+
+#account_text{
+    color:#666;
+    font-size:14px;
+}
+
+#controls{
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr 1fr;
+    gap:10px;
+    padding:14px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+#controls input,
+#controls select{
+    width:100%;
+    min-width:0;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    background:white;
+    color:#222;
+}
+
+#status{
+    min-height:22px;
+    margin-bottom:10px;
+    color:#666;
+    font-size:14px;
+}
+
+#blogs_list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.blog_card{
+    background:white;
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:18px;
+}
+
+.blog_card_top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+}
+
+.blog_card h2{
+    margin:0 0 7px;
+    font-size:23px;
+}
+
+.blog_title_link{
+    text-decoration:none;
+}
+
+.blog_title_link:hover{
+    text-decoration:underline;
+}
+
+.blog_meta{
+    color:#666;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.blog_preview{
+    margin:13px 0;
+    color:#444;
+    line-height:1.6;
+}
+
+.tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top:11px;
+}
+
+.tag{
+    display:inline-block;
+    padding:5px 9px;
+    border:1px solid #ddd;
+    border-radius:999px;
+    font-size:12px;
+    background:#fafafa;
+}
+
+.blog_actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.empty{
+    text-align:center;
+    padding:45px 20px;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:12px;
+    color:#666;
+}
+
+@media(max-width:760px){
+
+    .page_head{
+        flex-direction:column;
+    }
+
+    #controls{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:520px){
+
+    #topbar{
+        align-items:flex-start;
+    }
+
+    #controls{
+        grid-template-columns:1fr;
+    }
+
+    .blog_card_top{
+        flex-direction:column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header id="topbar">
+    <a href="view_blogs.html">Blogs</a>
+
+    <div class="topbar_actions">
+        <span id="account_text"></span>
+        <a class="page_button primary_button" href="blog.html">Create Blog</a>
+    </div>
+</header>
+
+
+<main id="page">
+
+    <div class="page_head">
+        <div>
+            <h1>Blogs</h1>
+            <p>Read, search and create blogs.</p>
+        </div>
+
+        <button class="page_button" id="refresh_button">Refresh</button>
+    </div>
+
+
+    <div id="controls">
+
+        <input
+            type="search"
+            id="search_input"
+            placeholder="Search blogs..."
+        >
+
+        <select id="sort_select">
+            <option value="last_edited">Last edited</option>
+            <option value="last_commented">Last commented</option>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="user">User A-Z</option>
+            <option value="title">Title A-Z</option>
+        </select>
+
+        <select id="user_select">
+            <option value="">All users</option>
+        </select>
+
+        <select id="tag_select">
+            <option value="">All tags</option>
+        </select>
+
+    </div>
+
+
+    <div id="status"></div>
+
+    <div id="blogs_list"></div>
+
+</main>
+
+
+<script type="module">
+
+import{
+    initializeApp
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+
+import{
+    getFirestore,
+    collection,
+    getDocs
+}from"https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
+
+
+/* =========================================================
+   FIREBASE
+========================================================= */
+
+const firebaseConfig={
+    apiKey:"AIzaSyDVh4UFpUIGLIDllXgB4V03PPHncg6llIA",
+    authDomain:"two-todolist-project.firebaseapp.com",
+    projectId:"two-todolist-project",
+    storageBucket:"two-todolist-project.firebasestorage.app",
+    messagingSenderId:"981585696379",
+    appId:"1:981585696379:web:fcd35ed7176c86c64ef4de"
+};
+
+const app=initializeApp(firebaseConfig);
+const database=getFirestore(app);
+
+
+/* =========================================================
+   PAGE VARIABLES
+========================================================= */
+
+var searchInput=document.getElementById("search_input");
+var sortSelect=document.getElementById("sort_select");
+var userSelect=document.getElementById("user_select");
+var tagSelect=document.getElementById("tag_select");
+var refreshButton=document.getElementById("refresh_button");
+var statusBox=document.getElementById("status");
+var blogsList=document.getElementById("blogs_list");
+var accountText=document.getElementById("account_text");
+
+var blogs=[];
+var preferenceKey="blog_list_preferences";
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function loadAccountFromLocalStorage(){
+
+    try{
+
+        var account=JSON.parse(
+            localStorage.getItem("account_details") || "null"
+        );
+
+        if(account?.username){
+            accountText.textContent=account.username;
+        }
+
+    }catch(error){
+        accountText.textContent="";
+    }
+}
+
+
+function savePreferences(){
+
+    var preferences={
+        search:searchInput.value,
+        sort:sortSelect.value,
+        user:userSelect.value,
+        tag:tagSelect.value
+    };
+
+    localStorage.setItem(
+        preferenceKey,
+        JSON.stringify(preferences)
+    );
+}
+
+
+function loadPreferences(){
+
+    try{
+
+        var preferences=JSON.parse(
+            localStorage.getItem(preferenceKey) || "null"
+        );
+
+        if(!preferences){
+            return;
+        }
+
+        searchInput.value=preferences.search || "";
+        sortSelect.value=preferences.sort || "last_edited";
+
+        userSelect.dataset.savedValue=
+            preferences.user || "";
+
+        tagSelect.dataset.savedValue=
+            preferences.tag || "";
+
+    }catch(error){
+        console.log("Could not load blog preferences.");
+    }
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function setStatus(text,colour){
+
+    statusBox.textContent=text || "";
+    statusBox.style.color=colour || "#666";
+}
+
+
+function timestampMilliseconds(value){
+
+    if(!value){
+        return 0;
+    }
+
+    if(typeof value.toMillis==="function"){
+        return value.toMillis();
+    }
+
+    if(value.seconds){
+        return value.seconds*1000;
+    }
+
+    return 0;
+}
+
+
+function formatDate(value){
+
+    var milliseconds=timestampMilliseconds(value);
+
+    if(!milliseconds){
+        return "";
+    }
+
+    return new Date(milliseconds).toLocaleString(
+        [],
+        {
+            year:"numeric",
+            month:"short",
+            day:"numeric",
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+}
+
+
+function normalize(value){
+    return String(value || "")
+        .trim()
+        .toLowerCase();
+}
+
+
+function getFirstParagraph(blog){
+
+    var sections=Array.isArray(blog.sections)
+        ? blog.sections
+        : [];
+
+    for(var section of sections){
+
+        var contents=Array.isArray(section.contents)
+            ? section.contents
+            : [];
+
+        for(var content of contents){
+
+            if(content.paragraph?.trim()){
+
+                var text=content.paragraph.trim();
+
+                if(text.length>180){
+                    return text.substring(0,180)+"...";
+                }
+
+                return text;
+            }
+        }
+    }
+
+    return "";
+}
+
+
+function blogSearchText(blog){
+
+    var pieces=[
+        blog.title,
+        blog.author_username,
+        ...(Array.isArray(blog.tags) ? blog.tags : [])
+    ];
+
+    var sections=Array.isArray(blog.sections)
+        ? blog.sections
+        : [];
+
+    sections.forEach(function(section){
+
+        pieces.push(section.title);
+
+        if(Array.isArray(section.tags)){
+            pieces.push(...section.tags);
+        }
+
+        if(Array.isArray(section.contents)){
+
+            section.contents.forEach(function(content){
+                pieces.push(content.title);
+                pieces.push(content.paragraph);
+            });
+        }
+    });
+
+    return normalize(pieces.join(" "));
+}
+
+
+/* =========================================================
+   FILTER OPTIONS
+========================================================= */
+
+function buildFilterOptions(){
+
+    var users=new Set();
+    var tags=new Set();
+
+    blogs.forEach(function(blog){
+
+        if(blog.author_username){
+            users.add(blog.author_username);
+        }
+
+        if(Array.isArray(blog.tags)){
+
+            blog.tags.forEach(function(tag){
+
+                if(String(tag).trim()){
+                    tags.add(String(tag).trim());
+                }
+            });
+        }
+
+        var sections=Array.isArray(blog.sections)
+            ? blog.sections
+            : [];
+
+        sections.forEach(function(section){
+
+            if(Array.isArray(section.tags)){
+
+                section.tags.forEach(function(tag){
+
+                    if(String(tag).trim()){
+                        tags.add(String(tag).trim());
+                    }
+                });
+            }
+        });
+    });
+
+
+    var savedUser=userSelect.dataset.savedValue || "";
+    var savedTag=tagSelect.dataset.savedValue || "";
+
+    userSelect.innerHTML="";
+    tagSelect.innerHTML="";
+
+    var allUsers=document.createElement("option");
+    allUsers.value="";
+    allUsers.textContent="All users";
+    userSelect.appendChild(allUsers);
+
+    Array.from(users)
+        .sort(function(a,b){
+            return a.localeCompare(b);
+        })
+        .forEach(function(username){
+
+            var option=document.createElement("option");
+            option.value=username;
+            option.textContent=username;
+            userSelect.appendChild(option);
+        });
+
+
+    var allTags=document.createElement("option");
+    allTags.value="";
+    allTags.textContent="All tags";
+    tagSelect.appendChild(allTags);
+
+    Array.from(tags)
+        .sort(function(a,b){
+            return a.localeCompare(b);
+        })
+        .forEach(function(tag){
+
+            var option=document.createElement("option");
+            option.value=tag;
+            option.textContent=tag;
+            tagSelect.appendChild(option);
+        });
+
+
+    if(
+        savedUser &&
+        Array.from(userSelect.options)
+            .some(function(option){
+                return option.value===savedUser;
+            })
+    ){
+        userSelect.value=savedUser;
+    }
+
+
+    if(
+        savedTag &&
+        Array.from(tagSelect.options)
+            .some(function(option){
+                return option.value===savedTag;
+            })
+    ){
+        tagSelect.value=savedTag;
+    }
+
+    delete userSelect.dataset.savedValue;
+    delete tagSelect.dataset.savedValue;
+}
+
+
+/* =========================================================
+   FILTER AND SORT
+========================================================= */
+
+function filteredBlogs(){
+
+    var result=[...blogs];
+
+    var search=normalize(searchInput.value);
+    var selectedUser=userSelect.value;
+    var selectedTag=normalize(tagSelect.value);
+
+
+    if(search){
+
+        result=result.filter(function(blog){
+            return blogSearchText(blog).includes(search);
+        });
+    }
+
+
+    if(selectedUser){
+
+        result=result.filter(function(blog){
+            return blog.author_username===selectedUser;
+        });
+    }
+
+
+    if(selectedTag){
+
+        result=result.filter(function(blog){
+
+            var blogTags=Array.isArray(blog.tags)
+                ? blog.tags
+                : [];
+
+            var sectionTags=[];
+
+            var sections=Array.isArray(blog.sections)
+                ? blog.sections
+                : [];
+
+            sections.forEach(function(section){
+
+                if(Array.isArray(section.tags)){
+                    sectionTags.push(...section.tags);
+                }
+            });
+
+            return [...blogTags,...sectionTags]
+                .some(function(tag){
+                    return normalize(tag)===selectedTag;
+                });
+        });
+    }
+
+
+    var sortMode=sortSelect.value;
+
+
+    if(sortMode==="last_edited"){
+
+        result.sort(function(a,b){
+            return timestampMilliseconds(b.updated_at)
+                - timestampMilliseconds(a.updated_at);
+        });
+    }
+
+
+    else if(sortMode==="last_commented"){
+
+        result.sort(function(a,b){
+
+            var aTime=
+                timestampMilliseconds(a.last_commented_at) ||
+                timestampMilliseconds(a.updated_at);
+
+            var bTime=
+                timestampMilliseconds(b.last_commented_at) ||
+                timestampMilliseconds(b.updated_at);
+
+            return bTime-aTime;
+        });
+    }
+
+
+    else if(sortMode==="newest"){
+
+        result.sort(function(a,b){
+            return timestampMilliseconds(b.created_at)
+                - timestampMilliseconds(a.created_at);
+        });
+    }
+
+
+    else if(sortMode==="oldest"){
+
+        result.sort(function(a,b){
+            return timestampMilliseconds(a.created_at)
+                - timestampMilliseconds(b.created_at);
+        });
+    }
+
+
+    else if(sortMode==="user"){
+
+        result.sort(function(a,b){
+
+            var byUser=
+                String(a.author_username || "")
+                .localeCompare(
+                    String(b.author_username || "")
+                );
+
+            if(byUser!==0){
+                return byUser;
+            }
+
+            return String(a.title || "")
+                .localeCompare(
+                    String(b.title || "")
+                );
+        });
+    }
+
+
+    else if(sortMode==="title"){
+
+        result.sort(function(a,b){
+            return String(a.title || "")
+                .localeCompare(
+                    String(b.title || "")
+                );
+        });
+    }
+
+
+    return result;
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderTags(container,tags){
+
+    if(!Array.isArray(tags) || tags.length===0){
+        return;
+    }
+
+    var tagsBox=document.createElement("div");
+    tagsBox.className="tags";
+
+    tags.forEach(function(tag){
+
+        var tagElement=document.createElement("span");
+        tagElement.className="tag";
+        tagElement.textContent=tag;
+
+        tagsBox.appendChild(tagElement);
+    });
+
+    container.appendChild(tagsBox);
+}
+
+
+function renderBlogs(){
+
+    blogsList.innerHTML="";
+
+    var result=filteredBlogs();
+
+    setStatus(
+        result.length+
+        (result.length===1 ? " blog" : " blogs")
+    );
+
+
+    if(result.length===0){
+
+        var empty=document.createElement("div");
+        empty.className="empty";
+        empty.textContent="No blogs found.";
+
+        blogsList.appendChild(empty);
+        return;
+    }
+
+
+    result.forEach(function(blog){
+
+        var card=document.createElement("article");
+        card.className="blog_card";
+
+
+        var top=document.createElement("div");
+        top.className="blog_card_top";
+
+
+        var info=document.createElement("div");
+
+
+        var titleLink=document.createElement("a");
+        titleLink.className="blog_title_link";
+        titleLink.href=
+            "blog.html?id="+
+            encodeURIComponent(blog.blog_id);
+
+        var h2=document.createElement("h2");
+        h2.textContent=blog.title || "Untitled Blog";
+
+        titleLink.appendChild(h2);
+
+
+        var meta=document.createElement("div");
+        meta.className="blog_meta";
+
+        var metaLines=[];
+
+        metaLines.push(
+            "By "+(blog.author_username || "User")
+        );
+
+        var edited=formatDate(blog.updated_at);
+
+        if(edited){
+            metaLines.push("Edited "+edited);
+        }
+
+        metaLines.push(
+            (Number(blog.comment_count) || 0)+
+            (
+                Number(blog.comment_count)===1
+                ? " comment"
+                : " comments"
+            )
+        );
+
+        meta.textContent=metaLines.join(" · ");
+
+
+        info.appendChild(titleLink);
+        info.appendChild(meta);
+
+        renderTags(info,blog.tags);
+
+
+        top.appendChild(info);
+        card.appendChild(top);
+
+
+        var previewText=getFirstParagraph(blog);
+
+        if(previewText){
+
+            var preview=document.createElement("p");
+            preview.className="blog_preview";
+            preview.textContent=previewText;
+
+            card.appendChild(preview);
+        }
+
+
+        var actions=document.createElement("div");
+        actions.className="blog_actions";
+
+
+        var openLink=document.createElement("a");
+        openLink.className="small_button";
+        openLink.href=
+            "blog.html?id="+
+            encodeURIComponent(blog.blog_id);
+        openLink.textContent="Open";
+
+
+        var shareButton=document.createElement("button");
+        shareButton.className="small_button";
+        shareButton.textContent="Share";
+
+        shareButton.onclick=function(){
+            shareBlog(blog);
+        };
+
+
+        actions.appendChild(openLink);
+        actions.appendChild(shareButton);
+
+        card.appendChild(actions);
+
+        blogsList.appendChild(card);
+    });
+}
+
+
+/* =========================================================
+   SHARE
+========================================================= */
+
+async function shareBlog(blog){
+
+    var url=
+        new URL(
+            "blog.html?id="+
+            encodeURIComponent(blog.blog_id),
+            window.location.href
+        ).href;
+
+    try{
+
+        if(navigator.share){
+
+            await navigator.share({
+                title:blog.title || "Blog",
+                url:url
+            });
+
+            return;
+        }
+
+
+        await navigator.clipboard.writeText(url);
+
+        setStatus("Blog link copied.","green");
+
+        setTimeout(function(){
+            renderBlogs();
+        },1200);
+
+    }catch(error){
+
+        if(error.name!=="AbortError"){
+            prompt("Copy blog link:",url);
+        }
+    }
+}
+
+
+/* =========================================================
+   FIREBASE LOAD
+========================================================= */
+
+async function loadBlogs(){
+
+    try{
+
+        setStatus("Loading blogs...");
+
+        var snapshot=await getDocs(
+            collection(database,"blogs")
+        );
+
+        blogs=snapshot.docs.map(function(blogDocument){
+
+            var data=blogDocument.data();
+
+            return{
+                ...data,
+                blog_id:data.blog_id || blogDocument.id
+            };
+        });
+
+
+        buildFilterOptions();
+        renderBlogs();
+
+    }catch(error){
+
+        console.error(error);
+
+        setStatus(
+            "Could not load blogs: "+error.message,
+            "red"
+        );
+    }
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+function controlsChanged(){
+
+    savePreferences();
+    renderBlogs();
+}
+
+
+searchInput.oninput=controlsChanged;
+sortSelect.onchange=controlsChanged;
+userSelect.onchange=controlsChanged;
+tagSelect.onchange=controlsChanged;
+
+refreshButton.onclick=loadBlogs;
+
+
+/* =========================================================
+   START
+========================================================= */
+
+loadAccountFromLocalStorage();
+loadPreferences();
+loadBlogs();
+
+</script>
+
+</body>
+</html>

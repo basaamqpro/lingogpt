@@ -38,21 +38,18 @@
       background: #ffffff;
     }
 
-    .header,
-    .room_header {
+    .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 15px;
     }
 
-    .header h1,
-    .room_header h3 {
-      margin: 0 0 6px;
+    .header h1 {
+      margin: 0 0 5px;
     }
 
-    .header p,
-    .room_header p {
+    .header p {
       margin: 0;
     }
 
@@ -91,11 +88,6 @@
       color: #ffffff;
     }
 
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
     button.secondary {
       background: #e5e7eb;
       color: #111827;
@@ -105,14 +97,10 @@
       background: #b91c1c;
     }
 
-    .button_row,
-    .room_actions {
+    .button_row {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .button_row {
+      gap: 10px;
       margin-top: 15px;
     }
 
@@ -149,17 +137,33 @@
       color: #166534;
     }
 
-    .message.loading {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-
     .room_card {
       margin-top: 14px;
       padding: 16px;
       border: 1px solid #d1d5db;
       border-radius: 12px;
       background: #ffffff;
+    }
+
+    .room_header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .room_header h3 {
+      margin: 0 0 6px;
+    }
+
+    .room_header p {
+      margin: 0;
+    }
+
+    .room_actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .empty {
@@ -172,10 +176,6 @@
     }
 
     @media (max-width: 700px) {
-      body {
-        padding: 12px;
-      }
-
       .grid {
         grid-template-columns: 1fr;
       }
@@ -187,8 +187,11 @@
       }
 
       .header button,
-      .room_actions,
       .room_actions button {
+        width: 100%;
+      }
+
+      .room_actions {
         width: 100%;
       }
     }
@@ -197,13 +200,7 @@
 
 <body>
 
-  <div
-    id="appMessage"
-    class="message"
-    role="status"
-    aria-live="polite"
-  ></div>
-
+  <div id="appMessage" class="message"></div>
 
   <section class="panel">
     <div class="header">
@@ -284,43 +281,143 @@
   </section>
 
 
-  <!--
-    We only use results.js here for its
-    supported language list.
-  -->
-
   <script src="results.js"></script>
 
-
-  <script type="module">
-
-    /*
-    Importing firebase.js first guarantees
-    window.LingoFirebase exists before
-    this page starts.
-    */
-
-    import "./firebase.js";
-
-
+  <script>
     "use strict";
 
-
     /*
     ==================================================
-    STATE
+    STORAGE
+
+    loginregister.html already stores:
+    - users
+    - language data
+    - logged-in user
+
+    welcome.html adds:
+    - currently selected room
     ==================================================
     */
 
-    let currentUser = null;
-    let rooms = [];
+    const STORAGE_KEYS = {
+      users: "lingo_user_details",
+      data: "lingo_user_data",
+      session: "lingo_logged_in_user",
+      currentRoom: "lingo_current_room"
+    };
 
 
     /*
     ==================================================
-    MESSAGE
+    DATA
     ==================================================
     */
+
+    function loadArray(key) {
+      const value =
+        localStorage.getItem(key);
+
+      if (!value) {
+        return [];
+      }
+
+      try {
+        const parsed =
+          JSON.parse(value);
+
+        return Array.isArray(parsed)
+          ? parsed
+          : [];
+      } catch (error) {
+        console.error(
+          "Invalid localStorage data:",
+          key,
+          error
+        );
+
+        return [];
+      }
+    }
+
+
+    let user_details =
+      loadArray(STORAGE_KEYS.users);
+
+    let userLingo_data =
+      loadArray(STORAGE_KEYS.data);
+
+    const loggedInUserIdx =
+      localStorage.getItem(
+        STORAGE_KEYS.session
+      ) || "";
+
+
+    /*
+    ==================================================
+    AUTH CHECK
+    ==================================================
+    */
+
+    function getLoggedInUser() {
+      return user_details.find(
+        function(user) {
+          return (
+            user.user_idx ===
+            loggedInUserIdx
+          );
+        }
+      ) || null;
+    }
+
+
+    const loggedInUser =
+      getLoggedInUser();
+
+
+    if (!loggedInUser) {
+      localStorage.removeItem(
+        STORAGE_KEYS.session
+      );
+
+      localStorage.removeItem(
+        STORAGE_KEYS.currentRoom
+      );
+
+      window.location.replace(
+        "loginregister.html"
+      );
+    }
+
+
+    /*
+    ==================================================
+    HELPERS
+    ==================================================
+    */
+
+    function saveData() {
+      localStorage.setItem(
+        STORAGE_KEYS.data,
+        JSON.stringify(
+          userLingo_data
+        )
+      );
+    }
+
+
+    function createId(prefix) {
+      return (
+        prefix +
+        "_" +
+        Date.now() +
+        "_" +
+        Math.floor(
+          Math.random() * 10000
+        )
+      );
+    }
+
 
     function showMessage(
       message,
@@ -337,31 +434,63 @@
       box.className =
         "message";
 
-      if (!message) {
-        return;
-      }
-
-      box.classList.add(
-        "visible"
-      );
-
-      if (type === "error") {
+      if (message) {
         box.classList.add(
-          "error"
+          "visible",
+          type === "error"
+            ? "error"
+            : "success"
+        );
+      }
+    }
+
+
+    function getLoggedInUserData() {
+      let userData =
+        userLingo_data.find(
+          function(item) {
+            return (
+              item.user_idx ===
+              loggedInUserIdx
+            );
+          }
         );
 
-      } else if (
-        type === "success"
+
+      /*
+      Older/new users may have an account
+      but no LingoGPT data record yet.
+      */
+
+      if (!userData && loggedInUser) {
+        userData = {
+          user_idx:
+            loggedInUser.user_idx,
+
+          username:
+            loggedInUser.username,
+
+          rooms: []
+        };
+
+        userLingo_data.push(
+          userData
+        );
+
+        saveData();
+      }
+
+
+      if (
+        userData &&
+        !Array.isArray(userData.rooms)
       ) {
-        box.classList.add(
-          "success"
-        );
-
-      } else {
-        box.classList.add(
-          "loading"
-        );
+        userData.rooms = [];
+        saveData();
       }
+
+
+      return userData || null;
     }
 
 
@@ -428,11 +557,9 @@
     const supportedLanguages =
       window.LingoGPTResults &&
       Array.isArray(
-        LingoGPTResults
-          .supportedLanguages
+        LingoGPTResults.supportedLanguages
       )
-        ? LingoGPTResults
-            .supportedLanguages
+        ? LingoGPTResults.supportedLanguages
         : fallbackLanguages;
 
 
@@ -473,7 +600,7 @@
     }
 
 
-    function populateLanguages() {
+    function populateLanguageSelectors() {
       populateSelect(
         "newRoomSourceLanguage",
         "English"
@@ -488,11 +615,14 @@
 
     /*
     ==================================================
-    RENDER ROOMS
+    SHOW ROOMS
     ==================================================
     */
 
-    function renderRooms() {
+    function showRooms() {
+      const userData =
+        getLoggedInUserData();
+
       const container =
         document.getElementById(
           "show_rooms_names"
@@ -501,7 +631,17 @@
       container.innerHTML = "";
 
 
-      if (!rooms.length) {
+      if (!userData) {
+        showMessage(
+          "User data could not be loaded.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (!userData.rooms.length) {
         const empty =
           document.createElement(
             "div"
@@ -521,7 +661,7 @@
       }
 
 
-      rooms.forEach(
+      userData.rooms.forEach(
         function(room) {
           const card =
             document.createElement(
@@ -557,15 +697,15 @@
             "Untitled Room";
 
 
-          const information =
+          const languages =
             document.createElement(
               "p"
             );
 
-          information.className =
+          languages.className =
             "muted";
 
-          information.textContent =
+          languages.textContent =
             (
               room.source_language ||
               "Source"
@@ -588,7 +728,7 @@
 
           details.append(
             title,
-            information
+            languages
           );
 
 
@@ -636,8 +776,8 @@
 
           deleteButton.onclick =
             function() {
-              removeRoom(
-                room
+              deleteRoom(
+                room.room_idx
               );
             };
 
@@ -647,17 +787,14 @@
             deleteButton
           );
 
-
           header.append(
             details,
             actions
           );
 
-
           card.appendChild(
             header
           );
-
 
           container.appendChild(
             card
@@ -669,26 +806,14 @@
 
     /*
     ==================================================
-    LOAD ROOMS FROM FIREBASE
+    CREATE ROOM
     ==================================================
     */
 
-    async function loadRooms() {
-      rooms =
-        await LingoFirebase
-          .getRooms();
+    function createRoom() {
+      const userData =
+        getLoggedInUserData();
 
-      renderRooms();
-    }
-
-
-    /*
-    ==================================================
-    CREATE ROOM IN FIREBASE
-    ==================================================
-    */
-
-    async function createRoom() {
       const roomName =
         document
           .getElementById(
@@ -711,10 +836,15 @@
           )
           .value;
 
-      const button =
-        document.getElementById(
-          "createRoomButton"
+
+      if (!userData) {
+        showMessage(
+          "User data could not be loaded.",
+          "error"
         );
+
+        return;
+      }
 
 
       if (!roomName) {
@@ -740,72 +870,91 @@
       }
 
 
-      button.disabled = true;
+      const room = {
+        room_idx:
+          createId("room"),
 
-      button.textContent =
-        "Creating...";
+        room_name:
+          roomName,
 
-      showMessage(
-        "Saving room to Firebase..."
+        source_language:
+          sourceLanguage,
+
+        target_language:
+          targetLanguage,
+
+        room_data: []
+      };
+
+
+      userData.rooms.push(
+        room
       );
 
 
-      try {
-        await LingoFirebase
-          .createRoom(
-            roomName,
-            sourceLanguage,
-            targetLanguage
-          );
+      saveData();
 
 
-        document.getElementById(
-          "newRoomName"
-        ).value = "";
+      document.getElementById(
+        "newRoomName"
+      ).value = "";
 
 
-        await loadRooms();
+      showMessage(
+        "Room created.",
+        "success"
+      );
 
 
-        showMessage(
-          "Room created.",
-          "success"
-        );
-
-      } catch (error) {
-        console.error(error);
-
-        showMessage(
-          error.message ||
-          "Could not create room.",
-          "error"
-        );
-
-      } finally {
-        button.disabled = false;
-
-        button.textContent =
-          "Create Room";
-      }
+      showRooms();
     }
 
 
     /*
     ==================================================
     OPEN ROOM
+
+    We only save the selected room ID here.
+
+    index.html will read:
+    localStorage.getItem("lingo_current_room")
     ==================================================
     */
 
     function openRoom(roomIdx) {
+      const userData =
+        getLoggedInUserData();
 
-      /*
-      firebase.js saves:
 
-      lingo_current_room
-      */
+      if (!userData) {
+        return;
+      }
 
-      LingoFirebase.selectRoom(
-        roomIdx
+
+      const room =
+        userData.rooms.find(
+          function(item) {
+            return (
+              item.room_idx ===
+              roomIdx
+            );
+          }
+        );
+
+
+      if (!room) {
+        showMessage(
+          "Room was not found.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      localStorage.setItem(
+        STORAGE_KEYS.currentRoom,
+        room.room_idx
       );
 
 
@@ -816,16 +965,41 @@
 
     /*
     ==================================================
-    DELETE ROOM FROM FIREBASE
+    DELETE ROOM
     ==================================================
     */
 
-    async function removeRoom(room) {
+    function deleteRoom(roomIdx) {
+      const userData =
+        getLoggedInUserData();
+
+
+      if (!userData) {
+        return;
+      }
+
+
+      const room =
+        userData.rooms.find(
+          function(item) {
+            return (
+              item.room_idx ===
+              roomIdx
+            );
+          }
+        );
+
+
+      if (!room) {
+        return;
+      }
+
+
       const confirmed =
         confirm(
           'Delete "' +
           room.room_name +
-          '" and all its translations?'
+          '" and all its saved translations?'
         );
 
 
@@ -834,35 +1008,43 @@
       }
 
 
+      userData.rooms =
+        userData.rooms.filter(
+          function(item) {
+            return (
+              item.room_idx !==
+              roomIdx
+            );
+          }
+        );
+
+
+      const selectedRoom =
+        localStorage.getItem(
+          STORAGE_KEYS.currentRoom
+        );
+
+
+      if (
+        selectedRoom ===
+        roomIdx
+      ) {
+        localStorage.removeItem(
+          STORAGE_KEYS.currentRoom
+        );
+      }
+
+
+      saveData();
+
+
       showMessage(
-        "Deleting room..."
+        "Room deleted.",
+        "success"
       );
 
 
-      try {
-        await LingoFirebase
-          .deleteRoom(
-            room.room_idx
-          );
-
-
-        await loadRooms();
-
-
-        showMessage(
-          "Room deleted.",
-          "success"
-        );
-
-      } catch (error) {
-        console.error(error);
-
-        showMessage(
-          error.message ||
-          "Could not delete room.",
-          "error"
-        );
-      }
+      showRooms();
     }
 
 
@@ -873,90 +1055,16 @@
     */
 
     function logout() {
-      LingoFirebase.logout();
-    }
-
-
-    /*
-    ==================================================
-    START
-    ==================================================
-    */
-
-    async function startPage() {
-      populateLanguages();
-
-
-      showMessage(
-        "Loading your rooms..."
+      localStorage.removeItem(
+        STORAGE_KEYS.session
       );
 
+      localStorage.removeItem(
+        STORAGE_KEYS.currentRoom
+      );
 
-      try {
-
-        /*
-        sync():
-
-        Firebase
-           ↓
-        user + rooms
-           ↓
-        localStorage cache
-
-        This keeps index.html compatible
-        while we convert it to Firebase.
-        */
-
-        const synced =
-          await LingoFirebase
-            .sync();
-
-
-        if (
-          !synced ||
-          !synced.user
-        ) {
-          window.location.replace(
-            "loginregister.html"
-          );
-
-          return;
-        }
-
-
-        currentUser =
-          synced.user;
-
-
-        document.getElementById(
-          "loggedInUsername"
-        ).textContent =
-          currentUser.username ||
-          currentUser.name ||
-          "User";
-
-
-        rooms =
-          Array.isArray(
-            synced.data?.rooms
-          )
-            ? synced.data.rooms
-            : [];
-
-
-        renderRooms();
-
-        showMessage("");
-
-      } catch (error) {
-        console.error(error);
-
-        showMessage(
-          error.message ||
-          "Could not load your rooms from Firebase.",
-          "error"
-        );
-      }
+      window.location.href =
+        "loginregister.html";
     }
 
 
@@ -998,15 +1106,27 @@
             "Enter"
           ) {
             event.preventDefault();
-
             createRoom();
           }
         }
       );
 
 
-    startPage();
+    /*
+    ==================================================
+    START
+    ==================================================
+    */
 
+    if (loggedInUser) {
+      document.getElementById(
+        "loggedInUsername"
+      ).textContent =
+        loggedInUser.username;
+
+      populateLanguageSelectors();
+      showRooms();
+    }
   </script>
 
 </body>

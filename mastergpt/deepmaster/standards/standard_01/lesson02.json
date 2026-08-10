@@ -1,0 +1,473 @@
+{
+  "lesson_id": 2,
+  "lesson_code": "lesson02",
+  "standard": 1,
+  "title": "Identity",
+  "main_target": "Identity",
+
+  "main_target_description": "Teach the learner how to introduce themselves, say their name, ask another person's name, identify themselves and other people, state simple personal information, ask basic identity questions, and participate in a short introductory conversation.",
+
+  "difficulty": {
+    "starting_level": "absolute_beginner",
+    "ending_level": "beginner",
+    "assumed_previous_knowledge": "basic greetings from Lesson 1"
+  },
+
+  "lesson_role": {
+    "type": "foundation",
+    "purpose": "Build on basic greetings by teaching the learner how to introduce themselves and exchange simple identity information.",
+    "priority": "communication_first"
+  },
+
+  "objectives": [
+    "Say one's name naturally in the target language.",
+    "Ask another person's name.",
+    "Understand when another person states their name.",
+    "Use basic first-person identity expressions.",
+    "Use basic second-person identity expressions.",
+    "Identify another person using simple language.",
+    "Ask who someone is when appropriate.",
+    "Understand simple personal introductions.",
+    "Combine greetings and identity expressions.",
+    "Participate in a short introduction conversation."
+  ],
+
+  "completion_requirements": [
+    "The learner can state their name independently.",
+    "The learner can ask another person's name.",
+    "The learner can understand a simple response giving a person's name.",
+    "The learner can use at least one natural way of introducing themselves.",
+    "The learner can recognize basic identity pronouns or equivalent structures when relevant to the target language.",
+    "The learner can ask or understand a simple question about who someone is.",
+    "The learner can combine a greeting with an introduction.",
+    "The learner can participate in a short first-meeting conversation."
+  ],
+
+  "teaching_principles": [
+    "Build directly on useful expressions learned in Lesson 1.",
+    "Begin with the simplest natural method of introducing oneself.",
+    "Teach practical communication before advanced grammar terminology.",
+    "Use the learner's source language for explanations.",
+    "Use the target language for the expressions being learned.",
+    "Explain important words individually when useful.",
+    "Explain pronouns when they are important to identity expressions.",
+    "Explain forms of the verb meaning 'to be' when relevant to the target language.",
+    "Do not assume every language expresses identity using the same grammar as English.",
+    "Prefer natural target-language expressions over literal translations.",
+    "Explain differences between formal and informal introductions when they exist.",
+    "Explain gender, number or social-status differences when they affect identity expressions.",
+    "Reuse greetings from Lesson 1 naturally.",
+    "Avoid introducing unrelated personal information too early.",
+    "Use realistic first-meeting conversations.",
+    "Gradually move from single expressions to connected introductions."
+  ],
+
+  "language_adaptation_rules": [
+    "The curriculum is language-neutral and must work for any source language and any target language.",
+    "Do not assume the target language uses an equivalent of English 'I am' to state a name.",
+    "If the target language normally says something equivalent to 'My name is...', teach that naturally.",
+    "If names are introduced differently in formal and informal speech, explain the difference gradually.",
+    "If pronouns can be omitted in the target language, explain that naturally rather than forcing them into examples.",
+    "If the target language changes identity expressions according to gender, number, politeness or social status, teach those distinctions gradually.",
+    "If the target language has no direct equivalent of English articles or the verb 'to be', do not invent them.",
+    "If word order differs from the learner's source language, explain the difference when useful.",
+    "Do not force English-style first-name conventions onto cultures that commonly use other introduction patterns.",
+    "The source language should remain the main explanation language unless learner progress indicates otherwise."
+  ],
+
+  "recommended_progression": [
+    {
+      "part_group": 1,
+      "name": "Saying Your Name",
+      "goal": "Teach the simplest and most natural way to tell another person one's name.",
+      "suggested_concepts": [
+        "my name is",
+        "I am",
+        "I am called",
+        "the most natural equivalent used in the target language"
+      ]
+    },
+
+    {
+      "part_group": 2,
+      "name": "Asking Someone's Name",
+      "goal": "Teach the learner how to ask another person's name naturally.",
+      "suggested_concepts": [
+        "what is your name",
+        "what are you called",
+        "formal forms when relevant",
+        "informal forms when relevant"
+      ]
+    },
+
+    {
+      "part_group": 3,
+      "name": "Answering Name Questions",
+      "goal": "Teach several simple ways of responding when someone asks the learner's name.",
+      "suggested_concepts": [
+        "my name is...",
+        "I am...",
+        "you can call me...",
+        "short natural replies"
+      ]
+    },
+
+    {
+      "part_group": 4,
+      "name": "Identity Pronouns and Core Structures",
+      "goal": "Introduce basic identity-related pronouns or equivalent grammatical structures when useful.",
+      "suggested_concepts": [
+        "I",
+        "you",
+        "he",
+        "she",
+        "basic equivalents appropriate to the target language",
+        "basic forms of the verb meaning to be when relevant"
+      ]
+    },
+
+    {
+      "part_group": 5,
+      "name": "Identifying Other People",
+      "goal": "Teach simple ways of identifying another person.",
+      "suggested_concepts": [
+        "he is...",
+        "she is...",
+        "this is...",
+        "that is...",
+        "equivalent natural structures in the target language"
+      ]
+    },
+
+    {
+      "part_group": 6,
+      "name": "Asking Who Someone Is",
+      "goal": "Teach simple identity questions about another person.",
+      "suggested_concepts": [
+        "who are you",
+        "who is he",
+        "who is she",
+        "who is this",
+        "natural equivalents appropriate to the target language"
+      ]
+    },
+
+    {
+      "part_group": 7,
+      "name": "Simple Personal Introduction",
+      "goal": "Combine greetings and identity expressions into a short personal introduction.",
+      "suggested_concepts": [
+        "hello, my name is...",
+        "nice to meet you",
+        "what is your name",
+        "short introduction exchanges"
+      ]
+    },
+
+    {
+      "part_group": 8,
+      "name": "Identity Review and Mastery",
+      "goal": "Review and test the learner's ability to introduce themselves and understand basic identity exchanges.",
+      "suggested_concepts": [
+        "recognition",
+        "translation",
+        "sentence building",
+        "question and answer",
+        "dialogue completion",
+        "independent introduction"
+      ]
+    }
+  ],
+
+  "part_generation_rules": {
+    "minimum_parts": 6,
+    "maximum_parts": 30,
+    "fixed_number_of_parts": false,
+
+    "rules": [
+      "Generate only one new lesson part at a time unless explicitly requested otherwise.",
+      "Each generated part must remain inside the Identity main target.",
+      "Each part should normally introduce one primary identity concept or one closely related group of expressions.",
+      "Build naturally on Lesson 1 greetings when useful.",
+      "Do not unnecessarily reteach basic greetings from zero.",
+      "The next part must build logically on completed parts.",
+      "Do not unnecessarily repeat an already generated identity expression.",
+      "Previously learned vocabulary may be reused freely.",
+      "Important previously learned grammar may be briefly reviewed when useful.",
+      "Do not move to Lesson 3 simply because the learner can state their name.",
+      "Continue until the completion requirements of Lesson 2 are sufficiently covered.",
+      "The ordering of parts may adapt to the grammar and culture of the target language."
+    ]
+  },
+
+  "lesson_part_blueprint": {
+    "required_sections": [
+      "title",
+      "main_target_expression",
+      "meaning",
+      "explanation",
+      "examples",
+      "practice"
+    ],
+
+    "optional_sections": [
+      "pronunciation",
+      "word_breakdown",
+      "phrase_breakdown",
+      "grammar",
+      "pronouns",
+      "sentence_structure",
+      "usage_notes",
+      "formal_vs_informal",
+      "gender_notes",
+      "cultural_note",
+      "source_language_comparison",
+      "common_mistakes",
+      "mini_dialogue",
+      "memory_tip",
+      "revision"
+    ],
+
+    "generation_instruction": "Use only the sections that genuinely help the learner understand the current identity expression. Do not force every lesson part into an identical structure."
+  },
+
+  "target_expression_rules": [
+    "Choose natural identity expressions used by native speakers.",
+    "Prefer useful everyday introductions.",
+    "Begin with short expressions.",
+    "Increase sentence complexity gradually.",
+    "Avoid too many new words in one lesson part.",
+    "Reuse greeting vocabulary from Lesson 1 when useful.",
+    "Provide the meaning in the learner's source language.",
+    "Provide pronunciation support when useful.",
+    "If the target language uses a different writing system, provide appropriate secondary pronunciation support.",
+    "Do not teach literal translations that sound unnatural in the target language."
+  ],
+
+  "word_teaching_rules": [
+    "Explain important identity-related words individually.",
+    "Give their meaning in the learner's source language.",
+    "Explain what each word does in the current expression.",
+    "Explain pronouns clearly when they are introduced.",
+    "Explain possession words such as equivalents of 'my' and 'your' when useful, without turning the lesson into the full Possession lesson.",
+    "Explain forms of the verb meaning 'to be' only when relevant.",
+    "Give simple additional examples.",
+    "Do not overwhelm beginners with multiple unrelated meanings of a word.",
+    "If a word changes form because of gender, number or politeness, explain only the distinctions currently needed."
+  ],
+
+  "grammar_teaching_rules": [
+    "Teach grammar through examples first.",
+    "Explain identity sentence structure when useful.",
+    "Explain first-person and second-person forms when relevant.",
+    "Explain basic pronouns when they improve understanding.",
+    "Explain the target language's equivalent of the verb 'to be' only if the language actually requires or uses it in the current structure.",
+    "If the target language omits the verb 'to be' in simple identity statements, explicitly explain this when useful.",
+    "If pronouns are optional or omitted, explain that naturally.",
+    "Compare source-language and target-language word order when useful.",
+    "Do not introduce unrelated grammar topics.",
+    "Build on grammar already introduced rather than restarting from zero."
+  ],
+
+  "pronoun_teaching_rules": [
+    "Introduce pronouns only as they become necessary for identity communication.",
+    "Begin with equivalents of 'I' and 'you' when appropriate.",
+    "Introduce third-person pronouns later in the lesson.",
+    "Explain gender distinctions when the target language has them.",
+    "Explain singular and plural distinctions when relevant.",
+    "Explain formal and informal versions of 'you' when they exist.",
+    "Do not assume all languages require explicit pronouns in every sentence."
+  ],
+
+  "pronunciation_teaching_rules": [
+    "Provide pronunciation help for important identity expressions.",
+    "Pay special attention to personal pronouns and common introductory phrases.",
+    "Use learner-friendly pronunciation guidance.",
+    "Keep the authentic target-language writing primary.",
+    "Use transliteration only as secondary support.",
+    "Mention unfamiliar sounds when useful.",
+    "Avoid overly technical phonetics for beginners unless requested."
+  ],
+
+  "example_generation_rules": {
+    "minimum_examples": 3,
+    "recommended_examples": 5,
+    "maximum_examples": 10,
+
+    "rules": [
+      "Examples must remain closely connected to identity and introductions.",
+      "Reuse greeting expressions learned in Lesson 1 when useful.",
+      "Examples should mostly use vocabulary already learned or introduced in the current part.",
+      "Use realistic names when needed.",
+      "Avoid introducing large amounts of unrelated personal information.",
+      "Include meanings in the learner's source language.",
+      "Vary examples enough to demonstrate the structure clearly."
+    ]
+  },
+
+  "name_usage_rules": [
+    "Personal names may be used as placeholders in examples.",
+    "Do not assume names must be translated between languages.",
+    "Preserve a person's chosen name unless transliteration is necessary for the writing system.",
+    "When transliterating a name, make clear that it is pronunciation or script adaptation rather than a translation.",
+    "Do not imply that one cultural naming convention applies to every language."
+  ],
+
+  "dialogue_rules": [
+    "Use greetings from Lesson 1 naturally.",
+    "Begin with very short introduction dialogues.",
+    "Gradually include asking and answering names.",
+    "Later include identifying another person when appropriate.",
+    "Keep conversations realistic.",
+    "Provide meanings in the learner's source language.",
+    "Avoid unnecessarily complex small talk until later lessons."
+  ],
+
+  "practice_rules": [
+    "Practice only concepts introduced in Lesson 2 or earlier lessons.",
+    "Begin with recognizing identity expressions.",
+    "Progress toward producing introductions independently.",
+    "Use translation in both directions when appropriate.",
+    "Include asking and answering names.",
+    "Include pronoun recognition when already taught.",
+    "Include sentence building when useful.",
+    "Include dialogue completion.",
+    "Do not introduce new major identity structures inside assessment questions.",
+    "Provide answers or feedback after attempts when the application supports interaction."
+  ],
+
+  "recommended_practice_types": [
+    "recognize_meaning",
+    "choose_correct_introduction",
+    "translate_to_target",
+    "translate_to_source",
+    "complete_name_expression",
+    "choose_correct_pronoun",
+    "reorder_words",
+    "build_introduction",
+    "answer_name_question",
+    "complete_dialogue",
+    "introduce_yourself"
+  ],
+
+  "lesson_1_reuse_rules": [
+    "Reuse basic greeting expressions from Lesson 1 when appropriate.",
+    "Do not make greetings the main educational target again.",
+    "Use greetings mainly to create natural introduction contexts.",
+    "Assume learned greetings may still need light reinforcement.",
+    "If the learner's saved knowledge shows weakness in a greeting needed for the current identity lesson, briefly review it."
+  ],
+
+  "adaptation_rules": {
+    "beginner": [
+      "Use the learner's source language heavily for explanations.",
+      "Keep target expressions short.",
+      "Introduce one main identity structure at a time.",
+      "Provide clear translation support.",
+      "Provide pronunciation help when useful.",
+      "Use familiar names and simple dialogues."
+    ],
+
+    "improving": [
+      "Reuse target-language greetings and identity expressions without full translation every time.",
+      "Encourage independent introduction.",
+      "Introduce alternative natural identity expressions.",
+      "Use slightly longer introductory conversations."
+    ],
+
+    "struggling": [
+      "Reduce the amount of new vocabulary.",
+      "Return to the simplest identity expression.",
+      "Provide more examples.",
+      "Review pronouns or sentence structure when needed.",
+      "Use shorter dialogues.",
+      "Do not advance until core identity expressions are clear."
+    ]
+  },
+
+  "knowledge_tracking": {
+    "track_vocabulary": true,
+    "track_grammar": true,
+    "track_expressions": true,
+    "track_pronouns": true,
+    "track_pronunciation_concepts": true,
+    "track_common_mistakes": true,
+
+    "statuses": [
+      "new",
+      "introduced",
+      "learning",
+      "reviewing",
+      "learned",
+      "weak"
+    ]
+  },
+
+  "common_mistake_rules": [
+    "Only mark an expression as wrong when it is genuinely incorrect, unnatural or inappropriate for the stated context.",
+    "Do not label a valid alternative introduction as wrong simply because another expression is being taught.",
+    "If two identity expressions are both valid, explain their difference instead of treating one as an error.",
+    "Distinguish between grammatical errors, pronunciation issues, unnatural wording and differences in formality.",
+    "Do not invent common mistakes merely to populate the section."
+  ],
+
+  "generated_part_output_requirements": {
+    "return_metadata": true,
+    "return_knowledge_update": true,
+    "return_progress_recommendation": true,
+
+    "metadata_fields": [
+      "standard",
+      "lesson_id",
+      "part_id",
+      "part_group",
+      "title",
+      "main_target"
+    ],
+
+    "knowledge_update_fields": [
+      "vocabulary_introduced",
+      "expressions_introduced",
+      "grammar_introduced",
+      "pronunciation_introduced",
+      "concepts_reviewed"
+    ],
+
+    "progress_fields": [
+      "lesson_target_coverage",
+      "current_part_group_complete",
+      "recommended_next_part_group",
+      "ready_to_complete_lesson"
+    ]
+  },
+
+  "progression_policy": {
+    "allow_automatic_completion": false,
+
+    "rules": [
+      "The AI may recommend when Lesson 2 has been sufficiently covered.",
+      "The machine engine controls actual advancement to Lesson 3.",
+      "Do not automatically advance after teaching how to say a name.",
+      "Do not mark the lesson complete based only on number of generated parts.",
+      "Completion should depend on coverage of the Identity objectives.",
+      "The learner should be able to introduce themselves and participate in a basic identity exchange before the lesson is considered ready for completion."
+    ]
+  },
+
+  "restrictions": [
+    "Do not assume the target language is English.",
+    "Do not assume the learner's source language is English.",
+    "Do not hardcode translations for a specific language pair.",
+    "Do not force English pronoun or verb structures onto another language.",
+    "Do not turn this lesson into the full Possession lesson.",
+    "Do not turn this lesson into the Family lesson.",
+    "Do not introduce detailed age, occupation, nationality or location content unless briefly needed for a natural identity example.",
+    "Do not introduce advanced tense structures.",
+    "Do not move beyond the Identity main target.",
+    "Do not repeatedly teach Lesson 1 greetings as if they are new.",
+    "Do not label valid alternative expressions as common mistakes.",
+    "Do not make every generated lesson part structurally identical."
+  ],
+
+  "lesson_end_goal": "By the end of Lesson 2, the learner should be able to greet another person, state their own name, ask another person's name, understand a simple identity response, identify another person using basic language, and participate in a short natural first-meeting introduction in the target language."
+}

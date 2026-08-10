@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Master Language</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f3f7ff,
+                    #ffffff,
+                    #f5f2ff
+                );
+
+            color: #222;
+
+        }
+
+
+        .page {
+
+            width: 94%;
+
+            max-width: 1100px;
+
+            margin: 0 auto;
+
+            padding: 40px 0;
+
+        }
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .header {
+
+            text-align: center;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .header h1 {
+
+            margin: 0;
+
+            font-size: 38px;
+
+        }
+
+
+        .header p {
+
+            margin-top: 10px;
+
+            color: #666;
+
+            font-size: 17px;
+
+        }
+
+
+
+        /* ==================================================
+           MAIN CARD
+        ================================================== */
+
+        .welcome_card {
+
+            background: white;
+
+            border: 1px solid #e5e5e5;
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 10px 35px
+                rgba(0, 0, 0, 0.06);
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .welcome_card h2 {
+
+            margin-top: 0;
+
+        }
+
+
+
+        /* ==================================================
+           FORM
+        ================================================== */
+
+        .form_grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0, 1fr)
+                );
+
+            gap: 22px;
+
+        }
+
+
+        .field {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+
+        }
+
+
+        .field.full {
+
+            grid-column:
+                1 / -1;
+
+        }
+
+
+        label {
+
+            font-weight: bold;
+
+            font-size: 14px;
+
+        }
+
+
+        select,
+        input {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 12px;
+
+            font-size: 16px;
+
+            background: white;
+
+            outline: none;
+
+        }
+
+
+        select:focus,
+        input:focus {
+
+            border-color: #777;
+
+        }
+
+
+
+        /* ==================================================
+           LANGUAGE DIRECTION
+        ================================================== */
+
+        .language_direction {
+
+            grid-column:
+                1 / -1;
+
+            padding: 18px;
+
+            border-radius: 14px;
+
+            background: #f7f8fa;
+
+            text-align: center;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+        }
+
+
+        .language_direction span {
+
+            margin: 0 8px;
+
+        }
+
+
+
+        /* ==================================================
+           LESSON INFO
+        ================================================== */
+
+        .lesson_information {
+
+            grid-column:
+                1 / -1;
+
+            border: 1px solid #ddd;
+
+            border-radius: 14px;
+
+            padding: 18px;
+
+            background: #fafafa;
+
+        }
+
+
+        .lesson_information p {
+
+            margin:
+                5px 0;
+
+        }
+
+
+        #selected_lesson_title {
+
+            font-weight: bold;
+
+            font-size: 17px;
+
+        }
+
+
+        #selected_standard {
+
+            color: #666;
+
+        }
+
+
+
+        /* ==================================================
+           BUTTONS
+        ================================================== */
+
+        .buttons {
+
+            grid-column:
+                1 / -1;
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 5px;
+
+        }
+
+
+        button {
+
+            border: none;
+
+            padding: 14px 24px;
+
+            border-radius: 12px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+        }
+
+
+        #start_button {
+
+            flex: 1;
+
+            background: #222;
+
+            color: white;
+
+        }
+
+
+        #start_button:hover {
+
+            opacity: 0.88;
+
+        }
+
+
+
+        /* ==================================================
+           ERROR / STATUS
+        ================================================== */
+
+        #status_message {
+
+            grid-column:
+                1 / -1;
+
+            display: none;
+
+            padding: 12px;
+
+            border-radius: 10px;
+
+            background: #f5f5f5;
+
+        }
+
+
+        #status_message.error {
+
+            display: block;
+
+            background: #fff0f0;
+
+            color: #9b1c1c;
+
+        }
+
+
+        #status_message.success {
+
+            display: block;
+
+            background: #effff3;
+
+            color: #176c2c;
+
+        }
+
+
+
+        /* ==================================================
+           EXISTING ROOMS
+        ================================================== */
+
+        .rooms_section {
+
+            margin-top: 30px;
+
+        }
+
+
+        .rooms_section h2 {
+
+            margin-bottom: 18px;
+
+        }
+
+
+        #rooms_list {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(250px, 1fr)
+                );
+
+            gap: 16px;
+
+        }
+
+
+        .room_card {
+
+            background: white;
+
+            border: 1px solid #ddd;
+
+            border-radius: 16px;
+
+            padding: 20px;
+
+        }
+
+
+        .room_card h3 {
+
+            margin-top: 0;
+
+            margin-bottom: 10px;
+
+        }
+
+
+        .room_card p {
+
+            margin:
+                5px 0;
+
+            color: #555;
+
+            font-size: 14px;
+
+        }
+
+
+        .room_actions {
+
+            display: flex;
+
+            gap: 8px;
+
+            margin-top: 15px;
+
+        }
+
+
+        .room_open {
+
+            flex: 1;
+
+            background: #222;
+
+            color: white;
+
+        }
+
+
+        .room_delete {
+
+            background: #eee;
+
+            color: #222;
+
+        }
+
+
+        .empty_rooms {
+
+            color: #777;
+
+            padding: 15px 0;
+
+        }
+
+
+
+        /* ==================================================
+           RESPONSIVE
+        ================================================== */
+
+        @media (
+            max-width: 700px
+        ) {
+
+            .form_grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .field.full,
+            .language_direction,
+            .lesson_information,
+            .buttons,
+            #status_message {
+
+                grid-column:
+                    auto;
+
+            }
+
+
+            .header h1 {
+
+                font-size: 30px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <!-- ====================================================
+         HEADER
+    ===================================================== -->
+
+    <div class="header">
+
+        <h1>
+            Master Language
+        </h1>
+
+        <p>
+            Learn any language from the language you already speak.
+        </p>
+
+    </div>
+
+
+
+    <!-- ====================================================
+         CREATE LEARNING ROOM
+    ===================================================== -->
+
+    <div class="welcome_card">
+
+        <h2>
+            Create a Learning Room
+        </h2>
+
+
+        <div class="form_grid">
+
+
+            <!-- ============================================
+                 ROOM NAME
+            ============================================= -->
+
+            <div class="field full">
+
+                <label for="room_name">
+
+                    Room name
+                    (optional)
+
+                </label>
+
+                <input
+                    type="text"
+                    id="room_name"
+                    placeholder="Example: My English Course"
+                >
+
+            </div>
+
+
+
+            <!-- ============================================
+                 SOURCE LANGUAGE
+            ============================================= -->
+
+            <div class="field">
+
+                <label for="source_language">
+
+                    Language I speak
+
+                </label>
+
+                <select id="source_language">
+
+                    <option value="">
+                        Choose your language
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- ============================================
+                 TARGET LANGUAGE
+            ============================================= -->
+
+            <div class="field">
+
+                <label for="target_language">
+
+                    Language I want to learn
+
+                </label>
+
+                <select id="target_language">
+
+                    <option value="">
+                        Choose a language to learn
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- ============================================
+                 LANGUAGE DIRECTION PREVIEW
+            ============================================= -->
+
+            <div class="language_direction">
+
+                <span id="source_preview">
+                    Your language
+                </span>
+
+                <span>
+                    →
+                </span>
+
+                <span id="target_preview">
+                    Target language
+                </span>
+
+            </div>
+
+
+
+            <!-- ============================================
+                 STARTING LESSON
+            ============================================= -->
+
+            <div class="field full">
+
+                <label for="starting_lesson">
+
+                    Starting lesson
+
+                </label>
+
+                <select id="starting_lesson">
+
+                </select>
+
+            </div>
+
+
+
+            <!-- ============================================
+                 LESSON INFORMATION
+            ============================================= -->
+
+            <div class="lesson_information">
+
+                <p id="selected_standard">
+                    Standard 1
+                </p>
+
+                <p id="selected_lesson_title">
+                    Lesson 1 — Greetings
+                </p>
+
+            </div>
+
+
+
+            <!-- ============================================
+                 STATUS
+            ============================================= -->
+
+            <div id="status_message">
+
+            </div>
+
+
+
+            <!-- ============================================
+                 START
+            ============================================= -->
+
+            <div class="buttons">
+
+                <button
+                    id="start_button"
+                    type="button"
+                >
+
+                    Start Learning
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ====================================================
+         EXISTING ROOMS
+    ===================================================== -->
+
+    <div class="rooms_section">
+
+        <h2>
+            My Learning Rooms
+        </h2>
+
+        <div id="rooms_list">
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script type="module">
+
+
+// ============================================================
+// IMPORT MASTER LANGUAGE MACHINE
+// ============================================================
+
+import {
+
+    machineMasterGPT
+
+} from "./js/machine_master_gpt.js";
+
+
+
+// ============================================================
+// ELEMENTS
+// ============================================================
+
+const sourceLanguageSelect =
+    document.getElementById(
+        "source_language"
+    );
+
+
+const targetLanguageSelect =
+    document.getElementById(
+        "target_language"
+    );
+
+
+const startingLessonSelect =
+    document.getElementById(
+        "starting_lesson"
+    );
+
+
+const roomNameInput =
+    document.getElementById(
+        "room_name"
+    );
+
+
+const sourcePreview =
+    document.getElementById(
+        "source_preview"
+    );
+
+
+const targetPreview =
+    document.getElementById(
+        "target_preview"
+    );
+
+
+const selectedStandard =
+    document.getElementById(
+        "selected_standard"
+    );
+
+
+const selectedLessonTitle =
+    document.getElementById(
+        "selected_lesson_title"
+    );
+
+
+const startButton =
+    document.getElementById(
+        "start_button"
+    );
+
+
+const roomsList =
+    document.getElementById(
+        "rooms_list"
+    );
+
+
+const statusMessage =
+    document.getElementById(
+        "status_message"
+    );
+
+
+
+// ============================================================
+// LANGUAGE LIST
+// ============================================================
+//
+// This list is only frontend data.
+//
+// It does NOT control what GPT can teach.
+//
+// OpenAI handles the actual language intelligence.
+//
+// More languages can be added later without changing
+// machine_master_gpt.js.
+//
+// ============================================================
+
+const languages = [
+
+    "English",
+
+    "Arabic",
+
+    "Hausa",
+
+    "French",
+
+    "Spanish",
+
+    "German",
+
+    "Italian",
+
+    "Portuguese",
+
+    "Dutch",
+
+    "Russian",
+
+    "Ukrainian",
+
+    "Polish",
+
+    "Turkish",
+
+    "Persian",
+
+    "Urdu",
+
+    "Hindi",
+
+    "Bengali",
+
+    "Punjabi",
+
+    "Gujarati",
+
+    "Marathi",
+
+    "Tamil",
+
+    "Telugu",
+
+    "Malayalam",
+
+    "Kannada",
+
+    "Nepali",
+
+    "Sinhala",
+
+    "Chinese",
+
+    "Japanese",
+
+    "Korean",
+
+    "Vietnamese",
+
+    "Thai",
+
+    "Indonesian",
+
+    "Malay",
+
+    "Filipino",
+
+    "Swahili",
+
+    "Somali",
+
+    "Amharic",
+
+    "Yoruba",
+
+    "Igbo",
+
+    "Zulu",
+
+    "Afrikaans",
+
+    "Greek",
+
+    "Hebrew",
+
+    "Swedish",
+
+    "Norwegian",
+
+    "Danish",
+
+    "Finnish",
+
+    "Czech",
+
+    "Romanian",
+
+    "Hungarian"
+
+];
+
+
+
+// ============================================================
+// 50 MASTER LESSON TITLES
+// ============================================================
+//
+// These are only navigation labels.
+//
+// The detailed curriculum comes from:
+//
+// lesson01.json
+// lesson02.json
+// lesson03.json
+// ...
+//
+// ============================================================
+
+const lessonTitles = {
+
+    1: "Greetings",
+
+    2: "Identity",
+
+    3: "Simple Nouns",
+
+    4: "Possession",
+
+    5: "Basic Descriptions",
+
+    6: "Wants and Needs",
+
+    7: "Likes and Dislikes",
+
+    8: "Simple Actions",
+
+    9: "Location",
+
+    10: "Basic Questions",
+
+    11: "Negatives",
+
+    12: "Numbers and Plurals",
+
+    13: "Family and People",
+
+    14: "Time",
+
+    15: "Daily Routines",
+
+    16: "Present Actions",
+
+    17: "Past Actions",
+
+    18: "Future Actions",
+
+    19: "Ability",
+
+    20: "Reasons",
+
+    21: "Preferences",
+
+    22: "Comparisons",
+
+    23: "Requests",
+
+    24: "Permission",
+
+    25: "Obligation",
+
+    26: "Experiences",
+
+    27: "Sequencing",
+
+    28: "Directions",
+
+    29: "Explaining Problems",
+
+    30: "Connected Conversation",
+
+    31: "Opinions",
+
+    32: "Supporting Opinions",
+
+    33: "Conditions",
+
+    34: "Hypotheticals",
+
+    35: "Relative Clauses",
+
+    36: "Detailed Descriptions",
+
+    37: "Storytelling",
+
+    38: "Cause and Consequence",
+
+    39: "Contrast",
+
+    40: "Extended Explanation",
+
+    41: "Nuanced Opinions",
+
+    42: "Possibility and Uncertainty",
+
+    43: "Formal Explanation",
+
+    44: "Complex Narratives",
+
+    45: "Abstract Concepts",
+
+    46: "Persuasion",
+
+    47: "Professional Communication",
+
+    48: "Subtle Distinctions",
+
+    49: "Sophisticated Expression",
+
+    50: "Language Mastery"
+
+};
+
+
+
+// ============================================================
+// INITIALIZE PAGE
+// ============================================================
+
+async function initializePage() {
+
+    try {
+
+        await machineMasterGPT.init();
+
+
+        populateLanguages();
+
+        populateLessons();
+
+        updateLanguagePreview();
+
+        updateLessonPreview();
+
+        renderRooms();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        showStatus(
+
+            error.message,
+
+            "error"
+
+        );
+
+    }
+
+}
+
+
+
+// ============================================================
+// POPULATE LANGUAGES
+// ============================================================
+
+function populateLanguages() {
+
+    for (
+        const language
+        of languages
+    ) {
+
+        const sourceOption =
+            document.createElement(
+                "option"
+            );
+
+
+        sourceOption.value =
+            language;
+
+        sourceOption.textContent =
+            language;
+
+
+        sourceLanguageSelect
+            .appendChild(
+                sourceOption
+            );
+
+
+
+        const targetOption =
+            document.createElement(
+                "option"
+            );
+
+
+        targetOption.value =
+            language;
+
+        targetOption.textContent =
+            language;
+
+
+        targetLanguageSelect
+            .appendChild(
+                targetOption
+            );
+
+    }
+
+}
+
+
+
+// ============================================================
+// POPULATE 50 LESSONS
+// ============================================================
+
+function populateLessons() {
+
+    startingLessonSelect.innerHTML =
+        "";
+
+
+    for (
+        let lesson = 1;
+        lesson <= 50;
+        lesson++
+    ) {
+
+        const standard =
+            Math.ceil(
+                lesson / 5
+            );
+
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+
+        option.value =
+            lesson;
+
+
+        option.textContent =
+
+            `Standard ${standard} — ` +
+
+            `Lesson ${lesson}: ` +
+
+            `${lessonTitles[lesson]}`;
+
+
+        startingLessonSelect
+            .appendChild(
+                option
+            );
+
+    }
+
+
+    startingLessonSelect.value =
+        "1";
+
+}
+
+
+
+// ============================================================
+// UPDATE LANGUAGE PREVIEW
+// ============================================================
+
+function updateLanguagePreview() {
+
+    const source =
+        sourceLanguageSelect.value;
+
+
+    const target =
+        targetLanguageSelect.value;
+
+
+    sourcePreview.textContent =
+
+        source ||
+
+        "Your language";
+
+
+    targetPreview.textContent =
+
+        target ||
+
+        "Target language";
+
+}
+
+
+
+// ============================================================
+// UPDATE LESSON PREVIEW
+// ============================================================
+
+function updateLessonPreview() {
+
+    const lesson =
+        Number(
+            startingLessonSelect.value
+        ) || 1;
+
+
+    const standard =
+        Math.ceil(
+            lesson / 5
+        );
+
+
+    selectedStandard.textContent =
+        `Standard ${standard}`;
+
+
+    selectedLessonTitle.textContent =
+
+        `Lesson ${lesson} — ` +
+
+        `${lessonTitles[lesson]}`;
+
+}
+
+
+
+// ============================================================
+// CREATE ROOM
+// ============================================================
+
+function createLearningRoom() {
+
+    clearStatus();
+
+
+    const sourceLanguage =
+        sourceLanguageSelect.value;
+
+
+    const targetLanguage =
+        targetLanguageSelect.value;
+
+
+    const startingLesson =
+        Number(
+            startingLessonSelect.value
+        );
+
+
+    const roomName =
+        roomNameInput.value.trim();
+
+
+
+    // ========================================================
+    // BASIC VALIDATION
+    // ========================================================
+
+    if (!sourceLanguage) {
+
+        showStatus(
+
+            "Please choose the language you speak.",
+
+            "error"
+
+        );
+
+        return;
+
+    }
+
+
+    if (!targetLanguage) {
+
+        showStatus(
+
+            "Please choose the language you want to learn.",
+
+            "error"
+
+        );
+
+        return;
+
+    }
+
+
+    if (
+        sourceLanguage ===
+        targetLanguage
+    ) {
+
+        showStatus(
+
+            "Please choose two different languages.",
+
+            "error"
+
+        );
+
+        return;
+
+    }
+
+
+
+    // ========================================================
+    // MACHINE CREATES THE ROOM
+    // ========================================================
+
+    try {
+
+        const room =
+            machineMasterGPT.createRoom({
+
+                sourceLanguage,
+
+                targetLanguage,
+
+                roomName:
+                    roomName || null,
+
+                startingLesson
+
+            });
+
+
+
+        console.log(
+
+            "Master Language room created:",
+
+            room
+
+        );
+
+
+
+        showStatus(
+
+            "Learning room created.",
+
+            "success"
+
+        );
+
+
+
+        // ====================================================
+        // GO TO CLASSROOM
+        // ====================================================
+        //
+        // index.html will read the current room from
+        // machine_master_gpt.js / localStorage.
+        //
+        // We don't need to place all room information
+        // inside the URL.
+        //
+        // ====================================================
+
+        window.location.href =
+            "./index.html";
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        showStatus(
+
+            error.message,
+
+            "error"
+
+        );
+
+    }
+
+}
+
+
+
+// ============================================================
+// RENDER EXISTING ROOMS
+// ============================================================
+
+function renderRooms() {
+
+    const rooms =
+        machineMasterGPT.getRooms();
+
+
+    roomsList.innerHTML =
+        "";
+
+
+    if (
+        !rooms ||
+        rooms.length === 0
+    ) {
+
+        roomsList.innerHTML = `
+
+            <div class="empty_rooms">
+
+                You do not have any learning rooms yet.
+
+            </div>
+
+        `;
+
+
+        return;
+
+    }
+
+
+
+    // Newest / most recently updated first.
+    const sortedRooms = [
+        ...rooms
+    ].sort(
+
+        (a, b) =>
+
+            new Date(
+                b.updatedAt
+            ) -
+
+            new Date(
+                a.updatedAt
+            )
+
+    );
+
+
+
+    for (
+        const room
+        of sortedRooms
+    ) {
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "room_card";
+
+
+        const standard =
+            room.progress
+                ?.standard ?? 1;
+
+
+        const lesson =
+            room.progress
+                ?.lesson ?? 1;
+
+
+        const part =
+            room.progress
+                ?.part ?? 1;
+
+
+        card.innerHTML = `
+
+            <h3>
+                ${escapeHTML(
+                    room.roomName
+                )}
+            </h3>
+
+
+            <p>
+                <strong>
+                    Learning:
+                </strong>
+
+                ${escapeHTML(
+                    room.targetLanguage
+                )}
+            </p>
+
+
+            <p>
+                <strong>
+                    Explained in:
+                </strong>
+
+                ${escapeHTML(
+                    room.sourceLanguage
+                )}
+            </p>
+
+
+            <p>
+                <strong>
+                    Progress:
+                </strong>
+
+                Standard ${standard},
+                Lesson ${lesson},
+                Part ${part}
+            </p>
+
+
+            <p>
+                <strong>
+                    Topic:
+                </strong>
+
+                ${escapeHTML(
+                    lessonTitles[lesson] ||
+                    "Lesson"
+                )}
+            </p>
+
+
+            <div class="room_actions">
+
+                <button
+                    class="room_open"
+                    data-room-id="${escapeHTML(
+                        room.roomId
+                    )}"
+                >
+                    Continue
+                </button>
+
+
+                <button
+                    class="room_delete"
+                    data-room-id="${escapeHTML(
+                        room.roomId
+                    )}"
+                >
+                    Delete
+                </button>
+
+            </div>
+
+        `;
+
+
+        roomsList
+            .appendChild(
+                card
+            );
+
+    }
+
+
+
+    addRoomButtonEvents();
+
+}
+
+
+
+// ============================================================
+// ADD ROOM BUTTON EVENTS
+// ============================================================
+
+function addRoomButtonEvents() {
+
+    const openButtons =
+        document.querySelectorAll(
+            ".room_open"
+        );
+
+
+    const deleteButtons =
+        document.querySelectorAll(
+            ".room_delete"
+        );
+
+
+
+    // ========================================================
+    // CONTINUE ROOM
+    // ========================================================
+
+    openButtons.forEach(
+
+        button => {
+
+            button.addEventListener(
+
+                "click",
+
+                () => {
+
+                    const roomId =
+                        button.dataset
+                            .roomId;
+
+
+                    try {
+
+                        machineMasterGPT
+                            .openRoom(
+                                roomId
+                            );
+
+
+                        window.location.href =
+                            "./index.html";
+
+                    }
+
+                    catch (error) {
+
+                        console.error(
+                            error
+                        );
+
+
+                        showStatus(
+
+                            error.message,
+
+                            "error"
+
+                        );
+
+                    }
+
+                }
+
+            );
+
+        }
+
+    );
+
+
+
+    // ========================================================
+    // DELETE ROOM
+    // ========================================================
+
+    deleteButtons.forEach(
+
+        button => {
+
+            button.addEventListener(
+
+                "click",
+
+                () => {
+
+                    const roomId =
+                        button.dataset
+                            .roomId;
+
+
+                    const confirmed =
+                        window.confirm(
+
+                            "Delete this learning room and its saved progress?"
+
+                        );
+
+
+                    if (!confirmed) {
+
+                        return;
+
+                    }
+
+
+                    machineMasterGPT
+                        .deleteRoom(
+                            roomId
+                        );
+
+
+                    renderRooms();
+
+                }
+
+            );
+
+        }
+
+    );
+
+}
+
+
+
+// ============================================================
+// STATUS
+// ============================================================
+
+function showStatus(
+    message,
+    type
+) {
+
+    statusMessage.textContent =
+        message;
+
+
+    statusMessage.className =
+        type;
+
+}
+
+
+
+function clearStatus() {
+
+    statusMessage.textContent =
+        "";
+
+    statusMessage.className =
+        "";
+
+}
+
+
+
+// ============================================================
+// SMALL HTML ESCAPE HELPER
+// ============================================================
+
+function escapeHTML(value) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        value ?? "";
+
+
+    return div.innerHTML;
+
+}
+
+
+
+// ============================================================
+// EVENTS
+// ============================================================
+
+sourceLanguageSelect
+    .addEventListener(
+
+        "change",
+
+        updateLanguagePreview
+
+    );
+
+
+targetLanguageSelect
+    .addEventListener(
+
+        "change",
+
+        updateLanguagePreview
+
+    );
+
+
+startingLessonSelect
+    .addEventListener(
+
+        "change",
+
+        updateLessonPreview
+
+    );
+
+
+startButton
+    .addEventListener(
+
+        "click",
+
+        createLearningRoom
+
+    );
+
+
+
+// ============================================================
+// START
+// ============================================================
+
+initializePage();
+
+
+</script>
+
+
+</body>
+
+</html>

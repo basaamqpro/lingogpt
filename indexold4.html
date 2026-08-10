@@ -487,11 +487,22 @@
   <script src="results5.js"></script>
   <script src="interact2.js"></script>
 
-  <script type="module">
-
-    import "./firebase.js";
-
+  <script>
     "use strict";
+
+
+    /*
+    ==================================================
+    STORAGE
+    ==================================================
+    */
+
+    const STORAGE_KEYS = {
+      users: "lingo_user_details",
+      data: "lingo_user_data",
+      session: "lingo_logged_in_user",
+      currentRoom: "lingo_current_room"
+    };
 
 
     /*
@@ -511,17 +522,59 @@
       "#f032e6"
     ];
 
-    let currentRoom = null;
-    let currentRoomIdx = "";
+
+    let user_details =
+      readArray(STORAGE_KEYS.users);
+
+    let userLingo_data =
+      readArray(STORAGE_KEYS.data);
+
+    let loggedInUserIdx =
+      localStorage.getItem(
+        STORAGE_KEYS.session
+      ) || "";
+
+    let currentRoomIdx =
+      localStorage.getItem(
+        STORAGE_KEYS.currentRoom
+      ) || "";
+
     let editingChatIdx = "";
     let activeController = null;
 
 
     /*
     ==================================================
-    HELPERS
+    BASIC HELPERS
     ==================================================
     */
+
+    function readArray(key) {
+      try {
+        const value =
+          JSON.parse(
+            localStorage.getItem(key) ||
+            "[]"
+          );
+
+        return Array.isArray(value)
+          ? value
+          : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+
+    function saveData() {
+      localStorage.setItem(
+        STORAGE_KEYS.data,
+        JSON.stringify(
+          userLingo_data
+        )
+      );
+    }
+
 
     function createId(prefix) {
       return (
@@ -545,17 +598,66 @@
     }
 
 
-    function getRoom() {
-      return currentRoom;
+    function getLoggedInUser() {
+      return user_details.find(
+        function(user) {
+          return (
+            user.user_idx ===
+            loggedInUserIdx
+          );
+        }
+      ) || null;
     }
 
 
-    async function refreshCurrentRoom() {
-      currentRoom =
-        await LingoFirebase
-          .getCurrentRoom();
+    function getUserData() {
+      return userLingo_data.find(
+        function(item) {
+          return (
+            item.user_idx ===
+            loggedInUserIdx
+          );
+        }
+      ) || null;
+    }
 
-      return currentRoom;
+
+    function getRoom() {
+      const userData =
+        getUserData();
+
+      if (!userData) {
+        return null;
+      }
+
+      return userData.rooms.find(
+        function(room) {
+          return (
+            room.room_idx ===
+            currentRoomIdx
+          );
+        }
+      ) || null;
+    }
+
+
+    /*
+    ==================================================
+    PAGE GUARDS
+    ==================================================
+    */
+
+    if (!getLoggedInUser()) {
+      window.location.replace(
+        "loginregister.html"
+      );
+    }
+
+
+    if (!getRoom()) {
+      window.location.replace(
+        "welcome.html"
+      );
     }
 
 
@@ -582,7 +684,6 @@
         );
 
       select.innerHTML = "";
-
 
       supportedLanguages.forEach(
         function(language) {
@@ -641,41 +742,36 @@
       }
 
       return items
-        .map(
-          function(item, index) {
-            return {
-              index:
-                index,
+        .map(function(item, index) {
+          return {
+            index: index,
 
-              source:
-                String(
-                  item?.source || ""
-                ).trim(),
+            source:
+              String(
+                item?.source || ""
+              ).trim(),
 
-              target:
-                String(
-                  item?.target ??
-                  item?.translation ??
-                  ""
-                ).trim(),
+            target:
+              String(
+                item?.target ??
+                item?.translation ??
+                ""
+              ).trim(),
 
-              pronunciation:
-                String(
-                  item?.pronunciation ||
-                  ""
-                ).trim()
-            };
-          }
-        )
-        .filter(
-          function(item) {
-            return (
-              item.source ||
-              item.target ||
-              item.pronunciation
-            );
-          }
-        );
+            pronunciation:
+              String(
+                item?.pronunciation ||
+                ""
+              ).trim()
+          };
+        })
+        .filter(function(item) {
+          return (
+            item.source ||
+            item.target ||
+            item.pronunciation
+          );
+        });
     }
 
 
@@ -689,12 +785,10 @@
         return null;
       }
 
-
       const last =
         chat.prompts_and_answers[
           chat.prompts_and_answers.length - 1
         ];
-
 
       return (
         last &&
@@ -710,7 +804,6 @@
       const result =
         getStoredResult(chat);
 
-
       return normalizeFlow(
         chat.target_flow ||
         chat.targetFlow ||
@@ -724,7 +817,6 @@
     function getSourceFlow(chat) {
       const result =
         getStoredResult(chat);
-
 
       return normalizeFlow(
         chat.source_flow ||
@@ -746,20 +838,9 @@
       const room =
         getRoom();
 
-
       if (!room) {
         return;
       }
-
-
-      if (
-        !Array.isArray(
-          room.room_data
-        )
-      ) {
-        room.room_data = [];
-      }
-
 
       document.getElementById(
         "roomLanguages"
@@ -803,7 +884,6 @@
             chat.display_flow ===
             "source";
 
-
           const flow =
             sourceFlowActive
               ? getSourceFlow(chat)
@@ -829,23 +909,17 @@
               "div"
             );
 
-
           const messageSide =
-            chat.message_type ===
-              "interaction" ||
-            chat.is_interaction ===
-              true
+            chat.message_type === "interaction" ||
+            chat.is_interaction === true
               ? "left"
-              : chat.message_type ===
-                  "user"
+              : chat.message_type === "user"
                 ? "right"
                 : (
-                    chatIndex % 2 ===
-                    0
+                    chatIndex % 2 === 0
                       ? "right"
                       : "left"
                   );
-
 
           row.className =
             "message_row " +
@@ -973,44 +1047,14 @@
             "Reverse";
 
           reverseButton.onclick =
-            async function() {
-              const oldFlow =
-                chat.display_flow ||
-                "target";
-
-
+            function() {
               chat.display_flow =
                 sourceFlowActive
                   ? "target"
                   : "source";
 
-
+              saveData();
               renderChat();
-
-
-              try {
-                await LingoFirebase
-                  .saveChat(
-                    currentRoomIdx,
-                    chat
-                  );
-
-                await refreshCurrentRoom();
-
-              } catch (error) {
-                console.error(error);
-
-                chat.display_flow =
-                  oldFlow;
-
-                renderChat();
-
-                setStatus(
-                  error.message ||
-                  "Could not save Reverse state.",
-                  "error"
-                );
-              }
             };
 
 
@@ -1083,9 +1127,7 @@
           window.scrollTo({
             top:
               document.body.scrollHeight,
-
-            behavior:
-              "smooth"
+            behavior: "smooth"
           });
         }
       );
@@ -1120,7 +1162,6 @@
       const room =
         getRoom();
 
-
       const chat =
         room?.room_data.find(
           function(item) {
@@ -1130,7 +1171,6 @@
             );
           }
         );
-
 
       if (!chat) {
         return;
@@ -1152,7 +1192,6 @@
         chat.source_language ||
         room.source_language
       );
-
 
       populateSelect(
         "targetLang",
@@ -1177,26 +1216,20 @@
       document.getElementById(
         "sourceText"
       ).focus();
-
-
-      resizeComposer();
     }
 
 
     function cancelEdit() {
       editingChatIdx = "";
 
-
       document.getElementById(
         "sourceText"
       ).value = "";
-
 
       document.getElementById(
         "sendButton"
       ).textContent =
         "Send";
-
 
       document.getElementById(
         "cancelEditButton"
@@ -1204,22 +1237,26 @@
         "visible"
       );
 
-
       setComposerLanguages();
       setStatus("");
-      resizeComposer();
     }
 
 
     /*
     ==================================================
-    DELETE FROM FIREBASE
+    DELETE
     ==================================================
     */
 
-    async function deleteChat(
-      chatIdx
-    ) {
+    function deleteChat(chatIdx) {
+      const room =
+        getRoom();
+
+      if (!room) {
+        return;
+      }
+
+
       if (
         !confirm(
           "Delete this translation?"
@@ -1227,6 +1264,17 @@
       ) {
         return;
       }
+
+
+      room.room_data =
+        room.room_data.filter(
+          function(chat) {
+            return (
+              chat.chat_idx !==
+              chatIdx
+            );
+          }
+        );
 
 
       if (
@@ -1237,33 +1285,8 @@
       }
 
 
-      setStatus(
-        "Deleting..."
-      );
-
-
-      try {
-        await LingoFirebase
-          .deleteChat(
-            currentRoomIdx,
-            chatIdx
-          );
-
-
-        await refreshCurrentRoom();
-
-        setStatus("");
-        renderChat();
-
-      } catch (error) {
-        console.error(error);
-
-        setStatus(
-          error.message ||
-          "Could not delete translation.",
-          "error"
-        );
-      }
+      saveData();
+      renderChat();
     }
 
 
@@ -1287,12 +1310,10 @@
 
       box.className = "";
 
-
       if (message) {
         box.classList.add(
           "visible"
         );
-
 
         if (type === "error") {
           box.classList.add(
@@ -1313,7 +1334,6 @@
       const room =
         getRoom();
 
-
       if (!room) {
         return;
       }
@@ -1324,24 +1344,20 @@
           "sourceText"
         ).value.trim();
 
-
       const sourceLanguage =
         document.getElementById(
           "sourceLang"
         ).value;
-
 
       const targetLanguage =
         document.getElementById(
           "targetLang"
         ).value;
 
-
       const sendButton =
         document.getElementById(
           "sendButton"
         );
-
 
       const interactButton =
         document.getElementById(
@@ -1384,12 +1400,8 @@
         controller;
 
 
-      sendButton.disabled =
-        true;
-
-      interactButton.disabled =
-        true;
-
+      sendButton.disabled = true;
+      interactButton.disabled = true;
 
       sendButton.textContent =
         editingChatIdx
@@ -1406,8 +1418,7 @@
         const results =
           await LingoGPTResults
             .generateResults({
-              text:
-                text,
+              text: text,
 
               sourceLanguage:
                 sourceLanguage,
@@ -1422,9 +1433,9 @@
                 function(message) {
                   if (
                     activeController ===
-                      controller &&
+                    controller &&
                     message !==
-                      "Complete."
+                    "Complete."
                   ) {
                     setStatus(
                       message
@@ -1468,8 +1479,7 @@
 
           is_interaction:
             oldChat &&
-            oldChat.is_interaction ===
-              true,
+            oldChat.is_interaction === true,
 
           source_language:
             results.detectedLanguage ||
@@ -1518,34 +1528,39 @@
           ],
 
           generated_at:
-            results.generatedAt ||
-            new Date()
-              .toISOString()
+            results.generatedAt
         };
 
 
-        /*
-        Firebase saves the chat and also
-        refreshes its localStorage cache.
-        */
+        if (editingChatIdx) {
+          const index =
+            room.room_data.findIndex(
+              function(chat) {
+                return (
+                  chat.chat_idx ===
+                  editingChatIdx
+                );
+              }
+            );
 
-        await LingoFirebase
-          .saveChat(
-            currentRoomIdx,
+          if (index !== -1) {
+            room.room_data[index] =
+              chatData;
+          }
+        } else {
+          room.room_data.push(
             chatData
           );
+        }
 
 
-        await refreshCurrentRoom();
-
+        saveData();
 
         editingChatIdx = "";
-
 
         document.getElementById(
           "sourceText"
         ).value = "";
-
 
         document.getElementById(
           "cancelEditButton"
@@ -1553,11 +1568,9 @@
           "visible"
         );
 
-
         setStatus("");
         setComposerLanguages();
         renderChat();
-        resizeComposer();
 
       } catch (error) {
         if (
@@ -1572,14 +1585,12 @@
             "error"
           );
         }
-
       } finally {
         if (
           activeController ===
           controller
         ) {
-          activeController =
-            null;
+          activeController = null;
 
           sendButton.disabled =
             false;
@@ -1599,13 +1610,17 @@
     /*
     ==================================================
     INTERACT
+
+    ChatGPT reads previous room messages,
+    writes one simple source-language reply,
+    then interact.js sends that reply through
+    results.js for translation and breakdown.
     ==================================================
     */
 
     async function interactWithRoom() {
       const room =
         getRoom();
-
 
       if (!room) {
         return;
@@ -1624,12 +1639,11 @@
 
       if (
         !window.LingoGPTInteract ||
-        typeof LingoGPTInteract
-          .interact !==
+        typeof LingoGPTInteract.interact !==
           "function"
       ) {
         setStatus(
-          "interact2.js is not loaded.",
+          "interact.js is not loaded.",
           "error"
         );
 
@@ -1641,7 +1655,6 @@
         document.getElementById(
           "sendButton"
         );
-
 
       const interactButton =
         document.getElementById(
@@ -1661,11 +1674,8 @@
         controller;
 
 
-      sendButton.disabled =
-        true;
-
-      interactButton.disabled =
-        true;
+      sendButton.disabled = true;
+      interactButton.disabled = true;
 
       interactButton.textContent =
         "Thinking...";
@@ -1677,33 +1687,25 @@
 
 
       try {
-
-        /*
-        interact2.js reads the localStorage
-        cache. firebase.js keeps that cache
-        synchronized with Firestore.
-        */
-
         const results =
-          await LingoGPTInteract
-            .interact({
-              signal:
-                controller.signal,
+          await LingoGPTInteract.interact({
+            signal:
+              controller.signal,
 
-              onStatus:
-                function(message) {
-                  if (
-                    activeController ===
-                      controller &&
-                    message !==
-                      "Complete."
-                  ) {
-                    setStatus(
-                      message
-                    );
-                  }
+            onStatus:
+              function(message) {
+                if (
+                  activeController ===
+                    controller &&
+                  message !==
+                    "Complete."
+                ) {
+                  setStatus(
+                    message
+                  );
                 }
-            });
+              }
+          });
 
 
         if (
@@ -1776,20 +1778,16 @@
 
           generated_at:
             results.generatedAt ||
-            new Date()
-              .toISOString()
+            new Date().toISOString()
         };
 
 
-        await LingoFirebase
-          .saveChat(
-            currentRoomIdx,
-            chatData
-          );
+        room.room_data.push(
+          chatData
+        );
 
 
-        await refreshCurrentRoom();
-
+        saveData();
 
         setStatus("");
         renderChat();
@@ -1813,8 +1811,7 @@
           activeController ===
           controller
         ) {
-          activeController =
-            null;
+          activeController = null;
 
           sendButton.disabled =
             false;
@@ -1839,18 +1836,15 @@
       const room =
         getRoom();
 
-
       if (!room) {
         return;
       }
-
 
       populateSelect(
         "sourceLang",
         room.source_language ||
         "English"
       );
-
 
       populateSelect(
         "targetLang",
@@ -1874,97 +1868,6 @@
           textarea.scrollHeight,
           120
         ) + "px";
-    }
-
-
-    /*
-    ==================================================
-    START FROM FIREBASE
-    ==================================================
-    */
-
-    async function startPage() {
-      setStatus(
-        "Loading conversation..."
-      );
-
-
-      try {
-
-        /*
-        1. Verify session
-        2. Download Firebase data
-        3. Refresh localStorage cache
-        */
-
-        const synced =
-          await LingoFirebase
-            .sync();
-
-
-        if (
-          !synced ||
-          !synced.user
-        ) {
-          window.location.replace(
-            "loginregister.html"
-          );
-
-          return;
-        }
-
-
-        currentRoomIdx =
-          LingoFirebase
-            .getCurrentRoomIdx();
-
-
-        if (!currentRoomIdx) {
-          window.location.replace(
-            "welcome.html"
-          );
-
-          return;
-        }
-
-
-        currentRoom =
-          await LingoFirebase
-            .getCurrentRoom();
-
-
-        if (!currentRoom) {
-          window.location.replace(
-            "welcome.html"
-          );
-
-          return;
-        }
-
-
-        if (
-          !Array.isArray(
-            currentRoom.room_data
-          )
-        ) {
-          currentRoom.room_data = [];
-        }
-
-
-        setComposerLanguages();
-        renderChat();
-        resizeComposer();
-        setStatus("");
-
-      } catch (error) {
-        console.error(error);
-
-        setStatus(
-          error.message ||
-          "Could not load this room from Firebase.",
-          "error"
-        );
-      }
     }
 
 
@@ -2023,20 +1926,39 @@
       "keydown",
       function(event) {
         if (
-          event.key ===
-            "Enter" &&
+          event.key === "Enter" &&
           !event.shiftKey
         ) {
           event.preventDefault();
-
           sendTranslation();
         }
       }
     );
 
 
-    startPage();
+    /*
+    ==================================================
+    START
+    ==================================================
+    */
 
+    const room =
+      getRoom();
+
+    if (room) {
+      if (
+        !Array.isArray(
+          room.room_data
+        )
+      ) {
+        room.room_data = [];
+        saveData();
+      }
+
+      setComposerLanguages();
+      renderChat();
+      resizeComposer();
+    }
   </script>
 
 </body>

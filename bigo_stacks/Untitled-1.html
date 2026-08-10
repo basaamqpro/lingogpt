@@ -1,0 +1,154 @@
+
+I wanted to create a chatting page with notifications where you can create different rooms for chatting page
+
+Users will be able to create text, record audio directly, upload picture, picture link, video, video link, youtube link, pdf and pdf link
+
+Users will be able to respond only to one message at a time, if you respond to someones message they will be notified
+
+If you tag someone in the message they will be notified
+
+There will also be typing indicators
+
+and you can react to every message
+
+
+We will be using firebase I'll show you the working configuration firebase, and local storage
+
+How many new and unread messages the user has will be shown to the user
+
+This is only a tutuorial for learning how to use firebase
+
+
+  function createUserIdx(){
+
+            return"user_"+
+                Date.now()+
+                "_"+
+                Math.floor(
+                    Math.random()*10000
+                );
+        }
+
+
+        all the related userdetails for example user_db_details ofcourse user_db_details will add more properties and value,
+        for now it will just username, password, profile_pic and user_dx I think
+   user_db_details.html = [
+              { "username": "Basaam123",
+                "password": "passwordB",
+                "profile_pic": "Basaam.png",
+                "user_idx": createUserIdx(),
+                created_at: timestamp settings: 
+                allow_mentions: true notification_mode: "all"
+                ...
+            },
+
+            { "username": "User2",
+                "password": "passwordB",
+                "profile_pic": "imagee2.jpg",
+                "user_idx": createUserIdx()
+                ...
+            },
+            
+   ]
+
+    register.html
+    login.html
+    create_room.html
+    view_rooms.htmls
+    room_chat.html
+
+
+   A room can only
+
+   var rooms_collection = [
+    {
+                "room_idx": createRoomIdx(),
+                "room_tite: "Hi everybody",
+                "time_created": time
+                "last_three_messages": []
+                "number_of_messages"
+                "last_message_time"
+                other properties...
+                ...
+            },
+
+            ...
+   ]
+   
+   
+  var groupchat_data_room0 = [
+                {
+                "user_idx": createUserIdx(),
+                "chat_value": "Hi everybody",
+                "chat_idx": "chat_idx"
+                "time_created": time,
+                "time_last_edited": time
+                
+                other properties...
+                ...
+            },
+
+            ....
+  ]
+
+
+index.html
+Will link to my other personal links, including register.html, login.html
+
+All .html pages will have a fixed menu bar on the top 
+
+<menu>
+  <p>Home
+  <p>login
+  <p>Register
+  <p>settings
+</menu>
+
+
+  ...
+register.html
+ <form >
+    <input file profile picture>
+    <input username/>
+    <input password/>
+    ...
+  </form>
+login.html
+  <form >
+    <input username/>
+    <input password/>
+  </form>
+
+create_room.html
+<form >
+    <input title/>
+  </form>
+
+view_rooms.htmls
+
+Rooms will sorted by the latest messages
+  for(a=0; a<=groupchat_data_room0.length+-1; a++) {
+    view rooms
+  }
+
+
+view_chat.html
+for(a=0; a<=groupchat_data_room0.length+-1; a++) {
+
+   view chat
+
+   <form >
+    <tagplus_user />
+   <input >
+    <send>
+  </form>
+}
+
+settings.html
+Will allow a user
+To accept to be tagged or not
+To accept notifications every 5 messages, or 10,
+To accept notifications only if he is tagged
+
+
+Very simple

@@ -1,0 +1,5141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Master Language - Classroom</title>
+
+
+    <style>
+
+    /* ======================================================
+       MASTER LANGUAGE - COLOURFUL CLASSROOM THEME
+    ====================================================== */
+
+    * {
+        box-sizing: border-box;
+    }
+
+
+    :root {
+
+        /* Main backgrounds */
+
+        --background:
+            #f4f7ff;
+
+        --background-secondary:
+            #eef2ff;
+
+        --card:
+            rgba(255, 255, 255, 0.95);
+
+
+        /* Main brand colours */
+
+        --primary:
+            #5b4df7;
+
+        --primary-dark:
+            #4338ca;
+
+        --primary-light:
+            #eef0ff;
+
+        --secondary:
+            #0ea5e9;
+
+        --secondary-light:
+            #e8f7ff;
+
+        --cyan:
+            #06b6d4;
+
+        --green:
+            #10b981;
+
+        --green-dark:
+            #047857;
+
+        --green-light:
+            #ecfdf5;
+
+        --orange:
+            #f59e0b;
+
+        --orange-light:
+            #fff7e6;
+
+        --pink:
+            #ec4899;
+
+        --pink-light:
+            #fff0f7;
+
+
+        /* Text */
+
+        --text:
+            #1e293b;
+
+        --text-soft:
+            #475569;
+
+        --muted:
+            #64748b;
+
+
+        /* Layout */
+
+        --border:
+            #dce3f3;
+
+        --soft:
+            #f7f9ff;
+
+
+        /* Status */
+
+        --success:
+            #047857;
+
+        --success-bg:
+            #ecfdf5;
+
+        --error:
+            #b91c1c;
+
+        --error-bg:
+            #fef2f2;
+
+
+        /* Shadows */
+
+        --shadow:
+            0 10px 30px rgba(67, 56, 202, 0.08);
+
+        --shadow-hover:
+            0 16px 35px rgba(67, 56, 202, 0.14);
+
+    }
+
+
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+
+    body {
+
+        margin: 0;
+
+        min-height: 100vh;
+
+        font-family:
+            Arial,
+            Helvetica,
+            sans-serif;
+
+        background:
+
+            radial-gradient(
+                circle at top left,
+                rgba(91, 77, 247, 0.12),
+                transparent 35%
+            ),
+
+            radial-gradient(
+                circle at top right,
+                rgba(14, 165, 233, 0.12),
+                transparent 35%
+            ),
+
+            linear-gradient(
+                135deg,
+                #f8faff,
+                #eef3ff,
+                #f7fbff
+            );
+
+        background-attachment: fixed;
+
+        color: var(--text);
+
+    }
+
+
+
+    button,
+    textarea,
+    input {
+
+        font: inherit;
+
+    }
+
+
+    button {
+
+        cursor: pointer;
+
+        transition:
+            transform 0.18s ease,
+            box-shadow 0.18s ease,
+            background 0.18s ease,
+            border 0.18s ease;
+
+    }
+
+
+    button:hover:not(:disabled) {
+
+        transform:
+            translateY(-1px);
+
+    }
+
+
+    .hidden {
+
+        display: none !important;
+
+    }
+
+
+
+    /* ======================================================
+       TOP BAR
+    ====================================================== */
+
+    #top_bar {
+
+        position: sticky;
+
+        top: 0;
+
+        z-index: 20;
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        gap: 15px;
+
+        padding:
+            15px 4%;
+
+        background:
+            rgba(
+                255,
+                255,
+                255,
+                0.88
+            );
+
+        backdrop-filter:
+            blur(16px);
+
+        -webkit-backdrop-filter:
+            blur(16px);
+
+        border-bottom:
+            1px solid
+            rgba(
+                91,
+                77,
+                247,
+                0.13
+            );
+
+        box-shadow:
+            0 5px 20px
+            rgba(
+                67,
+                56,
+                202,
+                0.05
+            );
+
+    }
+
+
+    #top_bar_left {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 15px;
+
+    }
+
+
+    #brand {
+
+        font-weight: 800;
+
+        font-size: 21px;
+
+        background:
+            linear-gradient(
+                90deg,
+                var(--primary),
+                var(--secondary)
+            );
+
+        -webkit-background-clip:
+            text;
+
+        background-clip:
+            text;
+
+        color:
+            transparent;
+
+    }
+
+
+    #room_name_top {
+
+        color:
+            var(--muted);
+
+        font-size:
+            14px;
+
+        margin-top:
+            3px;
+
+    }
+
+
+    #back_button {
+
+        border:
+            1px solid
+            #d9dcff;
+
+        background:
+            var(--primary-light);
+
+        color:
+            var(--primary-dark);
+
+        border-radius:
+            11px;
+
+        padding:
+            10px 15px;
+
+        font-weight:
+            600;
+
+    }
+
+
+    #back_button:hover {
+
+        background:
+            #e1e4ff;
+
+        box-shadow:
+            0 7px 18px
+            rgba(
+                91,
+                77,
+                247,
+                0.15
+            );
+
+    }
+
+
+
+    /* ======================================================
+       PAGE
+    ====================================================== */
+
+    #page {
+
+        width:
+            94%;
+
+        max-width:
+            1050px;
+
+        margin:
+            0 auto;
+
+        padding:
+            28px 0 70px;
+
+    }
+
+
+
+    /* ======================================================
+       COURSE HEADER
+    ====================================================== */
+
+    #course_header {
+
+        position:
+            relative;
+
+        overflow:
+            hidden;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.98
+                ),
+                rgba(
+                    243,
+                    246,
+                    255,
+                    0.98
+                )
+            );
+
+        border:
+            1px solid
+            rgba(
+                91,
+                77,
+                247,
+                0.14
+            );
+
+        border-radius:
+            22px;
+
+        padding:
+            27px;
+
+        margin-bottom:
+            20px;
+
+        box-shadow:
+            var(--shadow);
+
+    }
+
+
+    #course_header::before {
+
+        content:
+            "";
+
+        position:
+            absolute;
+
+        width:
+            170px;
+
+        height:
+            170px;
+
+        right:
+            -70px;
+
+        top:
+            -80px;
+
+        border-radius:
+            50%;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                rgba(
+                    91,
+                    77,
+                    247,
+                    0.18
+                ),
+                rgba(
+                    14,
+                    165,
+                    233,
+                    0.12
+                )
+            );
+
+    }
+
+
+    #language_direction {
+
+        display:
+            inline-block;
+
+        color:
+            var(--primary-dark);
+
+        background:
+            var(--primary-light);
+
+        border:
+            1px solid
+            #dcddff;
+
+        border-radius:
+            30px;
+
+        margin-bottom:
+            12px;
+
+        padding:
+            7px 13px;
+
+        font-size:
+            13px;
+
+        font-weight:
+            700;
+
+    }
+
+
+    #course_title {
+
+        position:
+            relative;
+
+        margin:
+            0;
+
+        font-size:
+            30px;
+
+        color:
+            #182039;
+
+    }
+
+
+    #course_position {
+
+        position:
+            relative;
+
+        margin-top:
+            10px;
+
+        color:
+            var(--muted);
+
+        font-weight:
+            500;
+
+    }
+
+
+
+    /* ======================================================
+       COVERAGE
+    ====================================================== */
+
+    #coverage_area {
+
+        position:
+            relative;
+
+        margin-top:
+            22px;
+
+    }
+
+
+    #coverage_text {
+
+        display:
+            flex;
+
+        justify-content:
+            space-between;
+
+        font-size:
+            13px;
+
+        margin-bottom:
+            8px;
+
+        color:
+            var(--muted);
+
+        font-weight:
+            600;
+
+    }
+
+
+    #coverage_percentage {
+
+        color:
+            var(--primary);
+
+        font-weight:
+            800;
+
+    }
+
+
+    #coverage_bar {
+
+        width:
+            100%;
+
+        height:
+            11px;
+
+        border-radius:
+            20px;
+
+        overflow:
+            hidden;
+
+        background:
+            #e6e9f7;
+
+    }
+
+
+    #coverage_fill {
+
+        width:
+            0%;
+
+        height:
+            100%;
+
+        border-radius:
+            20px;
+
+        background:
+
+            linear-gradient(
+                90deg,
+                var(--primary),
+                var(--secondary),
+                var(--cyan)
+            );
+
+        box-shadow:
+            0 0 12px
+            rgba(
+                14,
+                165,
+                233,
+                0.4
+            );
+
+        transition:
+            width 0.4s ease;
+
+    }
+
+
+
+    /* ======================================================
+       STATUS
+    ====================================================== */
+
+    #status {
+
+        display:
+            none;
+
+        margin-bottom:
+            20px;
+
+        padding:
+            15px 18px;
+
+        border-radius:
+            13px;
+
+        font-weight:
+            600;
+
+    }
+
+
+    #status.loading {
+
+        display:
+            block;
+
+        background:
+            #eff6ff;
+
+        color:
+            #1d4ed8;
+
+        border:
+            1px solid
+            #bfdbfe;
+
+    }
+
+
+    #status.error {
+
+        display:
+            block;
+
+        background:
+            var(--error-bg);
+
+        color:
+            var(--error);
+
+        border:
+            1px solid
+            #fecaca;
+
+    }
+
+
+    #status.success {
+
+        display:
+            block;
+
+        background:
+            var(--success-bg);
+
+        color:
+            var(--success);
+
+        border:
+            1px solid
+            #a7f3d0;
+
+    }
+
+
+
+    /* ======================================================
+       TARGET EXPRESSION
+    ====================================================== */
+
+    #target_card {
+
+        position:
+            relative;
+
+        overflow:
+            hidden;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #5b4df7,
+                #674bea,
+                #0ea5e9
+            );
+
+        color:
+            white;
+
+        border-radius:
+            22px;
+
+        padding:
+            31px;
+
+        margin-bottom:
+            20px;
+
+        box-shadow:
+
+            0 15px 35px
+            rgba(
+                91,
+                77,
+                247,
+                0.27
+            );
+
+    }
+
+
+    #target_card::after {
+
+        content:
+            "";
+
+        position:
+            absolute;
+
+        width:
+            180px;
+
+        height:
+            180px;
+
+        border-radius:
+            50%;
+
+        background:
+            rgba(
+                255,
+                255,
+                255,
+                0.09
+            );
+
+        right:
+            -60px;
+
+        bottom:
+            -90px;
+
+    }
+
+
+    #target_label {
+
+        position:
+            relative;
+
+        z-index:
+            1;
+
+        opacity:
+            0.8;
+
+        font-size:
+            12px;
+
+        margin-bottom:
+            11px;
+
+        text-transform:
+            uppercase;
+
+        letter-spacing:
+            1.4px;
+
+        font-weight:
+            700;
+
+    }
+
+
+    #target_expression {
+
+        position:
+            relative;
+
+        z-index:
+            1;
+
+        margin:
+            0;
+
+        font-size:
+            38px;
+
+        line-height:
+            1.3;
+
+    }
+
+
+    #target_translation {
+
+        position:
+            relative;
+
+        z-index:
+            1;
+
+        margin-top:
+            13px;
+
+        font-size:
+            20px;
+
+        opacity:
+            0.96;
+
+    }
+
+
+    #target_pronunciation {
+
+        position:
+            relative;
+
+        z-index:
+            1;
+
+        display:
+            inline-block;
+
+        margin-top:
+            15px;
+
+        padding:
+            8px 11px;
+
+        border-radius:
+            8px;
+
+        background:
+            rgba(
+                255,
+                255,
+                255,
+                0.12
+            );
+
+        opacity:
+            0.92;
+
+    }
+
+
+    #target_literal {
+
+        position:
+            relative;
+
+        z-index:
+            1;
+
+        margin-top:
+            11px;
+
+        opacity:
+            0.8;
+
+        font-size:
+            14px;
+
+    }
+
+
+
+    /* ======================================================
+       CONTENT SECTIONS
+    ====================================================== */
+
+    .lesson_section {
+
+        position:
+            relative;
+
+        background:
+            var(--card);
+
+        border:
+            1px solid
+            var(--border);
+
+        border-radius:
+            19px;
+
+        padding:
+            25px;
+
+        margin-bottom:
+            18px;
+
+        box-shadow:
+            var(--shadow);
+
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+
+    }
+
+
+    .lesson_section:hover {
+
+        transform:
+            translateY(-2px);
+
+        box-shadow:
+            var(--shadow-hover);
+
+    }
+
+
+    .lesson_section h2 {
+
+        margin-top:
+            0;
+
+        margin-bottom:
+            18px;
+
+        font-size:
+            21px;
+
+        color:
+            var(--primary-dark);
+
+        border-bottom:
+            2px solid
+            #eef0ff;
+
+        padding-bottom:
+            11px;
+
+    }
+
+
+    .lesson_section p {
+
+        line-height:
+            1.75;
+
+        color:
+            var(--text-soft);
+
+    }
+
+
+
+    /* ======================================================
+       ITEM CARDS
+    ====================================================== */
+
+    .item_card {
+
+        padding:
+            18px;
+
+        border:
+            1px solid
+            #dde4f4;
+
+        border-radius:
+            14px;
+
+        margin-bottom:
+            13px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #f8faff
+            );
+
+        box-shadow:
+            0 4px 13px
+            rgba(
+                51,
+                65,
+                85,
+                0.04
+            );
+
+    }
+
+
+    .item_card:nth-child(2n) {
+
+        border-left:
+            4px solid
+            var(--secondary);
+
+    }
+
+
+    .item_card:nth-child(2n + 1) {
+
+        border-left:
+            4px solid
+            var(--primary);
+
+    }
+
+
+    .item_card:last-child {
+
+        margin-bottom:
+            0;
+
+    }
+
+
+    .item_title {
+
+        font-weight:
+            800;
+
+        font-size:
+            18px;
+
+        margin-bottom:
+            7px;
+
+        color:
+            var(--primary-dark);
+
+    }
+
+
+    .item_meaning {
+
+        display:
+            inline-block;
+
+        color:
+            #0369a1;
+
+        background:
+            var(--secondary-light);
+
+        border-radius:
+            7px;
+
+        padding:
+            5px 9px;
+
+        margin-bottom:
+            8px;
+
+        font-weight:
+            600;
+
+    }
+
+
+    .item_explanation {
+
+        line-height:
+            1.7;
+
+    }
+
+
+
+    /* ======================================================
+       EXAMPLES
+    ====================================================== */
+
+    .example {
+
+        border-left:
+            5px solid
+            var(--secondary);
+
+        padding:
+            14px 16px;
+
+        margin-bottom:
+            12px;
+
+        background:
+
+            linear-gradient(
+                90deg,
+                #eff9ff,
+                #f8fcff
+            );
+
+        border-radius:
+            0 12px 12px 0;
+
+    }
+
+
+    .example:nth-child(2n) {
+
+        border-left-color:
+            var(--green);
+
+        background:
+
+            linear-gradient(
+                90deg,
+                #effcf7,
+                #f9fffc
+            );
+
+    }
+
+
+    .example_target {
+
+        font-weight:
+            800;
+
+        margin-bottom:
+            6px;
+
+        color:
+            #0f3d61;
+
+        font-size:
+            17px;
+
+    }
+
+
+    .example_source {
+
+        color:
+            var(--text-soft);
+
+    }
+
+
+    .example_pronunciation {
+
+        color:
+            #7c3aed;
+
+        margin-top:
+            7px;
+
+        font-size:
+            14px;
+
+        font-style:
+            italic;
+
+    }
+
+
+
+    /* ======================================================
+       DIALOGUE
+    ====================================================== */
+
+    .dialogue_line {
+
+        display:
+            grid;
+
+        grid-template-columns:
+            48px 1fr;
+
+        gap:
+            11px;
+
+        margin-bottom:
+            14px;
+
+    }
+
+
+    .speaker {
+
+        display:
+            flex;
+
+        align-items:
+            center;
+
+        justify-content:
+            center;
+
+        width:
+            40px;
+
+        height:
+            40px;
+
+        border-radius:
+            50%;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                var(--primary),
+                var(--secondary)
+            );
+
+        color:
+            white;
+
+        font-weight:
+            800;
+
+        box-shadow:
+            0 5px 12px
+            rgba(
+                91,
+                77,
+                247,
+                0.25
+            );
+
+    }
+
+
+    .dialogue_line:nth-child(2n)
+    .speaker {
+
+        background:
+
+            linear-gradient(
+                135deg,
+                var(--green),
+                #14b8a6
+            );
+
+    }
+
+
+    .dialogue_content {
+
+        padding:
+            14px 16px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #f5f4ff,
+                #f5fbff
+            );
+
+        border:
+            1px solid
+            #e3e5ff;
+
+        border-radius:
+            13px;
+
+    }
+
+
+    .dialogue_target {
+
+        font-weight:
+            800;
+
+        color:
+            #312e81;
+
+    }
+
+
+    .dialogue_source {
+
+        margin-top:
+            6px;
+
+        color:
+            var(--muted);
+
+    }
+
+
+
+    /* ======================================================
+       PRACTICE
+    ====================================================== */
+
+    .practice_question {
+
+        border:
+            1px solid
+            #dbe2f3;
+
+        border-radius:
+            15px;
+
+        padding:
+            19px;
+
+        margin-bottom:
+            15px;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #fafbff
+            );
+
+        box-shadow:
+            0 4px 14px
+            rgba(
+                51,
+                65,
+                85,
+                0.04
+            );
+
+    }
+
+
+    .practice_number {
+
+        display:
+            inline-block;
+
+        color:
+            var(--primary-dark);
+
+        background:
+            var(--primary-light);
+
+        font-size:
+            12px;
+
+        font-weight:
+            800;
+
+        margin-bottom:
+            10px;
+
+        padding:
+            5px 9px;
+
+        border-radius:
+            20px;
+
+    }
+
+
+    .practice_instruction {
+
+        font-weight:
+            800;
+
+        margin-bottom:
+            9px;
+
+        color:
+            var(--text);
+
+    }
+
+
+    .practice_options {
+
+        display:
+            flex;
+
+        flex-direction:
+            column;
+
+        gap:
+            8px;
+
+        margin-top:
+            13px;
+
+    }
+
+
+    .practice_option {
+
+        border:
+            1px solid
+            #dce3f2;
+
+        background:
+            #ffffff;
+
+        color:
+            var(--text);
+
+        padding:
+            11px 13px;
+
+        border-radius:
+            10px;
+
+        text-align:
+            left;
+
+    }
+
+
+    .practice_option:hover {
+
+        border-color:
+            #a5b4fc;
+
+        background:
+            var(--primary-light);
+
+        color:
+            var(--primary-dark);
+
+    }
+
+
+    .show_answer_button {
+
+        margin-top:
+            14px;
+
+        border:
+            none;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #f59e0b,
+                #f97316
+            );
+
+        color:
+            white;
+
+        padding:
+            10px 14px;
+
+        border-radius:
+            9px;
+
+        font-weight:
+            700;
+
+    }
+
+
+    .show_answer_button:hover {
+
+        box-shadow:
+            0 7px 16px
+            rgba(
+                245,
+                158,
+                11,
+                0.25
+            );
+
+    }
+
+
+    .practice_answer {
+
+        display:
+            none;
+
+        margin-top:
+            14px;
+
+        padding:
+            14px;
+
+        border-radius:
+            10px;
+
+        background:
+            var(--green-light);
+
+        border:
+            1px solid
+            #a7f3d0;
+
+        color:
+            var(--green-dark);
+
+        white-space:
+            pre-line;
+
+    }
+
+
+    .practice_answer.visible {
+
+        display:
+            block;
+
+    }
+
+
+
+    /* ======================================================
+       NAVIGATION
+    ====================================================== */
+
+    #lesson_navigation {
+
+        display:
+            flex;
+
+        gap:
+            13px;
+
+        margin:
+            27px 0;
+
+    }
+
+
+    #lesson_navigation button {
+
+        flex:
+            1;
+
+        min-height:
+            50px;
+
+        border-radius:
+            13px;
+
+        font-weight:
+            800;
+
+        font-size:
+            15px;
+
+    }
+
+
+    #previous_button {
+
+        background:
+            #ffffff;
+
+        color:
+            var(--primary-dark);
+
+        border:
+            1px solid
+            #c7d2fe !important;
+
+    }
+
+
+    #previous_button:hover:not(:disabled) {
+
+        background:
+            var(--primary-light);
+
+        box-shadow:
+            0 7px 17px
+            rgba(
+                91,
+                77,
+                247,
+                0.12
+            );
+
+    }
+
+
+    #next_button {
+
+        background:
+
+            linear-gradient(
+                135deg,
+                var(--primary),
+                var(--secondary)
+            );
+
+        color:
+            white;
+
+        border:
+            none !important;
+
+        box-shadow:
+            0 8px 20px
+            rgba(
+                91,
+                77,
+                247,
+                0.24
+            );
+
+    }
+
+
+    #next_button:hover:not(:disabled) {
+
+        box-shadow:
+            0 12px 24px
+            rgba(
+                91,
+                77,
+                247,
+                0.33
+            );
+
+    }
+
+
+    button:disabled {
+
+        opacity:
+            0.45;
+
+        cursor:
+            not-allowed;
+
+        transform:
+            none !important;
+
+        box-shadow:
+            none !important;
+
+    }
+
+
+
+    /* ======================================================
+       TOOLS
+    ====================================================== */
+
+    #tools {
+
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap:
+            19px;
+
+    }
+
+
+    .tool_card {
+
+        position:
+            relative;
+
+        overflow:
+            hidden;
+
+        background:
+            rgba(
+                255,
+                255,
+                255,
+                0.96
+            );
+
+        border:
+            1px solid
+            var(--border);
+
+        border-radius:
+            20px;
+
+        padding:
+            24px;
+
+        box-shadow:
+            var(--shadow);
+
+    }
+
+
+    .tool_card:first-child {
+
+        border-top:
+            5px solid
+            var(--primary);
+
+    }
+
+
+    .tool_card:last-child {
+
+        border-top:
+            5px solid
+            var(--green);
+
+    }
+
+
+    .tool_card h2 {
+
+        margin-top:
+            0;
+
+        color:
+            var(--primary-dark);
+
+    }
+
+
+    .tool_card:last-child h2 {
+
+        color:
+            var(--green-dark);
+
+    }
+
+
+    .tool_card p {
+
+        color:
+            var(--muted);
+
+        line-height:
+            1.6;
+
+    }
+
+
+    .tool_button {
+
+        border:
+            none;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                var(--primary),
+                var(--secondary)
+            );
+
+        color:
+            white;
+
+        padding:
+            12px 19px;
+
+        border-radius:
+            11px;
+
+        font-weight:
+            700;
+
+        box-shadow:
+            0 6px 16px
+            rgba(
+                91,
+                77,
+                247,
+                0.2
+            );
+
+    }
+
+
+    #practice_button {
+
+        background:
+
+            linear-gradient(
+                135deg,
+                var(--green),
+                #14b8a6
+            );
+
+        box-shadow:
+            0 6px 16px
+            rgba(
+                16,
+                185,
+                129,
+                0.2
+            );
+
+    }
+
+
+
+    /* ======================================================
+       TEACHER CHAT
+    ====================================================== */
+
+    #teacher_chat {
+
+        max-height:
+            430px;
+
+        overflow-y:
+            auto;
+
+        margin-bottom:
+            15px;
+
+        padding-right:
+            4px;
+
+    }
+
+
+    .chat_message {
+
+        margin-bottom:
+            12px;
+
+        padding:
+            13px 15px;
+
+        border-radius:
+            14px;
+
+        line-height:
+            1.65;
+
+        white-space:
+            pre-line;
+
+    }
+
+
+    .chat_user {
+
+        margin-left:
+            15%;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #e9e8ff,
+                #edf5ff
+            );
+
+        color:
+            #312e81;
+
+        border:
+            1px solid
+            #d8d8ff;
+
+    }
+
+
+    .chat_assistant {
+
+        margin-right:
+            15%;
+
+        background:
+
+            linear-gradient(
+                135deg,
+                #ecfdf5,
+                #f0fdfa
+            );
+
+        color:
+            #065f46;
+
+        border:
+            1px solid
+            #bbf7d0;
+
+    }
+
+
+    #teacher_input {
+
+        width:
+            100%;
+
+        min-height:
+            95px;
+
+        resize:
+            vertical;
+
+        padding:
+            13px;
+
+        border-radius:
+            12px;
+
+        border:
+            1px solid
+            #cfd8ed;
+
+        margin-bottom:
+            10px;
+
+        background:
+            #fbfcff;
+
+        color:
+            var(--text);
+
+        outline:
+            none;
+
+        transition:
+            border 0.2s,
+            box-shadow 0.2s;
+
+    }
+
+
+    #teacher_input:focus {
+
+        border-color:
+            var(--primary);
+
+        box-shadow:
+            0 0 0 4px
+            rgba(
+                91,
+                77,
+                247,
+                0.1
+            );
+
+        background:
+            white;
+
+    }
+
+
+
+    /* ======================================================
+       GENERATED PRACTICE
+    ====================================================== */
+
+    #generated_practice_area {
+
+        margin-top:
+            20px;
+
+    }
+
+
+    #generated_practice_area h3 {
+
+        color:
+            var(--green-dark);
+
+    }
+
+
+
+    /* ======================================================
+       LISTS
+    ====================================================== */
+
+    .lesson_section ul {
+
+        padding-left:
+            24px;
+
+    }
+
+
+    .lesson_section li {
+
+        margin-bottom:
+            9px;
+
+        line-height:
+            1.6;
+
+        color:
+            var(--text-soft);
+
+    }
+
+
+    .lesson_section li::marker {
+
+        color:
+            var(--primary);
+
+    }
+
+
+
+    /* ======================================================
+       SCROLLBAR
+    ====================================================== */
+
+    ::-webkit-scrollbar {
+
+        width:
+            9px;
+
+        height:
+            9px;
+
+    }
+
+
+    ::-webkit-scrollbar-track {
+
+        background:
+            #eef1f8;
+
+    }
+
+
+    ::-webkit-scrollbar-thumb {
+
+        background:
+
+            linear-gradient(
+                var(--primary),
+                var(--secondary)
+            );
+
+        border-radius:
+            10px;
+
+    }
+
+
+
+    /* ======================================================
+       RESPONSIVE
+    ====================================================== */
+
+    @media (
+        max-width: 750px
+    ) {
+
+        #top_bar {
+
+            align-items:
+                flex-start;
+
+        }
+
+
+        #room_name_top {
+
+            display:
+                none;
+
+        }
+
+
+        #page {
+
+            width:
+                93%;
+
+            padding-top:
+                20px;
+
+        }
+
+
+        #course_header {
+
+            padding:
+                21px;
+
+        }
+
+
+        #course_title {
+
+            font-size:
+                24px;
+
+        }
+
+
+        #target_card {
+
+            padding:
+                24px;
+
+        }
+
+
+        #target_expression {
+
+            font-size:
+                29px;
+
+        }
+
+
+        #target_translation {
+
+            font-size:
+                18px;
+
+        }
+
+
+        .lesson_section {
+
+            padding:
+                20px;
+
+        }
+
+
+        #tools {
+
+            grid-template-columns:
+                1fr;
+
+        }
+
+
+        #lesson_navigation {
+
+            flex-direction:
+                column;
+
+        }
+
+
+        .chat_user {
+
+            margin-left:
+                7%;
+
+        }
+
+
+        .chat_assistant {
+
+            margin-right:
+                7%;
+
+        }
+
+    }
+
+
+
+    /* ======================================================
+       SMALL PHONES
+    ====================================================== */
+
+    @media (
+        max-width: 430px
+    ) {
+
+        #brand {
+
+            font-size:
+                18px;
+
+        }
+
+
+        #back_button {
+
+            padding:
+                8px 10px;
+
+            font-size:
+                13px;
+
+        }
+
+
+        #course_title {
+
+            font-size:
+                21px;
+
+        }
+
+
+        #target_expression {
+
+            font-size:
+                25px;
+
+        }
+
+
+        .lesson_section h2 {
+
+            font-size:
+                19px;
+
+        }
+
+    }
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ========================================================
+     TOP BAR
+========================================================= -->
+
+<div id="top_bar">
+
+    <div id="top_bar_left">
+
+        <div>
+
+            <div id="brand">
+                Master Language
+            </div>
+
+            <div id="room_name_top">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <button id="back_button">
+        Learning Rooms
+    </button>
+
+</div>
+
+
+
+<!-- ========================================================
+     PAGE
+========================================================= -->
+
+<main id="page">
+
+
+    <!-- ====================================================
+         COURSE INFORMATION
+    ===================================================== -->
+
+    <section id="course_header">
+
+        <div id="language_direction">
+        </div>
+
+        <h1 id="course_title">
+            Loading lesson...
+        </h1>
+
+        <div id="course_position">
+        </div>
+
+
+        <div id="coverage_area">
+
+            <div id="coverage_text">
+
+                <span>
+                    Lesson coverage
+                </span>
+
+                <span id="coverage_percentage">
+                    0%
+                </span>
+
+            </div>
+
+
+            <div id="coverage_bar">
+
+                <div id="coverage_fill">
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ====================================================
+         STATUS
+    ===================================================== -->
+
+    <div id="status">
+    </div>
+
+
+
+    <!-- ====================================================
+         GENERATED LESSON
+    ===================================================== -->
+
+    <div id="lesson_area">
+
+        <section id="target_card" class="hidden">
+
+            <div id="target_label">
+                Target Expression
+            </div>
+
+            <h2
+                id="target_expression"
+                dir="auto"
+            >
+            </h2>
+
+            <div
+                id="target_translation"
+                dir="auto"
+            >
+            </div>
+
+            <div
+                id="target_pronunciation"
+                dir="auto"
+            >
+            </div>
+
+            <div
+                id="target_literal"
+                dir="auto"
+            >
+            </div>
+
+        </section>
+
+
+        <div id="dynamic_lesson_sections">
+        </div>
+
+    </div>
+
+
+
+    <!-- ====================================================
+         NAVIGATION
+    ===================================================== -->
+
+    <div id="lesson_navigation">
+
+        <button id="previous_button">
+
+            ← Previous
+
+        </button>
+
+
+        <button id="next_button">
+
+            Next Part →
+
+        </button>
+
+    </div>
+
+
+
+    <!-- ====================================================
+         EXTRA AI TOOLS
+    ===================================================== -->
+
+    <section id="tools">
+
+
+        <!-- ================================================
+             ASK TEACHER
+        ================================================= -->
+
+        <div class="tool_card">
+
+            <h2>
+                Ask Teacher
+            </h2>
+
+            <p>
+                Ask about anything in the current lesson.
+                This will not move you to another lesson.
+            </p>
+
+
+            <div id="teacher_chat">
+            </div>
+
+
+            <textarea
+                id="teacher_input"
+                placeholder="Ask your teacher..."
+            ></textarea>
+
+
+            <button
+                id="ask_teacher_button"
+                class="tool_button"
+            >
+
+                Ask Teacher
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ================================================
+             EXTRA PRACTICE
+        ================================================= -->
+
+        <div class="tool_card">
+
+            <h2>
+                Practice
+            </h2>
+
+            <p>
+                Generate fresh exercises using what you have
+                already learned.
+            </p>
+
+
+            <button
+                id="practice_button"
+                class="tool_button"
+            >
+
+                Generate Practice
+
+            </button>
+
+
+            <div id="generated_practice_area">
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<script type="module">
+
+
+// ============================================================
+// IMPORT MASTER MACHINE
+// ============================================================
+
+import {
+
+    machineMasterGPT
+
+} from "./js/machine_master_gpt.js";
+
+
+
+// ============================================================
+// ELEMENTS
+// ============================================================
+
+const roomNameTop =
+    document.getElementById(
+        "room_name_top"
+    );
+
+
+const languageDirection =
+    document.getElementById(
+        "language_direction"
+    );
+
+
+const courseTitle =
+    document.getElementById(
+        "course_title"
+    );
+
+
+const coursePosition =
+    document.getElementById(
+        "course_position"
+    );
+
+
+const coveragePercentage =
+    document.getElementById(
+        "coverage_percentage"
+    );
+
+
+const coverageFill =
+    document.getElementById(
+        "coverage_fill"
+    );
+
+
+const statusBox =
+    document.getElementById(
+        "status"
+    );
+
+
+const targetCard =
+    document.getElementById(
+        "target_card"
+    );
+
+
+const targetExpression =
+    document.getElementById(
+        "target_expression"
+    );
+
+
+const targetTranslation =
+    document.getElementById(
+        "target_translation"
+    );
+
+
+const targetPronunciation =
+    document.getElementById(
+        "target_pronunciation"
+    );
+
+
+const targetLiteral =
+    document.getElementById(
+        "target_literal"
+    );
+
+
+const sectionsArea =
+    document.getElementById(
+        "dynamic_lesson_sections"
+    );
+
+
+const previousButton =
+    document.getElementById(
+        "previous_button"
+    );
+
+
+const nextButton =
+    document.getElementById(
+        "next_button"
+    );
+
+
+const backButton =
+    document.getElementById(
+        "back_button"
+    );
+
+
+const teacherInput =
+    document.getElementById(
+        "teacher_input"
+    );
+
+
+const teacherChat =
+    document.getElementById(
+        "teacher_chat"
+    );
+
+
+const askTeacherButton =
+    document.getElementById(
+        "ask_teacher_button"
+    );
+
+
+const practiceButton =
+    document.getElementById(
+        "practice_button"
+    );
+
+
+const generatedPracticeArea =
+    document.getElementById(
+        "generated_practice_area"
+    );
+
+
+
+// ============================================================
+// CURRENT PAGE STATE
+// ============================================================
+
+let currentLessonData = null;
+
+let busy = false;
+
+
+
+// ============================================================
+// INITIALIZE CLASSROOM
+// ============================================================
+
+async function initializeClassroom() {
+
+    try {
+
+        await machineMasterGPT.init();
+
+
+        const room =
+            machineMasterGPT
+                .getCurrentRoom();
+
+
+        if (!room) {
+
+            window.location.href =
+                "./welcome.html";
+
+            return;
+
+        }
+
+
+        renderRoomInformation(
+            room
+        );
+
+
+        renderTeacherChat();
+
+
+        await loadCurrentLesson();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+
+// ============================================================
+// LOAD CURRENT LESSON
+// ============================================================
+
+async function loadCurrentLesson() {
+
+    setBusy(true);
+
+
+    showStatus(
+        "Preparing your lesson...",
+        "loading"
+    );
+
+
+    try {
+
+        const result =
+            await machineMasterGPT
+                .generateCurrentPart();
+
+
+        currentLessonData =
+            result.lesson;
+
+
+        renderLesson(
+            currentLessonData
+        );
+
+
+        clearStatus();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        showStatus(
+            error.message ||
+            "Could not load the lesson.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        setBusy(false);
+
+    }
+
+}
+
+
+
+// ============================================================
+// RENDER ROOM INFORMATION
+// ============================================================
+
+function renderRoomInformation(
+    room
+) {
+
+    roomNameTop.textContent =
+        room.roomName || "";
+
+
+    languageDirection.textContent =
+
+        `${room.sourceLanguage} → ${room.targetLanguage}`;
+
+}
+
+
+
+// ============================================================
+// RENDER LESSON
+// ============================================================
+
+function renderLesson(
+    lessonData
+) {
+
+    if (!lessonData) {
+
+        showStatus(
+            "No lesson data was returned.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    sectionsArea.innerHTML =
+        "";
+
+
+    const lesson =
+        lessonData.lesson || {};
+
+
+    const target =
+        lessonData.target || {};
+
+
+    // ========================================================
+    // HEADER
+    // ========================================================
+
+    courseTitle.textContent =
+
+        lesson.title ||
+
+        lesson.main_target ||
+
+        `Lesson ${lesson.lesson_id || ""}`;
+
+
+    coursePosition.textContent =
+
+        `Standard ${lesson.standard ?? "—"} · ` +
+
+        `Lesson ${lesson.lesson_id ?? "—"} · ` +
+
+        `Part ${lesson.part_number ?? "—"}`;
+
+
+
+    // ========================================================
+    // TARGET
+    // ========================================================
+
+    if (
+        target.expression ||
+        target.translation
+    ) {
+
+        targetCard.classList.remove(
+            "hidden"
+        );
+
+
+        targetExpression.textContent =
+            target.expression || "";
+
+
+        targetTranslation.textContent =
+            target.translation || "";
+
+
+        targetPronunciation.textContent =
+
+            target.pronunciation
+                ? `Pronunciation: ${target.pronunciation}`
+                : "";
+
+
+        targetLiteral.textContent =
+
+            target.literal_meaning
+                ? `Literal meaning: ${target.literal_meaning}`
+                : "";
+
+    }
+
+    else {
+
+        targetCard.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+
+    // ========================================================
+    // INTRODUCTION
+    // ========================================================
+
+    if (lessonData.introduction) {
+
+        addTextSection(
+
+            "Lesson Explanation",
+
+            lessonData.introduction
+
+        );
+
+    }
+
+
+
+    // ========================================================
+    // WORD BREAKDOWN
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.word_breakdown
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Word Breakdown"
+            );
+
+
+        for (
+            const item
+            of lessonData.word_breakdown
+        ) {
+
+            const card =
+                createItemCard();
+
+
+            addItemTitle(
+                card,
+                item.word
+            );
+
+
+            if (item.meaning) {
+
+                addItemMeaning(
+                    card,
+                    item.meaning
+                );
+
+            }
+
+
+            if (item.role) {
+
+                addParagraph(
+                    card,
+                    item.role
+                );
+
+            }
+
+
+            if (item.explanation) {
+
+                addParagraph(
+                    card,
+                    item.explanation
+                );
+
+            }
+
+
+            if (
+                hasItems(
+                    item.examples
+                )
+            ) {
+
+                const examples =
+                    createExamples(
+                        item.examples
+                    );
+
+
+                card.appendChild(
+                    examples
+                );
+
+            }
+
+
+            section.appendChild(
+                card
+            );
+
+        }
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // PHRASE BREAKDOWN
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.phrase_breakdown
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Phrase Breakdown"
+            );
+
+
+        for (
+            const item
+            of lessonData.phrase_breakdown
+        ) {
+
+            const card =
+                createItemCard();
+
+
+            addItemTitle(
+                card,
+                item.phrase
+            );
+
+
+            addItemMeaning(
+                card,
+                item.meaning
+            );
+
+
+            addParagraph(
+                card,
+                item.explanation
+            );
+
+
+            section.appendChild(
+                card
+            );
+
+        }
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // GRAMMAR
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.grammar
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Grammar"
+            );
+
+
+        for (
+            const item
+            of lessonData.grammar
+        ) {
+
+            const card =
+                createItemCard();
+
+
+            addItemTitle(
+                card,
+                item.title
+            );
+
+
+            addParagraph(
+                card,
+                item.explanation
+            );
+
+
+            if (
+                hasItems(
+                    item.examples
+                )
+            ) {
+
+                card.appendChild(
+
+                    createExamples(
+                        item.examples
+                    )
+
+                );
+
+            }
+
+
+            section.appendChild(
+                card
+            );
+
+        }
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // PRONUNCIATION
+    // ========================================================
+
+    if (
+        lessonData.pronunciation &&
+        (
+            lessonData
+                .pronunciation
+                .guide ||
+
+            hasItems(
+                lessonData
+                    .pronunciation
+                    .important_points
+            )
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Pronunciation"
+            );
+
+
+        addParagraph(
+
+            section,
+
+            lessonData
+                .pronunciation
+                .guide
+
+        );
+
+
+        addBulletList(
+
+            section,
+
+            lessonData
+                .pronunciation
+                .important_points
+
+        );
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // USAGE NOTES
+    // ========================================================
+
+    renderSimpleObjectSection(
+
+        "Usage Notes",
+
+        lessonData.usage_notes
+
+    );
+
+
+
+    // ========================================================
+    // LANGUAGE COMPARISON
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.language_comparison
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Language Comparison"
+            );
+
+
+        for (
+            const item
+            of lessonData.language_comparison
+        ) {
+
+            const card =
+                createItemCard();
+
+
+            if (
+                item.source_language_point
+            ) {
+
+                addParagraph(
+                    card,
+                    item.source_language_point,
+                    true
+                );
+
+            }
+
+
+            if (
+                item.target_language_point
+            ) {
+
+                addParagraph(
+                    card,
+                    item.target_language_point,
+                    true
+                );
+
+            }
+
+
+            addParagraph(
+                card,
+                item.explanation
+            );
+
+
+            section.appendChild(
+                card
+            );
+
+        }
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // EXAMPLES
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.examples
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Examples"
+            );
+
+
+        section.appendChild(
+
+            createExamples(
+                lessonData.examples
+            )
+
+        );
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // DIALOGUE
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.dialogue
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Mini Conversation"
+            );
+
+
+        for (
+            const item
+            of lessonData.dialogue
+        ) {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "dialogue_line";
+
+
+            const speaker =
+                document.createElement(
+                    "div"
+                );
+
+
+            speaker.className =
+                "speaker";
+
+
+            speaker.textContent =
+                item.speaker || "•";
+
+
+            const content =
+                document.createElement(
+                    "div"
+                );
+
+
+            content.className =
+                "dialogue_content";
+
+
+            const targetText =
+                document.createElement(
+                    "div"
+                );
+
+
+            targetText.className =
+                "dialogue_target";
+
+            targetText.dir =
+                "auto";
+
+            targetText.textContent =
+                item.target || "";
+
+
+            content.appendChild(
+                targetText
+            );
+
+
+            if (item.source) {
+
+                const sourceText =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                sourceText.className =
+                    "dialogue_source";
+
+                sourceText.dir =
+                    "auto";
+
+                sourceText.textContent =
+                    item.source;
+
+
+                content.appendChild(
+                    sourceText
+                );
+
+            }
+
+
+            if (
+                item.pronunciation
+            ) {
+
+                const pronunciation =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                pronunciation.className =
+                    "example_pronunciation";
+
+                pronunciation.textContent =
+                    item.pronunciation;
+
+
+                content.appendChild(
+                    pronunciation
+                );
+
+            }
+
+
+            row.appendChild(
+                speaker
+            );
+
+
+            row.appendChild(
+                content
+            );
+
+
+            section.appendChild(
+                row
+            );
+
+        }
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // COMMON MISTAKES
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.common_mistakes
+        )
+    ) {
+
+        const section =
+            createSection(
+                "Common Mistakes"
+            );
+
+
+        for (
+            const item
+            of lessonData.common_mistakes
+        ) {
+
+            const card =
+                createItemCard();
+
+
+            if (item.wrong) {
+
+                addParagraph(
+
+                    card,
+
+                    `✗ ${item.wrong}`
+
+                );
+
+            }
+
+
+            if (item.correct) {
+
+                addParagraph(
+
+                    card,
+
+                    `✓ ${item.correct}`
+
+                );
+
+            }
+
+
+            addParagraph(
+                card,
+                item.explanation
+            );
+
+
+            section.appendChild(
+                card
+            );
+
+        }
+
+
+        sectionsArea.appendChild(
+            section
+        );
+
+    }
+
+
+
+    // ========================================================
+    // MEMORY TIP
+    // ========================================================
+
+    if (
+        lessonData.memory_tip
+    ) {
+
+        addTextSection(
+
+            "Memory Tip",
+
+            lessonData.memory_tip
+
+        );
+
+    }
+
+
+
+    // ========================================================
+    // LESSON PRACTICE
+    // ========================================================
+
+    if (
+        hasItems(
+            lessonData.practice
+        )
+    ) {
+
+        renderPracticeSection(
+
+            "Lesson Practice",
+
+            lessonData.practice,
+
+            sectionsArea
+
+        );
+
+    }
+
+
+
+    // ========================================================
+    // UPDATE PROGRESS
+    // ========================================================
+
+    renderProgress(
+
+        lessonData
+            .progress_recommendation
+
+    );
+
+
+    updateNavigation();
+
+}
+
+
+
+// ============================================================
+// PROGRESS
+// ============================================================
+
+function renderProgress(
+    recommendation
+) {
+
+    const coverage =
+        Math.min(
+            100,
+            Math.max(
+                0,
+                Number(
+                    recommendation
+                        ?.lesson_target_coverage
+                ) || 0
+            )
+        );
+
+
+    coveragePercentage.textContent =
+        `${coverage}%`;
+
+
+    coverageFill.style.width =
+        `${coverage}%`;
+
+}
+
+
+
+// ============================================================
+// NAVIGATION LABELS
+// ============================================================
+
+function updateNavigation() {
+
+    const position =
+        machineMasterGPT
+            .getCurrentPosition();
+
+
+    previousButton.disabled =
+        position.part <= 1;
+
+
+    const recommendation =
+        machineMasterGPT
+            .getProgressRecommendation();
+
+
+    if (
+        recommendation
+            ?.ready_to_complete_lesson
+    ) {
+
+        nextButton.textContent =
+            "Next Lesson →";
+
+    }
+
+    else {
+
+        nextButton.textContent =
+            "Next Part →";
+
+    }
+
+}
+
+
+
+// ============================================================
+// PREVIOUS
+// ============================================================
+
+async function handlePrevious() {
+
+    if (busy) {
+        return;
+    }
+
+
+    try {
+
+        const result =
+            machineMasterGPT
+                .previousPart();
+
+
+        if (!result) {
+
+            return;
+
+        }
+
+
+        if (!result.lesson) {
+
+            showStatus(
+                "This previous lesson part is not saved.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        currentLessonData =
+            result.lesson;
+
+
+        renderLesson(
+            currentLessonData
+        );
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+
+// ============================================================
+// NEXT
+// ============================================================
+
+async function handleNext() {
+
+    if (busy) {
+        return;
+    }
+
+
+    setBusy(true);
+
+
+    showStatus(
+        "Preparing the next lesson...",
+        "loading"
+    );
+
+
+    try {
+
+        const recommendation =
+            machineMasterGPT
+                .getProgressRecommendation();
+
+
+        let result;
+
+
+
+        // ====================================================
+        // GPT says main lesson has been adequately covered.
+        //
+        // GPT does NOT change the lesson.
+        //
+        // The user clicked Next, so the machine now performs
+        // the actual progression.
+        // ====================================================
+
+        if (
+            recommendation
+                ?.ready_to_complete_lesson
+        ) {
+
+            result =
+                await machineMasterGPT
+                    .nextLesson();
+
+        }
+
+        else {
+
+            // ================================================
+            // GPT may recommend moving to another curriculum
+            // part group.
+            // ================================================
+
+            if (
+                recommendation
+                    ?.current_part_group_complete &&
+
+                Number.isInteger(
+                    recommendation
+                        ?.recommended_next_part_group
+                )
+            ) {
+
+                machineMasterGPT.setPartGroup(
+
+                    recommendation
+                        .recommended_next_part_group
+
+                );
+
+            }
+
+
+            result =
+                await machineMasterGPT
+                    .nextPart();
+
+        }
+
+
+        currentLessonData =
+            result.lesson;
+
+
+        renderLesson(
+            currentLessonData
+        );
+
+
+        clearStatus();
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        showStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+    finally {
+
+        setBusy(false);
+
+    }
+
+}
+
+
+
+// ============================================================
+// ASK TEACHER
+// ============================================================
+
+async function handleAskTeacher() {
+
+    if (busy) {
+        return;
+    }
+
+
+    const message =
+        teacherInput
+            .value
+            .trim();
+
+
+    if (!message) {
+
+        return;
+
+    }
+
+
+    teacherInput.value =
+        "";
+
+
+    setBusy(true);
+
+
+    showStatus(
+        "Your teacher is answering...",
+        "loading"
+    );
+
+
+    try {
+
+        await machineMasterGPT
+            .askTeacher(
+                message
+            );
+
+
+        renderTeacherChat();
+
+
+        clearStatus();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        showStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+    finally {
+
+        setBusy(false);
+
+    }
+
+}
+
+
+
+// ============================================================
+// RENDER TEACHER CHAT
+// ============================================================
+
+function renderTeacherChat() {
+
+    const chat =
+        machineMasterGPT
+            .getChatHistory();
+
+
+    teacherChat.innerHTML =
+        "";
+
+
+    if (!chat.length) {
+
+        const text =
+            document.createElement(
+                "p"
+            );
+
+
+        text.textContent =
+            "Ask a question about the current lesson.";
+
+        text.style.color =
+            "#6b7280";
+
+
+        teacherChat.appendChild(
+            text
+        );
+
+
+        return;
+
+    }
+
+
+    for (
+        const message
+        of chat
+    ) {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.className =
+            "chat_message " +
+            (
+                message.role === "user"
+                    ? "chat_user"
+                    : "chat_assistant"
+            );
+
+
+        div.dir =
+            "auto";
+
+
+        div.textContent =
+            getChatText(
+                message.content
+            );
+
+
+        teacherChat.appendChild(
+            div
+        );
+
+    }
+
+
+    teacherChat.scrollTop =
+        teacherChat.scrollHeight;
+
+}
+
+
+
+// ============================================================
+// EXTRACT DISPLAYABLE CHAT ANSWER
+// ============================================================
+
+function getChatText(
+    content
+) {
+
+    if (
+        typeof content ===
+        "string"
+    ) {
+
+        return content;
+
+    }
+
+
+    if (
+        content &&
+        typeof content ===
+        "object"
+    ) {
+
+        if (content.answer) {
+
+            let text =
+                content.answer;
+
+
+            if (
+                Array.isArray(
+                    content.examples
+                ) &&
+                content.examples.length
+            ) {
+
+                text += "\n\n";
+
+
+                text +=
+                    content.examples
+                        .map(
+                            item =>
+                                `${item.target || ""} — ${item.source || ""}`
+                        )
+                        .join("\n");
+
+            }
+
+
+            return text;
+
+        }
+
+
+        return JSON.stringify(
+            content,
+            null,
+            2
+        );
+
+    }
+
+
+    return "";
+
+}
+
+
+
+// ============================================================
+// GENERATE EXTRA PRACTICE
+// ============================================================
+
+async function handleGeneratePractice() {
+
+    if (busy) {
+        return;
+    }
+
+
+    setBusy(true);
+
+
+    showStatus(
+        "Generating practice...",
+        "loading"
+    );
+
+
+    try {
+
+        const record =
+            await machineMasterGPT
+                .generatePractice({
+
+                    amount: 5,
+
+                    difficulty:
+                        "appropriate",
+
+                    practiceType:
+                        "mixed"
+
+                });
+
+
+        renderGeneratedPractice(
+            record.data
+        );
+
+
+        clearStatus();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        showStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+    finally {
+
+        setBusy(false);
+
+    }
+
+}
+
+
+
+// ============================================================
+// RENDER GENERATED PRACTICE
+// ============================================================
+
+function renderGeneratedPractice(
+    data
+) {
+
+    generatedPracticeArea.innerHTML =
+        "";
+
+
+    if (!data) {
+        return;
+    }
+
+
+    if (data.title) {
+
+        const title =
+            document.createElement(
+                "h3"
+            );
+
+
+        title.textContent =
+            data.title;
+
+
+        generatedPracticeArea
+            .appendChild(
+                title
+            );
+
+    }
+
+
+    if (data.instructions) {
+
+        addParagraph(
+
+            generatedPracticeArea,
+
+            data.instructions
+
+        );
+
+    }
+
+
+    if (
+        hasItems(
+            data.exercises
+        )
+    ) {
+
+        renderPracticeItems(
+
+            data.exercises,
+
+            generatedPracticeArea
+
+        );
+
+    }
+
+}
+
+
+
+// ============================================================
+// RENDER PRACTICE SECTION
+// ============================================================
+
+function renderPracticeSection(
+    title,
+    exercises,
+    parent
+) {
+
+    const section =
+        createSection(
+            title
+        );
+
+
+    renderPracticeItems(
+        exercises,
+        section
+    );
+
+
+    parent.appendChild(
+        section
+    );
+
+}
+
+
+
+// ============================================================
+// RENDER PRACTICE ITEMS
+// ============================================================
+
+function renderPracticeItems(
+    exercises,
+    parent
+) {
+
+    exercises.forEach(
+
+        (exercise, index) => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "practice_question";
+
+
+            const number =
+                document.createElement(
+                    "div"
+                );
+
+
+            number.className =
+                "practice_number";
+
+
+            number.textContent =
+                `Question ${index + 1}`;
+
+
+            card.appendChild(
+                number
+            );
+
+
+            if (
+                exercise.instruction
+            ) {
+
+                const instruction =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                instruction.className =
+                    "practice_instruction";
+
+                instruction.dir =
+                    "auto";
+
+                instruction.textContent =
+                    exercise.instruction;
+
+
+                card.appendChild(
+                    instruction
+                );
+
+            }
+
+
+            if (
+                exercise.question
+            ) {
+
+                const question =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                question.dir =
+                    "auto";
+
+                question.textContent =
+                    exercise.question;
+
+
+                card.appendChild(
+                    question
+                );
+
+            }
+
+
+            if (
+                hasItems(
+                    exercise.options
+                )
+            ) {
+
+                const options =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                options.className =
+                    "practice_options";
+
+
+                for (
+                    const option
+                    of exercise.options
+                ) {
+
+                    const button =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    button.className =
+                        "practice_option";
+
+                    button.dir =
+                        "auto";
+
+                    button.textContent =
+                        option;
+
+
+                    options.appendChild(
+                        button
+                    );
+
+                }
+
+
+                card.appendChild(
+                    options
+                );
+
+            }
+
+
+
+            const showAnswer =
+                document.createElement(
+                    "button"
+                );
+
+
+            showAnswer.className =
+                "show_answer_button";
+
+            showAnswer.textContent =
+                "Show Answer";
+
+
+
+            const answer =
+                document.createElement(
+                    "div"
+                );
+
+
+            answer.className =
+                "practice_answer";
+
+            answer.dir =
+                "auto";
+
+
+            answer.textContent =
+
+                exercise.answer
+                    ? `Answer: ${exercise.answer}`
+                    : "Answer not provided.";
+
+
+            if (
+                exercise.explanation
+            ) {
+
+                answer.textContent +=
+
+                    `\n${exercise.explanation}`;
+
+            }
+
+
+            showAnswer.addEventListener(
+
+                "click",
+
+                () => {
+
+                    answer.classList
+                        .toggle(
+                            "visible"
+                        );
+
+
+                    showAnswer.textContent =
+
+                        answer.classList
+                            .contains(
+                                "visible"
+                            )
+
+                            ? "Hide Answer"
+
+                            : "Show Answer";
+
+                }
+
+            );
+
+
+            card.appendChild(
+                showAnswer
+            );
+
+
+            card.appendChild(
+                answer
+            );
+
+
+            parent.appendChild(
+                card
+            );
+
+        }
+
+    );
+
+}
+
+
+
+// ============================================================
+// SIMPLE OBJECT SECTION
+// ============================================================
+
+function renderSimpleObjectSection(
+    title,
+    items
+) {
+
+    if (!hasItems(items)) {
+
+        return;
+
+    }
+
+
+    const section =
+        createSection(
+            title
+        );
+
+
+    for (
+        const item
+        of items
+    ) {
+
+        const card =
+            createItemCard();
+
+
+        addItemTitle(
+            card,
+            item.title
+        );
+
+
+        addParagraph(
+            card,
+            item.explanation
+        );
+
+
+        section.appendChild(
+            card
+        );
+
+    }
+
+
+    sectionsArea.appendChild(
+        section
+    );
+
+}
+
+
+
+// ============================================================
+// CREATE EXAMPLES
+// ============================================================
+
+function createExamples(
+    examples
+) {
+
+    const container =
+        document.createElement(
+            "div"
+        );
+
+
+    for (
+        const item
+        of examples
+    ) {
+
+        const example =
+            document.createElement(
+                "div"
+            );
+
+
+        example.className =
+            "example";
+
+
+        if (item.target) {
+
+            const target =
+                document.createElement(
+                    "div"
+                );
+
+
+            target.className =
+                "example_target";
+
+            target.dir =
+                "auto";
+
+            target.textContent =
+                item.target;
+
+
+            example.appendChild(
+                target
+            );
+
+        }
+
+
+        if (item.source) {
+
+            const source =
+                document.createElement(
+                    "div"
+                );
+
+
+            source.className =
+                "example_source";
+
+            source.dir =
+                "auto";
+
+            source.textContent =
+                item.source;
+
+
+            example.appendChild(
+                source
+            );
+
+        }
+
+
+        if (
+            item.pronunciation
+        ) {
+
+            const pronunciation =
+                document.createElement(
+                    "div"
+                );
+
+
+            pronunciation.className =
+                "example_pronunciation";
+
+            pronunciation.dir =
+                "auto";
+
+            pronunciation.textContent =
+                item.pronunciation;
+
+
+            example.appendChild(
+                pronunciation
+            );
+
+        }
+
+
+        if (item.note) {
+
+            const note =
+                document.createElement(
+                    "div"
+                );
+
+
+            note.className =
+                "example_pronunciation";
+
+            note.dir =
+                "auto";
+
+            note.textContent =
+                item.note;
+
+
+            example.appendChild(
+                note
+            );
+
+        }
+
+
+        container.appendChild(
+            example
+        );
+
+    }
+
+
+    return container;
+
+}
+
+
+
+// ============================================================
+// SECTION HELPERS
+// ============================================================
+
+function createSection(
+    title
+) {
+
+    const section =
+        document.createElement(
+            "section"
+        );
+
+
+    section.className =
+        "lesson_section";
+
+
+    const heading =
+        document.createElement(
+            "h2"
+        );
+
+
+    heading.textContent =
+        title;
+
+
+    section.appendChild(
+        heading
+    );
+
+
+    return section;
+
+}
+
+
+
+function addTextSection(
+    title,
+    text
+) {
+
+    if (!text) {
+        return;
+    }
+
+
+    const section =
+        createSection(
+            title
+        );
+
+
+    addParagraph(
+        section,
+        text
+    );
+
+
+    sectionsArea.appendChild(
+        section
+    );
+
+}
+
+
+
+function createItemCard() {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.className =
+        "item_card";
+
+
+    return card;
+
+}
+
+
+
+function addItemTitle(
+    parent,
+    text
+) {
+
+    if (!text) {
+        return;
+    }
+
+
+    const element =
+        document.createElement(
+            "div"
+        );
+
+
+    element.className =
+        "item_title";
+
+    element.dir =
+        "auto";
+
+    element.textContent =
+        text;
+
+
+    parent.appendChild(
+        element
+    );
+
+}
+
+
+
+function addItemMeaning(
+    parent,
+    text
+) {
+
+    if (!text) {
+        return;
+    }
+
+
+    const element =
+        document.createElement(
+            "div"
+        );
+
+
+    element.className =
+        "item_meaning";
+
+    element.dir =
+        "auto";
+
+    element.textContent =
+        text;
+
+
+    parent.appendChild(
+        element
+    );
+
+}
+
+
+
+function addParagraph(
+    parent,
+    text,
+    bold = false
+) {
+
+    if (!text) {
+        return;
+    }
+
+
+    const p =
+        document.createElement(
+            "p"
+        );
+
+
+    p.dir =
+        "auto";
+
+    p.textContent =
+        text;
+
+
+    if (bold) {
+
+        p.style.fontWeight =
+            "bold";
+
+    }
+
+
+    parent.appendChild(
+        p
+    );
+
+}
+
+
+
+function addBulletList(
+    parent,
+    items
+) {
+
+    if (!hasItems(items)) {
+
+        return;
+
+    }
+
+
+    const ul =
+        document.createElement(
+            "ul"
+        );
+
+
+    for (
+        const item
+        of items
+    ) {
+
+        const li =
+            document.createElement(
+                "li"
+            );
+
+
+        li.dir =
+            "auto";
+
+        li.textContent =
+            item;
+
+
+        li.style.marginBottom =
+            "8px";
+
+
+        ul.appendChild(
+            li
+        );
+
+    }
+
+
+    parent.appendChild(
+        ul
+    );
+
+}
+
+
+
+function hasItems(value) {
+
+    return (
+        Array.isArray(value) &&
+        value.length > 0
+    );
+
+}
+
+
+
+// ============================================================
+// BUSY STATE
+// ============================================================
+
+function setBusy(
+    value
+) {
+
+    busy =
+        value;
+
+
+    previousButton.disabled =
+        value;
+
+
+    nextButton.disabled =
+        value;
+
+
+    askTeacherButton.disabled =
+        value;
+
+
+    practiceButton.disabled =
+        value;
+
+
+    if (!value) {
+
+        updateNavigation();
+
+    }
+
+}
+
+
+
+// ============================================================
+// STATUS
+// ============================================================
+
+function showStatus(
+    message,
+    type
+) {
+
+    statusBox.textContent =
+        message;
+
+
+    statusBox.className =
+        type;
+
+}
+
+
+
+function clearStatus() {
+
+    statusBox.textContent =
+        "";
+
+    statusBox.className =
+        "";
+
+}
+
+
+
+// ============================================================
+// EVENTS
+// ============================================================
+
+previousButton
+    .addEventListener(
+        "click",
+        handlePrevious
+    );
+
+
+nextButton
+    .addEventListener(
+        "click",
+        handleNext
+    );
+
+
+askTeacherButton
+    .addEventListener(
+        "click",
+        handleAskTeacher
+    );
+
+
+practiceButton
+    .addEventListener(
+        "click",
+        handleGeneratePractice
+    );
+
+
+backButton
+    .addEventListener(
+
+        "click",
+
+        () => {
+
+            window.location.href =
+                "./welcome.html";
+
+        }
+
+    );
+
+
+
+teacherInput
+    .addEventListener(
+
+        "keydown",
+
+        event => {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+
+                handleAskTeacher();
+
+            }
+
+        }
+
+    );
+
+
+
+// ============================================================
+// START CLASSROOM
+// ============================================================
+
+initializeClassroom();
+
+
+</script>
+
+
+</body>
+
+</html>
